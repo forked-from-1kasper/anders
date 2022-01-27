@@ -137,10 +137,11 @@ sys     0m0.670s
 ```
 
 ```
-$ time for i in library/* ; do ./anders.native check $i ; done
-real    0m2.085s
-user    0m1.982s
-sys     0m0.105s
+$ time ./anders.native check library/library.anders
+
+real    0m0.435s
+user    0m0.435s
+sys     0m0.000s
 ```
 
 Acknowledgements

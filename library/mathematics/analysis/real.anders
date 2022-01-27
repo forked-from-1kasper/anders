@@ -57,8 +57,7 @@ def convex-body : U₁ :=
     Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
       Path A (a zero) (M x)), U
 
-def isSingleton (A: U) : U := Π (a: A), Σ (x: A), Path A a x
-def ∃! (A : U) (B : A -> U) : U := isSingleton (Σ (x: A), B x)
+def ∃! (A : U) (B : A -> U) : U := isContr (Σ (x: A), B x)
 
 def Interval-Object : U₁ :=
   Σ (J : convex-body) (u v : J.A),

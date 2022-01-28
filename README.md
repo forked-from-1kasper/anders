@@ -137,11 +137,11 @@ sys     0m0.670s
 ```
 
 ```
-$ time ./anders.native check library/library.anders
+$ time ./anders.native check library/book.anders
 
-real    0m0.435s
-user    0m0.435s
-sys     0m0.000s
+real    0m0.375s
+user    0m0.355s
+sys     0m0.020s
 ```
 
 Acknowledgements

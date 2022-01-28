@@ -1,14 +1,14 @@
-module library where
-import library/foundations/mltt/bool
-import library/foundations/mltt/induction
-import library/foundations/mltt/list
+module book where
 import library/foundations/mltt/pi
 import library/foundations/mltt/sigma
-import library/foundations/mltt/nat
-import library/foundations/mltt/fin
-import library/foundations/mltt/vec
+import library/foundations/mltt/induction
+import library/foundations/mltt/bool
 import library/foundations/mltt/either
 import library/foundations/mltt/maybe
+import library/foundations/mltt/nat
+import library/foundations/mltt/list
+import library/foundations/mltt/fin
+import library/foundations/mltt/vec
 import library/foundations/univalent/path
 import library/foundations/univalent/prop
 import library/foundations/univalent/equiv

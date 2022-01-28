@@ -1,0 +1,7 @@
+module either where
+
+def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
+def inl (A B : U) (a : A) : + A B := (0₂, a)
+def inr (A B : U) (b : B) : + A B := (1₂, b)
+def +-ind (A B : U) (C : + A B → U) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) (w : + A B) : C w
+ := ind₂ (λ (x : 𝟐), Π (u : ind₂ (λ (_ : 𝟐), U) A B x), C (x, u)) f g w.1 w.2

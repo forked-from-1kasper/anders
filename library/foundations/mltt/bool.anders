@@ -1,4 +1,4 @@
-{- Run-time Bool Type:
+{- Run-time Homotopy-inductive types:
    - Bool type (0-Sphere).
    - Theorems are in bool_theory module.
 

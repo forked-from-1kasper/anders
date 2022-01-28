@@ -1,3 +1,11 @@
+{- Run-time Homotopy-inductive types:
+   - Nat type.
+
+   HoTT 5.3 W-Types
+   HoTT 5.5 Homotopy-inductive types
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
 module nat where
 import library/foundations/mltt/induction
 
@@ -21,10 +29,8 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ : ℕ), C) z s
 def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
 def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
-
 def plus : ℕ → ℕ → ℕ := ℕ-iter (ℕ → ℕ) (idfun ℕ) (∘ ℕ ℕ ℕ succ)
 def mult : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(_: ℕ), zero) (\(_: ℕ) (x: ℕ → ℕ) (m: ℕ), plus m (x m))
-
 def one : ℕ := succ zero
 def two : ℕ := succ one
 def three : ℕ := succ two

@@ -9,8 +9,8 @@
 module nat where
 import library/foundations/mltt/induction
 
-def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
+def ℕ := W (x : 𝟐), ℕ-ctor x
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 

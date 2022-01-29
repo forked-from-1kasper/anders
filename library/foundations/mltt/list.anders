@@ -29,3 +29,14 @@ def List-ind (A: U) (C: List A -> U) (z: C (nil A)) (s: Π (x: A) (xs: List A), 
 def List-rec  (A: U) (C : U) (z : C) (s : A → List A → C → C) : List A → C := List-ind A (λ (_: List A), C) z s
 def List-iter (A: U) (C : U) (z : C) (s : A → C → C) : List A → C := List-rec A C z (λ (x: A) (_: List A), s x)
 def List-case (A: U) (C : U) (z : C) (s : A → C) : List A → C := List-iter A C z (λ (x : A) (_: C), s x)
+
+def head (A: U): List A → Maybe A
+ := List-case A (Maybe A) (nothing A) (λ(x: A), just A x)
+
+def tail (A: U): List A → Maybe (List A)
+ := List-ind A (λ (_: List A), Maybe (List A))
+               (nothing (List A))
+               (λ (a: A) (x: List A) (_: Maybe (List A)), just (List A) x)
+
+
+

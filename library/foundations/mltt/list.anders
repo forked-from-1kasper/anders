@@ -9,3 +9,4 @@ option girard true
 def List (A: U) := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
 def List-ctor (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
 def nil (A: U) : List A := sup (Maybe A) (List-ctor A) (nothing A) (ind₀ (List A))
+def cons (A: U) (x : A) (xs: List A) : List A := sup (Maybe A) (List-ctor A) (just A x) (λ (x : 𝟏), xs)

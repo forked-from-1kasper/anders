@@ -1,5 +1,5 @@
 {- MLTT Reality Check:
-   - Empty, Pi, Sigma, Equ, W.
+   - Empty, Pi, Sigma, Equ.
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module mltt where

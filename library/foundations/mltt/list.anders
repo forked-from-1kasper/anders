@@ -1,5 +1,8 @@
 {- Run-Time List Type:
    - List;
+
+   HoTT 5.3 W-Types
+
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module list where

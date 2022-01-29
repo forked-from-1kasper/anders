@@ -1,7 +1,11 @@
 {- Run-Time List Type:
    - List;
-   - Polymorphic funtions.
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module list where
-import library/foundations/mltt/bool
+import library/foundations/mltt/maybe
+option girard true
+
+def List (A: U) := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
+def List-ctor (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+def nil (A: U) : List A := sup (Maybe A) (List-ctor A) (nothing A) (ind₀ (List A))

@@ -27,6 +27,13 @@ type exp =
   | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp        (* Disc *)
 ```
 
+Anders is a HoTT theorem prover based on: classical MLTT-80 with 0, 1, 2, W types;
+CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
+HTS sctrict equality on pretypes; de Rham stack modality primitives.
+We tend not to touch general recursive higher inductive schemes yet,
+instead we will try to express as much HIT as possible through W,
+Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
+
 Features
 --------
 
@@ -47,7 +54,7 @@ Features
 * Lean syntax for ΠΣW
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
-* Groupoid Infinity CCHM base library: https://groupoid.space/math
+* Groupoid Infinity CCHM base library: https://groupoid.space/misc/library/
 * Best suited for academic papers and fast type checking
 
 Setup

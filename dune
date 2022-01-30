@@ -1,7 +1,7 @@
 (env (dev (flags (:standard -warn-error -A))))
 
 (install (files library/foundations/mltt/bool.anders
-                library/foundations/mltt/induction.anders
+                library/foundations/mltt/inductive.anders
                 library/foundations/mltt/list.anders
                 library/foundations/mltt/pi.anders
                 library/foundations/mltt/sigma.anders

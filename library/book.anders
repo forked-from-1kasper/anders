@@ -1,7 +1,7 @@
 module book where
 import library/foundations/mltt/pi
 import library/foundations/mltt/sigma
-import library/foundations/mltt/induction
+import library/foundations/mltt/inductive
 import library/foundations/mltt/bool
 import library/foundations/mltt/either
 import library/foundations/mltt/maybe

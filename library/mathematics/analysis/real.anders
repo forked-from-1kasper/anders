@@ -32,7 +32,7 @@
 
 module real where
 import library/foundations/univalent/path
-import library/foundations/mltt/induction
+import library/foundations/mltt/inductive
 
 def ≤₂ (a b : 𝟐) : U := Path 𝟐 a 0₂ → Path 𝟐 b 1₂
 def is-decreasing (α : ℕ → 𝟐) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)

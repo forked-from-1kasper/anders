@@ -1,5 +1,5 @@
 module KGn where
-import library/foundations/mltt/induction
+import library/foundations/mltt/inductive
 import library/mathematics/algebra/algebra
 import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/truncation

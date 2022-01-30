@@ -14,7 +14,7 @@
 
 module coequalizer where
 import library/foundations/univalent/equiv
-import library/foundations/mltt/induction
+import library/foundations/mltt/inductive
 
 
 -- [1]. Nicolai Kraus, Jakob von Raumer.

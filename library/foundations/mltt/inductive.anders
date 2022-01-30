@@ -1,4 +1,4 @@
-module induction where
+module inductive where
 import library/foundations/univalent/path
 option girard true
 
@@ -38,6 +38,11 @@ def trans-W-is-correct (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : 
   : Path (W (x : A 1), B 1 x) (trans-W A B a f) (trans-W′ A B a f)
  := <_> trans-W A B a f
 
+def hcomp-W′ (A : U) (B : A → U) (r : I) (a : I → Partial A r)
+    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
+ := hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀))
+
 -- def hcomp-W (A : U) (B : A → U) (r : I) (a : I → Partial A r)
 --     (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
 --     (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
@@ -45,9 +50,5 @@ def trans-W-is-correct (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : 
 --             (hcomp (B (hcomp A r a (ouc a₀)) → (W (x : A), B x)) r
 --                    (λ (i : I), [(r = 1) → λ (b : B (a 1 1=1)), (f i 1=1) (transp (<j> B (a (-j ∨ i) 1=1)) 0 b)]) ?)
 
-def hcomp-W′ (A : U) (B : A → U) (r : I) (a : I → Partial A r)
-    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
-    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
- := hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀))
 
 

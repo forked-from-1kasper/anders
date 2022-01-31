@@ -1,9 +1,8 @@
-{- Topos Theory:
+{- Topos Theory: https://groupoid.space/mathematics/topoi/topos
    - Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC;
    - setSig, setPi, SET, Path;
    - Topos, Set Topos.
-
-   https://groupoid.space/math/topos/
+   
    http://www.ams.org/notices/200409/what-is-illusie.pdf
 
    Copyright (c) Groupoid Infinity, 2014-2022. -}

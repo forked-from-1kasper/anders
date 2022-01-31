@@ -1,4 +1,4 @@
-{- Run-time Homotopy-inductive types:
+{- Run-time Homotopy-inductive types: https://groupoid.space/foundations/mltt/nat/
    - Nat type.
 
    HoTT 5.3 W-Types

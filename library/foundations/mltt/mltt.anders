@@ -1,5 +1,6 @@
-{- MLTT Reality Check:
+{- MLTT Reality Check: https://groupoid.space/articles/mltt/mltt.pdf
    - Pi, Sigma, Path.
+
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module mltt where

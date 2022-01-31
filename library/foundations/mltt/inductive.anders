@@ -1,3 +1,10 @@
+{- Inductive Basis: https://groupoid.space/foundations/mltt/inductive/
+   - 0, 1, 2, W types;
+
+   HoTT 5.3 W-Types
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
 module inductive where
 import library/foundations/univalent/path
 option girard true

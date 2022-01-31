@@ -53,8 +53,8 @@ let intersectionWith f =
 
 module Files = Set.Make(String)
 
-let inc : int ref = ref 0
-let gen () = inc := !inc + 1; !inc
+let gidx : int ref = ref 0
+let gen () = gidx := !gidx + 1; !gidx
 
 let fresh : name -> name = function
   | Irrefutable -> Irrefutable | Name (p, _) -> Name (p, gen ())

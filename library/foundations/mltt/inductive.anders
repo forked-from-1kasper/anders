@@ -19,6 +19,10 @@ option girard true
 def 0-ind (C: 𝟎 → U) (z: 𝟎) : C z := ind₀ (C z) z
 def 1-ind (C: 𝟏 → U) (x: C ★) (z: 𝟏) : C z := ind₁ C x z
 def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) (z: 𝟐) : C z := ind₂ C x y z
+
+def W' (A: U) (B: A → U): U := W (x: A), B x
+def sup' (A: U) (B: A → U) (x: A) (f: B x → W' A B) : W' A B := sup A B x f
+
 def W-ind (A : U) (B : A → U) (C : (W (x : A), B x) → U)
     (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
     (a : A) (f : B a → (W (x : A), B x)) (b : B a) : C (f b) := indᵂ A B C g (f b)

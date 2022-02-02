@@ -1,4 +1,5 @@
-%{ open Formula
+%{ open Language.Spec
+   open Formula
    open Module
    open Ident
    open Elab

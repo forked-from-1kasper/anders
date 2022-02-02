@@ -1,9 +1,9 @@
+open Language.Spec
 open Prettyprinter
 open Reader
 open Module
-open Ident
 open Error
-open Expr
+open Ident
 
 let fail x = raise (ExtractionError x)
 

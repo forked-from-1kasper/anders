@@ -1,3 +1,4 @@
+open Language.Spec
 open Ident
 open Expr
 

@@ -1,48 +1,8 @@
-type name =
-  | Irrefutable
-  | Name of string * int
+open Language.Spec
 
 let showName : name -> string = function
   | Irrefutable -> "_"
   | Name (p, n) -> if !Prefs.indices then p ^ "#" ^ string_of_int n else p
-
-module Name =
-struct
-  type t = name
-  let compare x y =
-    match (x, y) with
-    | Irrefutable, Irrefutable -> 0
-    | Irrefutable, Name _ -> -1
-    | Name _, Irrefutable -> 1
-    | Name (p, a), Name (q, b) ->
-      if p = q then compare a b
-      else compare p q
-end
-
-module Env = Map.Make(Name)
-type dir   = Zero | One
-type face  = dir Env.t
-
-let negDir : dir -> dir = function
-  | Zero -> One | One -> Zero
-
-module Dir =
-struct
-  type t = dir
-  let compare a b =
-    match a, b with
-    | One, Zero -> 1
-    | Zero, One -> -1
-    | _, _      -> 0
-end
-
-module Face =
-struct
-  type t = face
-  let compare = Env.compare Dir.compare
-end
-
-module System = Map.Make(Face)
 
 let keys ts = List.of_seq (Seq.map fst (System.to_seq ts))
 let intersectionWith f =

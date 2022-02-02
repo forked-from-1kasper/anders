@@ -1,3 +1,4 @@
+open Language.Spec
 open Prelude
 open Ident
 open Error

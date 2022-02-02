@@ -1,3 +1,4 @@
+open Language.Spec
 open Prettyprinter
 open Ident
 open Expr

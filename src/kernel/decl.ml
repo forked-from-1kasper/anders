@@ -1,3 +1,4 @@
+open Language.Spec
 open Module
 open Check
 open Error

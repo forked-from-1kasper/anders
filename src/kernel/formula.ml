@@ -1,7 +1,11 @@
+open Language.Spec
 open Prettyprinter
 open Ident
 open Error
 open Expr
+
+let negDir : dir -> dir = function
+  | Zero -> One | One -> Zero
 
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),

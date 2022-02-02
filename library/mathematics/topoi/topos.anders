@@ -1,4 +1,4 @@
-{- Topos Theory: https://groupoid.space/mathematics/topoi/topos
+{- Topos Theory: https://homotopy.dev/mathematics/topoi/topos
    - Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC;
    - setSig, setPi, SET, Path;
    - Topos, Set Topos.

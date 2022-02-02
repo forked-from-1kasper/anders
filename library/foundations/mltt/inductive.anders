@@ -1,4 +1,4 @@
-{- Inductive Basis: https://groupoid.space/foundations/mltt/inductive/
+{- Inductive Basis: https://homotopy.dev/foundations/mltt/inductive/
    - 0, 1, 2, W types;
 
    HoTT 5.3 W-Types

@@ -1,7 +1,8 @@
 open Language.Spec
 open Prettyprinter
-open Ident
-open Expr
+open Prefs
+open Term
+open Gen
 
 exception Restart
 exception IncompatibleFaces
@@ -20,7 +21,7 @@ exception UnknownOption of string
 exception ExpectedNeutral of value
 exception ExpectedFibrant of value
 exception UnknownCommand of string
-exception VariableNotFound of name
+exception VariableNotFound of ident
 exception ExtractionError of string
 exception AlreadyDeclared of string
 exception UnknownPrimitive of string
@@ -36,7 +37,7 @@ let prettyPrintError : exn -> unit = function
   | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showValue e)
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
   | InferError e -> Printf.printf "Cannot infer type of\n  %s\n" (showExp e)
-  | VariableNotFound p -> Printf.printf "Variable %s was not found\n" (showName p)
+  | VariableNotFound p -> Printf.printf "Variable %s was not found\n" (showIdent p)
   | InvalidModuleName (name, filename) -> Printf.printf "Module “%s” does not match name of its file: %s\n" name filename
   | ExpectedESet x -> Printf.printf "  %s\nexpected to be universe\n" (showExp x)
   | ExpectedVSet x -> Printf.printf "  %s\nexpected to be universe\n" (showValue x)

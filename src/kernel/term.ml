@@ -1,6 +1,6 @@
 open Language.Spec
 
-type tele = name * exp
+type tele = ident * exp
 
 type scope = Local | Global
 
@@ -8,7 +8,7 @@ type scope = Local | Global
 
 type value =
   | VKan of Z.t | VPre of Z.t
-  | Var of name * value | VHole
+  | Var of ident * value | VHole
   | VPi of value * clos | VLam of value * clos | VApp of value * value
   | VSig of value * clos | VPair of tag * value * value | VFst of value | VSnd of value
   | VId of value | VRef of value | VJ of value
@@ -24,7 +24,7 @@ type value =
   | W of value * clos | VSup of value * value | VIndW of value * value * value
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
-and clos = name * (value -> value)
+and clos = ident * (value -> value)
 
 type term = Exp of exp | Value of value
 
@@ -50,12 +50,12 @@ let vone  = VDir One
 let isOne i = VApp (VApp (VId VI, VDir One), i)
 let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
 
-let name x = Name (x, 0)
-let decl x = EVar (name x)
+let ident x = Ident (x, 0L)
+let decl x = EVar (ident x)
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
-let upLocal (ctx : ctx) (p : name) t v = upVar p (Local, Value t, Value v) ctx
-let upGlobal (ctx : ctx) (p : name) t v = upVar p (Global, Value t, Value v) ctx
+let upLocal (ctx : ctx) (p : ident) t v = upVar p (Local, Value t, Value v) ctx
+let upGlobal (ctx : ctx) (p : ident) t v = upVar p (Global, Value t, Value v) ctx
 
 let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n

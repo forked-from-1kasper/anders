@@ -1,21 +1,21 @@
-type name =
+type ident =
   | Irrefutable
-  | Name of string * int
+  | Ident of string * int64
 
-module Name =
+module Ident =
 struct
-  type t = name
+  type t = ident
   let compare x y =
     match (x, y) with
     | Irrefutable, Irrefutable -> 0
-    | Irrefutable, Name _ -> -1
-    | Name _, Irrefutable -> 1
-    | Name (p, a), Name (q, b) ->
+    | Irrefutable, Ident _ -> -1
+    | Ident _, Irrefutable -> 1
+    | Ident (p, a), Ident (q, b) ->
       if p = q then compare a b
       else compare p q
 end
 
-module Env = Map.Make(Name)
+module Env = Map.Make(Ident)
 
 type dir = Zero | One
 
@@ -45,9 +45,9 @@ type tag = (string option) ref
 
 type exp =
   | EPre of Z.t | EKan of Z.t                                                          (* cosmos *)
-  | EVar of name | EHole                                                            (* variables *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp             (* pi *)
-  | ESig of exp * (name * exp) | EPair of tag * exp * exp                               (* sigma *)
+  | EVar of ident | EHole                                                           (* variables *)
+  | EPi of exp * (ident * exp) | ELam of exp * (ident * exp) | EApp of exp * exp           (* pi *)
+  | ESig of exp * (ident * exp) | EPair of tag * exp * exp                              (* sigma *)
   | EFst of exp | ESnd of exp | EField of exp * string                    (* simga elims/records *)
   | EId of exp | ERef of exp | EJ of exp                                      (* strict equality *)
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* path equality *)
@@ -59,7 +59,7 @@ type exp =
   | EEmpty | EIndEmpty of exp                                                               (* 𝟎 *)
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
-  | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp                 (* W *)
+  | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp * exp * exp                (* W *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
 
 type extension =

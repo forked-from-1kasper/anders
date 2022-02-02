@@ -4,9 +4,9 @@ open Formula
 open Prelude
 open Error
 open Trace
-open Ident
 open Elab
-open Expr
+open Term
+open Gen
 
 (* Evaluator *)
 let rec eval ctx e0 = traceEval e0; match e0 with
@@ -104,7 +104,7 @@ and transport i p phi u0 = match p, phi, u0 with
   (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
      λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x -i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)
-  | VPi (t, (_, b)), _, _ -> let x = fresh (name "x") in
+  | VPi (t, (_, b)), _, _ -> let x = fresh (ident "x") in
   let j = freshName "ι" in let k = freshName "κ" in
     VLam (act0 i vone t, (x, fun x ->
       let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
@@ -565,7 +565,7 @@ and check ctx (e0 : exp) (t0 : value) =
     ignore (extSet (inferV t)); check ctx e1 t;
     check ctx e2 (g (eval ctx e1));
     begin match p with
-      | Name (v, _) -> r := Some v
+      | Ident (v, _) -> r := Some v
       | Irrefutable -> ()
     end
   | EHole, v -> traceHole v ctx

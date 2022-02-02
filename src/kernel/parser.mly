@@ -1,9 +1,10 @@
 %{ open Language.Spec
    open Formula
    open Module
-   open Ident
+   open Prefs
    open Elab
-   open Expr
+   open Term
+   open Gen
 
   let getVar x =
     let xs = [(!intervalPrim, EI);
@@ -21,14 +22,14 @@
     | []           -> e
     | (p, a) :: xs -> ctor p a (telescope ctor e xs)
 
-  let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
+  let rec pLam e : ident list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
 
   type formula =
     | Falsehood
-    | Equation of name * dir
+    | Equation of ident * dir
     | Truth
 
-  let extEquation : formula -> name * dir = function
+  let extEquation : formula -> ident * dir = function
     | Equation (x, d) -> (x, d)
     | _               -> raise (Failure "extEquation")
 
@@ -76,7 +77,7 @@
 
 %%
 
-ident : IRREF { Irrefutable } | IDENT { name $1 }
+ident : IRREF { Irrefutable } | IDENT { ident $1 }
 vars : ident+ { $1 }
 lense : LPARENS vars COLON exp2 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }

@@ -1,8 +1,8 @@
 open Language.Spec
 open Prelude
-open Ident
 open Error
-open Expr
+open Term
+open Gen
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
@@ -103,7 +103,7 @@ let rec getField p v = function
     else getField p (vsnd v) (g (vfst v))
   | t -> raise (ExpectedSig t)
 
-let rec salt (ns : name Env.t) : exp -> exp = function
+let rec salt (ns : ident Env.t) : exp -> exp = function
   | ELam (a, (p, b))     -> saltTele eLam ns p a b
   | EKan n               -> EKan n
   | EPi (a, (p, b))      -> saltTele ePi ns p a b

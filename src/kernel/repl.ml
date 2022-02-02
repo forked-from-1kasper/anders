@@ -3,7 +3,7 @@ open Module
 open Error
 open Decl
 open Elab
-open Expr
+open Term
 
 let help =
 "Available commands:

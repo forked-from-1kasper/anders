@@ -3,7 +3,7 @@ open Prettyprinter
 open Reader
 open Module
 open Error
-open Ident
+open Gen
 
 let fail x = raise (ExtractionError x)
 
@@ -28,7 +28,7 @@ let rec extractExp : exp -> string = function
   | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)
   | EApp (EApp (EPathP p, a), b) -> Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
   | EApp (EApp (EGlue t, _), u) -> Printf.sprintf "Glue %s %s" (extractExp t) (extractExp u)
-  | EPLam (ELam (EI, (p, e))) -> Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
+  | EPLam (ELam (EI, (p, e))) -> Printf.sprintf "(<%s> %s)" (showIdent p) (extractExp e)
   | EPLam _ -> fail "invalid path lambda (should never happen)"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (extractExp f) (extractExp x)
   | EDir d -> showDir d
@@ -43,9 +43,9 @@ let rec extractExp : exp -> string = function
   | ESnd exp -> extractExp exp ^ ".2"
   | EField _ -> fail "cubicaltt does not support named sigma accessors"
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (extractExp f) (extractExp x)
-  | EVar p -> showName p
+  | EVar p -> showIdent p
   | EHole -> "?"
-and extractTele p x = Printf.sprintf "(%s : %s)" (showName p) (extractExp x)
+and extractTele p x = Printf.sprintf "(%s : %s)" (showIdent p) (extractExp x)
 
 let extractDecl : decl -> string = function
   | Def (p, Some t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)

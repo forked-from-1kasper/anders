@@ -1,8 +1,20 @@
 open Language.Spec
 open Prettyprinter
-open Ident
 open Error
-open Expr
+open Term
+
+module Atom =
+struct
+  type t = ident * dir
+  let compare (a, x) (b, y) =
+    if a = b then Dir.compare x y else Ident.compare a b
+end
+
+module Conjunction = Set.Make(Atom)
+type conjunction = Conjunction.t
+
+module Disjunction = Set.Make(Conjunction)
+type disjunction = Disjunction.t
 
 let negDir : dir -> dir = function
   | Zero -> One | One -> Zero
@@ -32,7 +44,7 @@ let rec negFormula : value -> value = function
   | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
   | v           -> VNeg v
 
-(* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of names equipped with sign. *)
+(* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of idents equipped with sign. *)
 let rec extAnd : value -> conjunction = function
   | Var (x, _)        -> Conjunction.singleton (x, One)
   | VNeg (Var (x, _)) -> Conjunction.singleton (x, Zero)
@@ -113,7 +125,7 @@ let getFormula ts = System.fold (fun x _ e -> EOr (getFace x, e)) ts (EDir Zero)
 
 let singleton p x = Env.add p x Env.empty
 
-let contrAtom : name * dir -> value = function
+let contrAtom : ident * dir -> value = function
   | (x, Zero) -> VNeg (Var (x, VI))
   | (x, One)  -> Var (x, VI)
 
@@ -162,3 +174,11 @@ let bimap f g ts =
   List.filter (fun (alpha, _) ->
     not (List.exists (fun (beta, _) -> lt beta alpha) ts')) ts'
   |> mkSystem
+
+let keys ts = List.of_seq (Seq.map fst (System.to_seq ts))
+
+let intersectionWith f =
+  System.merge (fun _ x y ->
+    match x, y with
+    | Some a, Some b -> Some (f a b)
+    | _,      _      -> None)

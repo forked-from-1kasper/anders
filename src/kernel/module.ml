@@ -1,9 +1,7 @@
 open Language.Spec
 open Prettyprinter
 open Prelude
-open Ident
 open Elab
-open Expr
 
 type command =
   | Nope
@@ -42,10 +40,6 @@ let showLine : line -> string = function
 
 let showContent x = String.concat "\n" (List.map showLine x)
 let showFile : file -> string = function | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
-
-let freshTele ns : tele -> tele = fun (p, e) ->
-  let q = fresh p in let e' = salt !ns e in
-  ns := Env.add p q !ns; (q, e')
 
 let freshDecl : decl -> decl = function
   | Def (p, Some exp1, exp2) -> Def (p, Some (freshExp exp1), freshExp exp2)

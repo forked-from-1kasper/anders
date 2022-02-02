@@ -1,5 +1,5 @@
 open Error
-open Ident
+open Prefs
 
 type cmdline =
   | Check     of string

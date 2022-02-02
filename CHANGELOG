@@ -1,7 +1,7 @@
 Changelog
 =========
 
-7 MAR 2022 Version 1.3.0 Pipeline:
+9 MAR 2022 Version 1.3.0 Pipeline:
 
 * Microkernel Architecture: Kernel, Proof Shell, and Tactic Server with open binary protocols
 * NixOS package /applications/science/logic/anders/ [@suhr]

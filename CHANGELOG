@@ -1,6 +1,13 @@
 Changelog
 =========
 
+9 MAR 2022 Version 1.3.0 Microkernel Pipeline:
+
+* Microkernel Architecture: Kernel, Proof Shell, and Tactics Server with open binary protocols
+* NixOS package /applications/science/logic/anders/ [@suhr]
+* Homotopy Library Manual: https://homotopy.dev/library/
+* New Homepage: https://homotopy.dev/
+
 27 JAN 2022 Version 1.1.1 Univalence:
 
 * Glue Type
@@ -40,7 +47,7 @@ Changelog
 * Minor optimizations
 * OPAM package
 * ISC license
-* Homepage: https://groupoid.space/homotopy
+* Homepage: https://groupoid.space/homotopy/
 
 5 JUL 2021 Version 0.7 MLTT Internalization:
 

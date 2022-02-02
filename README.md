@@ -37,7 +37,7 @@ Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Thre
 Features
 --------
 
-* Homepage: https://groupoid.space/homotopy/
+* Homepage: https://homotopy.dev/
 * Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
@@ -54,7 +54,7 @@ Features
 * Lean syntax for ΠΣW
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
-* Groupoid Infinity CCHM base library: https://groupoid.space/homotopy/library/
+* Groupoid Infinity CCHM base library: https://homotopy.dev/library/
 * Best suited for academic papers and fast type checking
 
 Setup

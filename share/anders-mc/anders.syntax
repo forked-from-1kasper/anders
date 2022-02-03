@@ -60,6 +60,9 @@ context default
     keyword whole true cyan
     keyword whole false cyan
     keyword whole module cyan
+    keyword whole plugin cyan
+    keyword whole begin cyan
+    keyword whole end cyan
     keyword whole where cyan
     keyword whole one? cyan
     keyword whole Id cyan

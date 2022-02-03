@@ -16,6 +16,8 @@ struct
         |> fun n -> Int64.shift_left n (i * 8))
     done; !n
 
+  let int () = Int64.to_int (int64 ())
+
   let string () = R.getn (int64 ())
   let integer () = Z.of_bits (string ())
 
@@ -29,8 +31,8 @@ struct
     | '\xFF' -> One
     | _      -> failwith "Dir?"
 
-  let face () = let n = int64 () in let mu = ref Env.empty in
-    for _ = 1 to Int64.to_int n do
+  let face () = let n = int () in let mu = ref Env.empty in
+    for _ = 1 to n do
       let i = ident () in let d = dir () in
       mu := Env.add i d !mu
     done; !mu
@@ -95,11 +97,55 @@ struct
 
   and clos () = let a = exp () in let p = ident () in let b = exp () in (a, p, b)
 
-  and system () = let n = int64 () in let ts = ref System.empty in
-    for _ = 1 to Int64.to_int n do
+  and system () = let n = int () in
+    let ts = ref System.empty in
+    for _ = 1 to n do
       let mu = face () in let e = exp () in
       ts := System.add mu e !ts
     done; !ts
+
+  let req () = match R.get () with
+    | '\x10' -> let (e, t) = exp2 () in Check (e, t)
+    | '\x11' -> Infer (exp ())
+    | '\x12' -> Eval (exp ())
+    | '\x13' -> let (e1, e2) = exp2 () in Conv (e1, e2)
+    | '\x20' -> let x = string () in let (t, e) = exp2 () in Assign (x, t, e)
+    | '\x21' -> let x = string () in let t = exp () in Assume (x, t)
+    | '\x22' -> Erase (string ())
+    | '\x23' -> Wipe
+    | '\x30' -> Version
+    | '\x31' -> Ping
+    | _      -> failwith "Req?"
+
+  let error () = match R.get () with
+    | '\x01' -> Unknown (string ())
+    | '\x02' -> let (e1, e2) = exp2 () in Ineq (e1, e2)
+    | '\x03' -> ExpectedPi (exp ())
+    | '\x04' -> ExpectedSig (exp ())
+    | '\x05' -> ExpectedType (exp ())
+    | '\x06' -> ExpectedKan (exp ())
+    | '\x07' -> ExpectedPath (exp ())
+    | '\x08' -> ExpectedSubtype (exp ())
+    | '\x09' -> ExpectedSystem (exp ())
+    | '\x0A' -> ExpectedConj (exp ())
+    | '\x0B' -> AlreadyDeclared (string ())
+    | '\x0C' -> VariableNotFound (ident ())
+    | _      -> failwith "Error?"
+
+  let resp () = match R.get () with
+    | '\x10' -> let i = int64 () in let j = int64 () in let k = int64 () in Version (i, j, k)
+    | '\x11' -> let x = string () in let n = int () in
+      let arr = Array.make n EHole in
+      for idx = 0 to n - 1 do
+        Array.set arr idx (exp ())
+      done; Trace (x, Array.to_list arr)
+    | '\x12' -> Error (error ())
+    | '\x20' -> Bool false
+    | '\x21' -> Bool true
+    | '\x22' -> Term (exp ())
+    | '\xF0' -> Pong
+    | '\x00' -> OK
+    | _      -> failwith "Resp?"
 end
 
 module Deserialize = Decode(struct

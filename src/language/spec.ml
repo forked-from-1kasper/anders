@@ -65,3 +65,43 @@ type exp =
 type extension =
   | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp                  (* Coequalizer *)
   | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
+
+(* Kernel Interface *)
+
+type req =
+  (* checker & evaluator *)
+  | Check  of exp * exp
+  | Infer  of exp
+  | Eval   of exp
+  | Conv   of exp * exp
+  (* context *)
+  | Assign of string * exp * exp
+  | Assume of string * exp
+  | Erase  of string
+  | Wipe
+  (* configuration *)
+  | Version
+  | Ping
+
+type error =
+  | Unknown          of string
+  | Ineq             of exp * exp
+  | ExpectedPi       of exp
+  | ExpectedSig      of exp
+  | ExpectedType     of exp
+  | ExpectedKan      of exp
+  | ExpectedPath     of exp
+  | ExpectedSubtype  of exp
+  | ExpectedSystem   of exp
+  | ExpectedConj     of exp
+  | AlreadyDeclared  of string
+  | VariableNotFound of ident
+
+type resp =
+  | Version of int64 * int64 * int64
+  | Trace of string * exp list
+  | Error of error
+  | Bool of bool
+  | Term of exp
+  | Pong
+  | OK

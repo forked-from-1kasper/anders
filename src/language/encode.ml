@@ -90,6 +90,42 @@ struct
 
   and system ts = int (System.cardinal ts);
     System.iter (fun mu e -> face mu; exp e) ts
+
+  let req = function
+    | Check (e, t)     -> W.put '\x10'; exp e; exp t
+    | Infer e          -> W.put '\x11'; exp e
+    | Eval e           -> W.put '\x12'; exp e
+    | Conv (e1, e2)    -> W.put '\x13'; exp e1; exp e2
+    | Assign (x, t, e) -> W.put '\x20'; string x; exp t; exp e
+    | Assume (x, t)    -> W.put '\x21'; string x; exp t
+    | Erase x          -> W.put '\x22'; string x
+    | Wipe             -> W.put '\x23'
+    | Version          -> W.put '\x30'
+    | Ping             -> W.put '\x31'
+
+  let error = function
+    | Unknown x          -> W.put '\x01'; string x
+    | Ineq (e1, e2)      -> W.put '\x02'; exp e1; exp e2
+    | ExpectedPi e       -> W.put '\x03'; exp e
+    | ExpectedSig e      -> W.put '\x04'; exp e
+    | ExpectedType e     -> W.put '\x05'; exp e
+    | ExpectedKan e      -> W.put '\x06'; exp e
+    | ExpectedPath e     -> W.put '\x07'; exp e
+    | ExpectedSubtype e  -> W.put '\x08'; exp e
+    | ExpectedSystem e   -> W.put '\x09'; exp e
+    | ExpectedConj e     -> W.put '\x0A'; exp e
+    | AlreadyDeclared x  -> W.put '\x0B'; string x
+    | VariableNotFound x -> W.put '\x0C'; ident x
+
+  let resp = function
+    | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k
+    | Trace (x, es)     -> W.put '\x11'; string x; int (List.length es); List.iter exp es
+    | Error err         -> W.put '\x12'; error err
+    | Bool false        -> W.put '\x20'
+    | Bool true         -> W.put '\x21'
+    | Term e            -> W.put '\x22'; exp e
+    | Pong              -> W.put '\xF0'
+    | OK                -> W.put '\x00'
 end
 
 module Serialize = Encode(struct

@@ -6,6 +6,24 @@
 context default
     keyword whole Pi brightmagenta
     keyword whole Equ brightmagenta
+    keyword whole zero brightmagenta
+    keyword whole succ brightmagenta
+    keyword whole ℕ-ind brightmagenta
+    keyword whole ℕ-rec brightmagenta
+    keyword whole ℕ-case brightmagenta
+    keyword whole ℕ brightmagenta
+    keyword whole Fin-ind brightmagenta
+    keyword whole Fin-rec brightmagenta
+    keyword whole Fin-iter brightmagenta
+    keyword whole Fin brightmagenta
+    keyword whole vzero brightmagenta
+    keyword whole vsucc brightmagenta
+    keyword whole Vec-ind brightmagenta
+    keyword whole Vec-rec brightmagenta
+    keyword whole Vec-case brightmagenta
+    keyword whole vzero brightmagenta
+    keyword whole vsucc brightmagenta
+    keyword whole Vec brightmagenta
     keyword whole lam brightmagenta
     keyword whole apply brightmagenta
     keyword whole app brightmagenta
@@ -45,16 +63,16 @@ context default
     keyword whole unit brightmagenta
     keyword whole fill brightmagenta
     keyword whole LineP brightmagenta
+    keyword whole Σ-ind cyan
     keyword whole Σ cyan
     keyword whole Π cyan
+    keyword whole W cyan
     keyword whole module cyan
     keyword whole def cyan
     keyword whole definition cyan
     keyword whole axiom cyan
     keyword whole theorem cyan
-    keyword whole data cyan
-    keyword whole split cyan
-    keyword whole opaque cyan
+    keyword whole summa cyan
     keyword whole import cyan
     keyword whole option cyan
     keyword whole true cyan
@@ -64,12 +82,26 @@ context default
     keyword whole begin cyan
     keyword whole end cyan
     keyword whole where cyan
+    keyword whole ind₀  cyan
+    keyword whole ind₁  cyan
+    keyword whole ind₂  cyan
+    keyword whole pr₁  cyan
+    keyword whole pr₂  cyan
+    keyword whole 0₂  cyan
+    keyword whole 1₂  cyan
+    keyword whole indᵂ cyan
+    keyword whole sup cyan
+    keyword whole Glue cyan
+    keyword whole glue cyan
+    keyword whole unglue cyan
     keyword whole one? cyan
     keyword whole Id cyan
     keyword whole idJ cyan
     keyword whole ref cyan
     keyword whole PathP cyan
     keyword whole Partial cyan
+    keyword whole PartialP cyan
+    keyword whole ↦ cyan
     keyword whole Sub cyan
     keyword whole inc cyan
     keyword whole ouc cyan

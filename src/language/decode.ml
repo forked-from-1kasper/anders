@@ -101,3 +101,11 @@ struct
       ts := System.add mu e !ts
     done; !ts
 end
+
+module Deserialize = Decode(struct
+  let get () = input_char stdin
+  let getn n = let m = Int64.to_int n in let bs = Bytes.make m '\x00' in
+    for idx = 0 to m - 1 do
+      Bytes.set bs idx (get ())
+    done; Bytes.to_string bs
+end)

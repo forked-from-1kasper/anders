@@ -99,9 +99,9 @@ type error =
 
 type resp =
   | Version of int64 * int64 * int64
-  | Trace of string * exp list
-  | Error of error
-  | Bool of bool
-  | Term of exp
+  | Trace   of string * exp list
+  | Error   of error
+  | Bool    of bool
+  | Term    of exp
   | Pong
   | OK

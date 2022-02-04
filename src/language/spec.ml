@@ -30,6 +30,7 @@ struct
 end
 
 type face = dir Env.t
+let eps : face = Env.empty
 
 module Face =
 struct
@@ -66,6 +67,22 @@ type extension =
   | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp                  (* Coequalizer *)
   | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
 
+type tele = ident * exp
+
+let eLam p a b = ELam (a, (p, b))
+let ePi  p a b = EPi  (a, (p, b))
+let eSig p a b = ESig (a, (p, b))
+let eW   p a b = EW   (a, (p, b))
+
+let ezero = EDir Zero
+let eone  = EDir One
+
+let ident x = Ident (x, 0L)
+let decl x = EVar (ident x)
+
+let impl a b = EPi (a, (Irrefutable, b))
+let prod a b = ESig (a, (Irrefutable, b))
+
 (* Kernel Interface *)
 
 type req =
@@ -75,11 +92,13 @@ type req =
   | Eval   of exp
   | Conv   of exp * exp
   (* context *)
+  | Def    of string * exp * exp
   | Assign of string * exp * exp
   | Assume of string * exp
   | Erase  of string
   | Wipe
   (* configuration *)
+  | Set    of string * string
   | Version
   | Ping
 
@@ -94,12 +113,21 @@ type error =
   | ExpectedSubtype  of exp
   | ExpectedSystem   of exp
   | ExpectedConj     of exp
+  | ExpectedIm       of exp
+  | ExpectedInf      of exp
+  | ExpectedGlue     of exp
+  | DNFSolverError   of exp * dir
   | AlreadyDeclared  of string
   | VariableNotFound of ident
+  | InferError       of exp
+  | Traceback        of error * (exp * exp) list
+  | InvalidOpt       of string
+  | InvalidOptValue  of string * string
 
 type resp =
   | Version of int64 * int64 * int64
   | Trace   of string * exp list
+  | Hole    of exp * (ident * exp) list
   | Error   of error
   | Bool    of bool
   | Term    of exp

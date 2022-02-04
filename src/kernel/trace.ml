@@ -1,32 +1,24 @@
-open Prettyprinter
-open Gen
+open Language.Encode
+open Language.Spec
+open Term
+open Rbv
 
-let traceHole v gma = print_string ("\nHole:\n\n" ^ showGamma gma ^ "\n" ^ String.make 80 '-' ^ "\n" ^ showValue v ^ "\n\n")
-let trace x = print_string x; flush_all ()
+let traceHole v ctx =
+  let gma =
+    Env.bindings ctx
+    |> List.filter_map
+        (fun (p, x) -> match x with
+          | Local, Value v, _ -> Some (p, rbV v)
+          | Local, Exp e, _   -> Some (p, e)
+          | _, _, _           -> None) in
+  Serialize.resp (Hole (rbV v, gma)); flush_all ()
 
-let traceCheck e t : unit = if !Prefs.trace then
-  trace (Printf.sprintf "CHECK: %s : %s\n" (showExp e) (showValue t))
+let trace x xs = Serialize.resp (Trace (x, xs)); flush_all ()
 
-let traceInfer e : unit = if !Prefs.trace then
-  trace (Printf.sprintf "INFER: %s\n" (showExp e))
-
-let traceInferV v : unit = if !Prefs.trace then
-  trace (Printf.sprintf "INFERV: %s\n" (showValue v))
-
-let traceEval e : unit = if !Prefs.trace then
-  trace (Printf.sprintf "EVAL: %s\n" (showExp e))
-
-let traceWeak e : unit = if !Prefs.trace then
-  trace (Printf.sprintf "WEAK: %s\n" (showExp e))
-
-let traceRbV v : unit = if !Prefs.trace then
-  trace (Printf.sprintf "RBV: %s\n" (showValue v))
-
-let traceClos e p v : unit = if !Prefs.trace then
-  trace (Printf.sprintf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showIdent p) (showValue v))
-
-let traceConv v1 v2 : unit = if !Prefs.trace then
-  trace (Printf.sprintf "CONV: %s = %s\n" (showValue v1) (showValue v2))
-
-let traceEqNF v1 v2 : unit = if !Prefs.trace then
-  trace (Printf.sprintf "EQNF: %s = %s\n" (showValue v1) (showValue v2))
+let traceCheck e t  = if !Prefs.trace then trace "CHECK" [e; rbV t]
+let traceInfer e    = if !Prefs.trace then trace "INFER" [e]
+let traceInferV v   = if !Prefs.trace then trace "INFERV" [rbV v]
+let traceEval e     = if !Prefs.trace then trace "EVAL" [e]
+let traceClos e p v = if !Prefs.trace then trace "CLOSBYVAL" [e; EVar p; rbV v]
+let traceConv v1 v2 = if !Prefs.trace then trace "CONV" [rbV v1; rbV v2]
+let traceEqNF v1 v2 = if !Prefs.trace then trace "EQNF" [rbV v1; rbV v2]

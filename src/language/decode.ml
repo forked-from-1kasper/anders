@@ -1,3 +1,4 @@
+open Prelude
 open Spec
 
 module type Reader =
@@ -13,7 +14,7 @@ struct
     for i = 0 to 7 do
       n := Int64.add !n
         (R.get () |> Char.code |> Int64.of_int
-        |> fun n -> Int64.shift_left n (i * 8))
+        |> flip Int64.shift_left (i * 8))
     done; !n
 
   let int () = Int64.to_int (int64 ())
@@ -109,15 +110,17 @@ struct
     | '\x11' -> Infer (exp ())
     | '\x12' -> Eval (exp ())
     | '\x13' -> let (e1, e2) = exp2 () in Conv (e1, e2)
-    | '\x20' -> let x = string () in let (t, e) = exp2 () in Assign (x, t, e)
-    | '\x21' -> let x = string () in let t = exp () in Assume (x, t)
-    | '\x22' -> Erase (string ())
-    | '\x23' -> Wipe
-    | '\x30' -> Version
-    | '\x31' -> Ping
+    | '\x20' -> let x = string () in let (t, e) = exp2 () in Def (x, t, e)
+    | '\x21' -> let x = string () in let (t, e) = exp2 () in Assign (x, t, e)
+    | '\x22' -> let x = string () in let t = exp () in Assume (x, t)
+    | '\x23' -> Erase (string ())
+    | '\x24' -> Wipe
+    | '\x30' -> let p = string () in let x = string () in Set (p, x)
+    | '\x31' -> Version
+    | '\x32' -> Ping
     | _      -> failwith "Req?"
 
-  let error () = match R.get () with
+  let rec error () = match R.get () with
     | '\x01' -> Unknown (string ())
     | '\x02' -> let (e1, e2) = exp2 () in Ineq (e1, e2)
     | '\x03' -> ExpectedPi (exp ())
@@ -128,18 +131,27 @@ struct
     | '\x08' -> ExpectedSubtype (exp ())
     | '\x09' -> ExpectedSystem (exp ())
     | '\x0A' -> ExpectedConj (exp ())
-    | '\x0B' -> AlreadyDeclared (string ())
-    | '\x0C' -> VariableNotFound (ident ())
+    | '\x0B' -> ExpectedIm (exp ())
+    | '\x0C' -> ExpectedInf (exp ())
+    | '\x0D' -> ExpectedGlue (exp ())
+    | '\x0E' -> let e = exp () in let d = dir () in DNFSolverError (e, d)
+    | '\x0F' -> AlreadyDeclared (string ())
+    | '\x10' -> VariableNotFound (ident ())
+    | '\x11' -> InferError (exp ())
+    | '\x12' -> let err = error () in let n = int () in
+      Traceback (err, Array.to_list (Array.init n (fun _ -> exp2 ())))
+    | '\x13' -> InvalidOpt (string ())
+    | '\x14' -> let p = string () in let x = string () in InvalidOptValue (p, x)
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with
     | '\x10' -> let i = int64 () in let j = int64 () in let k = int64 () in Version (i, j, k)
     | '\x11' -> let x = string () in let n = int () in
-      let arr = Array.make n EHole in
-      for idx = 0 to n - 1 do
-        Array.set arr idx (exp ())
-      done; Trace (x, Array.to_list arr)
-    | '\x12' -> Error (error ())
+      Trace (x, Array.to_list (Array.init n (fun _ -> exp ())))
+    | '\x12' -> let e = exp () in let n = int () in
+      Hole (e, Array.to_list (Array.init n (fun _ ->
+        let i = ident () in let e' = exp () in (i, e'))))
+    | '\x13' -> Error (error ())
     | '\x20' -> Bool false
     | '\x21' -> Bool true
     | '\x22' -> Term (exp ())

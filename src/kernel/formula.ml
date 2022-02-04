@@ -1,7 +1,6 @@
 open Language.Spec
-open Prettyprinter
-open Error
 open Term
+open Rbv
 
 module Atom =
 struct
@@ -49,7 +48,7 @@ let rec extAnd : value -> conjunction = function
   | Var (x, _)        -> Conjunction.singleton (x, One)
   | VNeg (Var (x, _)) -> Conjunction.singleton (x, Zero)
   | VAnd (x, y)       -> Conjunction.union (extAnd x) (extAnd y)
-  | v                 -> raise (ExpectedConjunction v)
+  | v                 -> raise (Internal (ExpectedConj (rbV v)))
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
    into list of extAnd results. *)
@@ -106,7 +105,6 @@ let meets xs ys =
       with IncompatibleFaces -> ()) ys) xs;
   nubRev !zs
 
-let eps : face = Env.empty
 let meetss = List.fold_left meets [eps]
 
 let union xs ys = nubRev (List.rev_append xs ys)
@@ -159,7 +157,7 @@ let rec solve k x = match k, x with
   | VNeg n, _ -> solve n (negDir x)
   | VOr (f, g), One  | VAnd (f, g), Zero -> union (solve f x) (solve g x)
   | VOr (f, g), Zero | VAnd (f, g), One  -> meets (solve f x) (solve g x)
-  | _, _ -> failwith (Printf.sprintf "Cannot solve: %s = %s" (showValue k) (showDir x))
+  | _, _ -> raise (Internal (DNFSolverError (rbV k, x)))
 
 let bimap f g ts =
   let ts' =

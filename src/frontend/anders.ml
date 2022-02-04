@@ -1,5 +1,4 @@
 open Error
-open Prefs
 
 type cmdline =
   | Check     of string
@@ -28,18 +27,18 @@ let cmd : cmdline -> unit = function
   | Parse     filename -> Reader.parse filename
   | Cubicaltt filename -> Cubical.extract filename
   | Prim (prim, value) -> begin match prim with
-    | "zero"     -> zeroPrim     := value
-    | "one"      -> onePrim      := value
-    | "interval" -> intervalPrim := value
-    | _ -> raise (UnknownPrimitive prim)
+    | "zero"     -> Prefs.zeroPrim     := value
+    | "one"      -> Prefs.onePrim      := value
+    | "interval" -> Prefs.intervalPrim := value
+    | _          -> raise (UnknownPrimitive prim)
   end
-  | Help -> print_endline Repl.banner ; print_endline help
-  | Repl -> repl := true
-  | Silent -> Prefs.verbose := false
-  | Indices -> Prefs.indices := true
-  | Trace -> Prefs.indices := true; Prefs.trace := true
-  | Girard -> Prefs.girard := true
-  | Irrelevance -> Prefs.irrelevance := true
+  | Help         -> print_endline Repl.banner ; print_endline help
+  | Repl         -> repl := true
+  | Indices      -> Prefs.indices := true
+  | Silent       -> Prefs.verbose := false
+  | Trace        -> Prefs.indices := true; Radio.set "trace" "true"
+  | Girard       -> Radio.set "girard" "true"
+  | Irrelevance -> Radio.set "irrelevance" "true"
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []

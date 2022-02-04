@@ -33,4 +33,5 @@
                 library/mathematics/homotopy/suspension.anders
                 library/mathematics/homotopy/S1.anders
                 library/mathematics/homotopy/Sn.anders
-                library/mathematics/homotopy/KGn.anders) (section share) (package anders))
+                library/mathematics/homotopy/KGn.anders)
+         (section share) (package anders))

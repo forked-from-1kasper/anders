@@ -1,3 +1,1 @@
-(ocamllex lexer)
-(menhir (modules parser))
-(executable (name anders) (libraries language dynlink zarith) (package anders) (public_name anders))
+(executable (name chm) (libraries language zarith) (public_name chm))

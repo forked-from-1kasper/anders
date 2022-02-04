@@ -3,7 +3,6 @@ open Prettyprinter
 open Reader
 open Module
 open Error
-open Gen
 
 let fail x = raise (ExtractionError x)
 

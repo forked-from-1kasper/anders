@@ -1,10 +1,7 @@
 %{ open Language.Spec
-   open Formula
+   open Prettyprinter
    open Module
    open Prefs
-   open Elab
-   open Term
-   open Gen
 
   let getVar x =
     let xs = [(!intervalPrim, EI);

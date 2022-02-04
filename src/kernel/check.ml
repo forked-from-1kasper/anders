@@ -1,12 +1,11 @@
+open Language.Prelude
 open Language.Spec
-open Prettyprinter
 open Formula
-open Prelude
-open Error
 open Trace
 open Elab
 open Term
 open Gen
+open Rbv
 
 (* Evaluator *)
 let rec eval ctx e0 = traceEval e0; match e0 with
@@ -298,7 +297,7 @@ and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v
   | Some (_, _, Exp e)   -> eval ctx e
-  | None                 -> raise (VariableNotFound x)
+  | None                 -> raise (Internal (VariableNotFound x))
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
@@ -317,7 +316,7 @@ and inferV v = traceInferV v; match v with
   begin match inferV f with
     | VPartialP (t, _) -> app (t, x)
     | VPi (_, (_, g)) -> g x
-    | v -> raise (ExpectedPi v)
+    | v -> raise (Internal (ExpectedPi (rbV v)))
   end
   | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
   | VRef v                   -> VApp (VApp (VId (inferV v), v), v)
@@ -328,7 +327,7 @@ and inferV v = traceInferV v; match v with
   | VOuc v                   ->
   begin match inferV v with
     | VSub (t, _, _) -> t
-    | _ -> raise (ExpectedSubtypeV v)
+    | _ -> raise (Internal (ExpectedSubtype (rbV v)))
   end
   | VId v -> let n = extSet (inferV v) in implv v (implv v (VPre n))
   | VJ v -> inferJ v (inferV v)
@@ -359,7 +358,7 @@ and inferV v = traceInferV v; match v with
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
-  | VPLam _ | VPair _ | VHole -> raise (ExpectedNeutral v)
+  | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 and recUnit t = let x = freshName "x" in
   implv (app (t, VStar)) (VPi (VUnit, (x, fun x -> app (t, x))))
@@ -545,16 +544,16 @@ and convProofIrrel v1 v2 =
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
     | _, _ -> false
-  with ExpectedNeutral _ -> false
+  with Internal _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;
-  if conv v1 v2 then () else raise (Ineq (v1, v2))
+  if conv v1 v2 then () else raise (Internal (Ineq (rbV v1, rbV v2)))
 
 (* Type checker itself *)
 and lookup ctx x = match Env.find_opt x ctx with
   | Some (_, Value v, _) -> v
   | Some (_, Exp e, _)   -> eval ctx e
-  | None                 -> raise (VariableNotFound x)
+  | None                 -> raise (Internal (VariableNotFound x))
 
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; try match e0, t0 with
@@ -576,8 +575,8 @@ and check ctx (e0 : exp) (t0 : value) =
     check ctx' e (appFormula p v); eqNf v0 u0; eqNf v1 u1
   | e, VPre u -> begin
     match infer ctx e with
-    | VKan v | VPre v -> if ieq u v then () else raise (Ineq (VPre u, VPre v))
-    | t -> raise (Ineq (VPre u, t))
+    | VKan v | VPre v -> if ieq u v then () else raise (Internal (Ineq (EPre u, EPre v)))
+    | t -> raise (Internal (Ineq (EPre u, rbV t)))
   end
   | ESystem ts, VPartialP (u, i) ->
     eqNf (eval ctx (getFormula ts)) i;
@@ -586,7 +585,7 @@ and check ctx (e0 : exp) (t0 : value) =
         (app (upd alpha u, VRef vone))) ts;
     checkOverlapping ctx ts
   | e, t -> eqNf (infer ctx e) t
-  with ex -> Printf.printf "When trying to typecheck\n  %s\nAgainst type\n  %s\n" (showExp e0) (showValue t0); raise ex
+  with exc -> let (err, es) = extTraceback (extErr exc) in raise (Internal (Traceback (err, (e0, rbV t0) :: es)))
 
 and checkOverlapping ctx ts =
   System.iter (fun alpha e1 ->
@@ -609,7 +608,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EApp (f, x) -> begin match infer ctx f with
     | VPartialP (t, i) -> check ctx x (isOne i); app (t, eval ctx x)
     | VPi (t, (_, g)) -> check ctx x t; g (eval ctx x)
-    | v -> raise (ExpectedPi v)
+    | v -> raise (Internal (ExpectedPi (rbV v)))
   end
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (_, (_, g)) = extSigG (infer ctx e) in g (vfst (eval ctx e))
@@ -642,7 +641,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EInc (e, r) -> ignore (extKan (infer ctx e)); check ctx r VI; inferInc (eval ctx e) (eval ctx r)
   | EOuc e -> begin match infer ctx e with
     | VSub (t, _, _) -> t
-    | _ -> raise (ExpectedSubtype e)
+    | _ -> raise (Internal (ExpectedSubtype e))
   end
   | ESystem ts -> checkOverlapping ctx ts;
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
@@ -680,7 +679,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     ignore (extSet (g (Var (x, c)))); inferIndIm t (eval ctx b)
-  | EPLam _ | EPair _ | EHole -> raise (InferError e)
+  | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in

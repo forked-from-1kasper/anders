@@ -1,32 +1,32 @@
+open Language.Prelude
 open Language.Spec
-open Prelude
-open Error
 open Term
 open Gen
+open Rbv
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
-  | u -> raise (ExpectedPi u)
+  | u -> raise (Internal (ExpectedPi (rbV u)))
 
 let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
-  | u -> raise (ExpectedSig u)
+  | u -> raise (Internal (ExpectedSig (rbV u)))
 
 let extSet : value -> Z.t = function
   | VPre n | VKan n -> n
-  | v               -> raise (ExpectedVSet v)
+  | v               -> raise (Internal (ExpectedType (rbV v)))
 
 let extKan : value -> Z.t = function
   | VKan n -> n
-  | v      -> raise (ExpectedFibrant v)
+  | v      -> raise (Internal (ExpectedKan (rbV v)))
 
 let extIm : value -> value = function
   | VIm v -> v
-  | v -> failwith (Printf.sprintf "“%s” expected to be a modality" (Prettyprinter.showValue v))
+  | v     -> raise (Internal (ExpectedIm (rbV v)))
 
 let extInf : value -> value = function
   | VInf v -> v
-  | v -> failwith (Printf.sprintf "“%s” expected to be a unit of modality" (Prettyprinter.showValue v))
+  | v      -> raise (Internal (ExpectedInf (rbV v)))
 
 let isInf : value -> bool = function
   | VInf _ -> true | _ -> false
@@ -45,11 +45,11 @@ let inc t r = function
 
 let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
-  | v                              -> raise (ExpectedPath v)
+  | v                              -> raise (Internal (ExpectedPath (rbV v)))
 
 let extGlue = function
   | VApp (VApp (VGlue t, r), u) -> (t, r, u)
-  | v -> failwith (Printf.sprintf "“%s” expected to be a Glue-type" (Prettyprinter.showValue v))
+  | v -> raise (Internal (ExpectedGlue (rbV v)))
 
 let extVar ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value (Var (y, _))) -> y
@@ -59,8 +59,8 @@ let extVar ctx x = match Env.find_opt x ctx with
 let imax a b = match a, b with
   | VKan u, VKan v -> VKan (max u v)
   | VPre u, VPre v | VPre u, VKan v | VKan u, VPre v -> VPre (max u v)
-  | VKan _, _ | VPre _, _ -> raise (ExpectedVSet b)
-  | _, _ -> raise (ExpectedVSet a)
+  | VKan _, _ | VPre _, _ -> raise (Internal (ExpectedType (rbV b)))
+  | _, _ -> raise (Internal (ExpectedType (rbV a)))
 
 let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
@@ -70,9 +70,6 @@ let pairv a b = VPair (ref None, a, b)
 let idp v = VPLam (VLam (VI, (Irrefutable, fun _ -> v)))
 let idfun t = VLam (t, (freshName "x", fun x -> x))
 let pathv v a b = VApp (VApp (VPathP v, a), b)
-
-let impl a b = EPi (a, (Irrefutable, b))
-let prod a b = ESig (a, (Irrefutable, b))
 
 let hcompval u = EApp (EApp (u, ezero), ERef eone)
 
@@ -101,7 +98,7 @@ let rec getField p v = function
   | VSig (t, (q, g)) ->
     if matchIdent p q then (vfst v, t)
     else getField p (vsnd v) (g (vfst v))
-  | t -> raise (ExpectedSig t)
+  | t -> raise (Internal (ExpectedSig (rbV t)))
 
 let rec salt (ns : ident Env.t) : exp -> exp = function
   | ELam (a, (p, b))     -> saltTele eLam ns p a b
@@ -233,3 +230,11 @@ let rec mem y = function
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
+
+let extErr = function
+  | Internal err -> err
+  | exc          -> Unknown (Printexc.to_string exc)
+
+let extTraceback = function
+  | Traceback (err, es) -> (err, es)
+  | err                 -> (err, [])

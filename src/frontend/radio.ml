@@ -26,10 +26,21 @@ module Response = Decode(struct
     done; Bytes.to_string bs
 end)
 
-let () = Request.req Ping; flush Kernel.stdin;
-  match Response.resp () with
-  | Pong -> ()
-  | _    -> raise ProtocolViolation
+module Fuze =
+struct
+  let (year, month, patch) =
+    (* ping-pong *)
+    Request.req Ping; flush Kernel.stdin;
+    begin match Response.resp () with
+      | Pong -> ()
+      | _    -> raise ProtocolViolation
+    end;
+    Request.req Version; flush Kernel.stdin;
+    begin match Response.resp () with
+      | Version (i, j, k) -> (i, j, k)
+      | _                 -> raise ProtocolViolation
+    end
+end
 
 let trace x xs = Printf.printf "%s: [%s]\n" x (String.concat "; " (List.map showExp xs)); flush_all ()
 

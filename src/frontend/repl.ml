@@ -12,7 +12,9 @@ let help =
   :r             restart
   :h             display this message"
 
-let banner = "Anders [MLTT][CCHM][HTS][deRham] proof assistant version 1.3.0"
+let banner =
+  Printf.sprintf "Anders [MLTT][CCHM][HTS][deRham] proof assistant version %Ld.%Ld.%Ld"
+    Fuze.year Fuze.month Fuze.patch
 
 let loaded : Files.t ref = ref Files.empty
 

@@ -139,7 +139,7 @@ struct
     | '\x10' -> VariableNotFound (ident ())
     | '\x11' -> InferError (exp ())
     | '\x12' -> let err = error () in let n = int () in
-      Traceback (err, Array.to_list (Array.init n (fun _ -> exp2 ())))
+      Traceback (err, List.init n (fun _ -> exp2 ()))
     | '\x13' -> InvalidOpt (string ())
     | '\x14' -> let p = string () in let x = string () in InvalidOptValue (p, x)
     | _      -> failwith "Error?"
@@ -149,8 +149,8 @@ struct
     | '\x11' -> let x = string () in let n = int () in
       Trace (x, Array.to_list (Array.init n (fun _ -> exp ())))
     | '\x12' -> let e = exp () in let n = int () in
-      Hole (e, Array.to_list (Array.init n (fun _ ->
-        let i = ident () in let e' = exp () in (i, e'))))
+      Hole (e, List.init n (fun _ ->
+        let i = ident () in let e' = exp () in (i, e')))
     | '\x13' -> Error (error ())
     | '\x20' -> Bool false
     | '\x21' -> Bool true

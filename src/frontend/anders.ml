@@ -38,7 +38,7 @@ let cmd : cmdline -> unit = function
   | Silent       -> Prefs.verbose := false
   | Trace        -> Prefs.indices := true; Radio.set "trace" "true"
   | Girard       -> Radio.set "girard" "true"
-  | Irrelevance -> Radio.set "irrelevance" "true"
+  | Irrelevance  -> Radio.set "irrelevance" "true"
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []

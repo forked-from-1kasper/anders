@@ -162,7 +162,5 @@ end
 
 module Deserialize = Decode(struct
   let get () = input_char stdin
-  let getn n = let m = Int64.to_int n in
-    Bytes.init m (fun _ -> get ())
-    |> Bytes.to_string
+  let getn n = String.init (Int64.to_int n) (fun _ -> get ())
 end)

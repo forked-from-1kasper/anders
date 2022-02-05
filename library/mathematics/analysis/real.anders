@@ -38,7 +38,7 @@ def ≤₂ (a b : 𝟐) : U := Path 𝟐 a 0₂ → Path 𝟐 b 1₂
 def is-decreasing (α : ℕ → 𝟐) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
 def ℕ∞ : U := Σ (α : ℕ → 𝟐), is-decreasing α
 def incl (α : ℕ∞) : ℕ → 𝟐 := α.1
-def tail (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
+def tail∞ (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
 
 def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
   Σ (isSet : isSet A)
@@ -53,7 +53,7 @@ def convex-body : U₁ :=
     (cancelative : Π (a b c : A), Path A (O a c) (O b c) → Path A a b)
     (iterative :
     Σ (M : Π (_ : ℕ → A), A)
-      (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail A a)))),
+      (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail∞ A a)))),
     Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
       Path A (a zero) (M x)), U
 

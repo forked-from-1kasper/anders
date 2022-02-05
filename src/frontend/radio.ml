@@ -20,10 +20,9 @@ end)
 
 module Response = Decode(struct
   let get () = input_char Kernel.stdout
-  let getn n = let m = Int64.to_int n in let bs = Bytes.make m '\x00' in
-    for idx = 0 to m - 1 do
-      Bytes.set bs idx (get ())
-    done; Bytes.to_string bs
+  let getn n = let m = Int64.to_int n in
+    Bytes.init m (fun _ -> get ())
+    |> Bytes.to_string
 end)
 
 module Fuze =

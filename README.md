@@ -147,7 +147,7 @@ sys     0m0.564s
 ```
 
 ```
-$ $ time dune exec anders check library/book.anders
+$ time dune exec anders check library/book.anders
 
 real    0m0.468s
 user    0m0.051s

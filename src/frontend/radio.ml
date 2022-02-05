@@ -70,3 +70,20 @@ let assign p t e = Request.req (Assign (p, t, e)); flush Kernel.stdin; over ()
 let assume p t = Request.req (Assume (p, t)); flush Kernel.stdin; over ()
 
 let set p x = Request.req (Set (p, x)); flush Kernel.stdin; over ()
+
+let showResp = function
+  | Version (i, j, k) -> Printf.printf "Version (%Ld, %Ld, %Ld)\n" i j k
+  | Trace (x, xs)     -> trace x xs
+  | Hole (e, gma)     -> traceHole e gma
+  | Error err         -> print_string (prettyPrintError err)
+  | Bool false        -> print_string "false\n"
+  | Bool true         -> print_string "true\n"
+  | Term e            -> Printf.printf "%s\n" (showExp e)
+  | Pong              -> print_string "pong\n"
+  | OK                -> print_string "OK\n"
+
+let receive () =
+  while true do
+    try showResp (Deserialize.resp ())
+    with Invalid_argument _ | Failure _ -> ()
+  done

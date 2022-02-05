@@ -6,7 +6,8 @@ type cmdline =
   | Parse     of string
   | Cubicaltt of string
   | Prim      of string * string
-  | Repl | Help | Trace | Indices | Girard | Silent | Irrelevance
+  | Repl | Help | Trace | Receive
+  | Indices | Girard | Silent | Irrelevance
 
 let help =
 "\n  invocation = anders | anders list
@@ -16,9 +17,9 @@ let help =
      command = check <filename>      | lex <filename>
              | parse <filename>      | prim primitive <name>
              | cubicaltt <filename>  | girard
-             | trace                 | indices
-             | silent                | repl
-             | help "
+             | trace                 | receive
+             | indices               | silent
+             | repl                  | help "
 
 let repl = ref false
 let cmd : cmdline -> unit = function
@@ -32,11 +33,12 @@ let cmd : cmdline -> unit = function
     | "interval" -> Prefs.intervalPrim := value
     | _          -> raise (UnknownPrimitive prim)
   end
-  | Help         -> print_endline Repl.banner ; print_endline help
   | Repl         -> repl := true
+  | Help         -> print_endline Repl.banner; print_endline help
+  | Trace        -> Prefs.indices := true; Radio.set "trace" "true"
+  | Receive      -> Radio.receive ()
   | Indices      -> Prefs.indices := true
   | Silent       -> Prefs.verbose := false
-  | Trace        -> Prefs.indices := true; Radio.set "trace" "true"
   | Girard       -> Radio.set "girard" "true"
   | Irrelevance  -> Radio.set "irrelevance" "true"
 
@@ -49,6 +51,7 @@ let rec parseArgs : string list -> cmdline list = function
   | "cubicaltt"   :: filename :: rest -> Cubicaltt filename :: parseArgs rest
   | "help"        :: rest             -> Help        :: parseArgs rest
   | "trace"       :: rest             -> Trace       :: parseArgs rest
+  | "receive"     :: rest             -> Receive     :: parseArgs rest
   | "indices"     :: rest             -> Indices     :: parseArgs rest
   | "silent"      :: rest             -> Silent      :: parseArgs rest
   | "girard"      :: rest             -> Girard      :: parseArgs rest

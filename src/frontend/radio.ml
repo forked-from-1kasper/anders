@@ -71,6 +71,8 @@ let assume p t = Request.req (Assume (p, t)); flush Kernel.stdin; over ()
 
 let set p x = Request.req (Set (p, x)); flush Kernel.stdin; over ()
 
+let wipe () = Request.req Wipe; flush Kernel.stdin; over ()
+
 let showResp = function
   | Version (i, j, k) -> Printf.printf "Version (%Ld, %Ld, %Ld)\n" i j k
   | Trace (x, xs)     -> trace x xs

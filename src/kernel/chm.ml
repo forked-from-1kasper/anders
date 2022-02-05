@@ -49,6 +49,8 @@ let proto : req -> resp = function
   | Ping             -> Pong
 
 let () = try while true do
-  Serialize.resp (proto (Deserialize.req ()));
+  Serialize.resp (try proto (Deserialize.req ())
+    with Invalid_argument xs
+       | Decode xs -> Error (Unknown xs));
   flush_all ()
 done with End_of_file -> ()

@@ -1,6 +1,8 @@
 open Prelude
 open Spec
 
+exception Decode of string
+
 module type Reader =
 sig
   val get  : unit -> char
@@ -25,12 +27,12 @@ struct
   let ident () = match R.get () with
     | '\x00' -> Irrefutable
     | '\xFF' -> let xs = string () in let n = int64 () in Ident (xs, n)
-    | _      -> failwith "Ident?"
+    | _      -> raise (Decode "Ident?")
 
   let dir () = match R.get () with
     | '\x00' -> Zero
     | '\xFF' -> One
-    | _      -> failwith "Dir?"
+    | _      -> raise (Decode "Dir?")
 
   let face () = let n = int () in let mu = ref Env.empty in
     for _ = 1 to n do
@@ -90,7 +92,7 @@ struct
     | '\x51' -> EInf (exp ())
     | '\x52' -> let (t, f) = exp2 () in EIndIm (t, f)
     | '\x53' -> EJoin (exp ())
-    | _      -> failwith "Term?"
+    | _      -> raise (Decode "Term?")
 
   and exp2 () = let a = exp () in let b = exp () in (a, b)
   and exp3 () = let a = exp () in let b = exp () in let c = exp () in (a, b, c)
@@ -118,7 +120,7 @@ struct
     | '\x30' -> let p = string () in let x = string () in Set (p, x)
     | '\x31' -> Version
     | '\x32' -> Ping
-    | _      -> failwith "Req?"
+    | _      -> raise (Decode "Req?")
 
   let rec error () = match R.get () with
     | '\x01' -> Unknown (string ())
@@ -142,7 +144,7 @@ struct
       Traceback (err, Array.to_list (Array.init n (fun _ -> exp2 ())))
     | '\x13' -> InvalidOpt (string ())
     | '\x14' -> let p = string () in let x = string () in InvalidOptValue (p, x)
-    | _      -> failwith "Error?"
+    | _      -> raise (Decode "Error?")
 
   let resp () = match R.get () with
     | '\x10' -> let i = int64 () in let j = int64 () in let k = int64 () in Version (i, j, k)
@@ -157,13 +159,12 @@ struct
     | '\x22' -> Term (exp ())
     | '\xF0' -> Pong
     | '\x00' -> OK
-    | _      -> failwith "Resp?"
+    | _      -> raise (Decode "Resp?")
 end
 
 module Deserialize = Decode(struct
   let get () = input_char stdin
-  let getn n = let m = Int64.to_int n in let bs = Bytes.make m '\x00' in
-    for idx = 0 to m - 1 do
-      Bytes.set bs idx (get ())
-    done; Bytes.to_string bs
+  let getn n = let m = Int64.to_int n in
+    Bytes.init m (fun _ -> get ())
+    |> Bytes.to_string
 end)

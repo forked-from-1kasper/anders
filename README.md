@@ -145,11 +145,11 @@ sys     0m0.564s
 ```
 
 ```
-$ time ./anders.native check library/book.anders
+$ $ time dune exec anders check library/book.anders
 
-real    0m0.375s
-user    0m0.355s
-sys     0m0.020s
+real    0m0.468s
+user    0m0.051s
+sys     0m0.032s
 ```
 
 Acknowledgements

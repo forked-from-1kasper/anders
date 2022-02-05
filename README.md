@@ -137,10 +137,11 @@ Benchmarks
 ----------
 
 ```
-$ time make
-real    0m4.936s
-user    0m1.874s
-sys     0m0.670s
+$ time dune build
+
+real    0m1.456s
+user    0m2.794s
+sys     0m0.564s
 ```
 
 ```

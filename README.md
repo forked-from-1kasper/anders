@@ -136,6 +136,8 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 Benchmarks
 ----------
 
+Intel i7-8700.
+
 ```
 $ time dune build
 

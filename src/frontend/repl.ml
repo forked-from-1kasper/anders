@@ -10,10 +10,13 @@ let help =
   <statement>    infer type and normalize statement
   :q             quit
   :r             restart
-  :h             display this message"
+  :h             display this message
+
+Information about command line options can be found at “anders help”."
 
 let banner =
-  Printf.sprintf "Anders [MLTT][CCHM][HTS][deRham] proof assistant version %Ld.%Ld.%Ld"
+  Printf.sprintf "Anders Proof Assisant version %Ld.%Ld.%Ld
+Copyright © 2021–2022 Groupoid Infinity."
     Fuze.year Fuze.month Fuze.patch
 
 let loaded : Files.t ref = ref Files.empty
@@ -30,7 +33,7 @@ let main : command -> unit = function
 let check filename = loaded := handleErrors (checkFile !loaded) filename !loaded
 
 let repl () =
-  print_endline ("\n" ^ banner);
+  print_endline ("\n" ^ banner ^ "\n\nFor help type “:h”.\n");
   try while true do
     print_string "> "; let line = read_line () in
     handleErrors (fun x -> main (Reader.parseErr Parser.repl

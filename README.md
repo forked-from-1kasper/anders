@@ -27,7 +27,7 @@ type exp =
   | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp        (* Disc *)
 ```
 
-Anders is a HoTT theorem prover based on: classical MLTT-80 with 0, 1, 2, W types;
+Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
 CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
 HTS sctrict equality on pretypes; de Rham stack modality primitives.
 We tend not to touch general recursive higher inductive schemes yet,

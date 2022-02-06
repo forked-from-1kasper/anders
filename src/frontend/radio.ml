@@ -20,10 +20,7 @@ end)
 
 module Response = Decode(struct
   let get () = input_char Kernel.stdout
-  let getn n = let m = Int64.to_int n in let bs = Bytes.make m '\x00' in
-    for idx = 0 to m - 1 do
-      Bytes.set bs idx (get ())
-    done; Bytes.to_string bs
+  let getn n = String.init (Int64.to_int n) (fun _ -> get ())
 end)
 
 module Fuze =
@@ -70,6 +67,8 @@ let assign p t e = Request.req (Assign (p, t, e)); flush Kernel.stdin; over ()
 let assume p t = Request.req (Assume (p, t)); flush Kernel.stdin; over ()
 
 let set p x = Request.req (Set (p, x)); flush Kernel.stdin; over ()
+
+let wipe () = Request.req Wipe; flush Kernel.stdin; over ()
 
 let showResp = function
   | Version (i, j, k) -> Printf.printf "Version (%Ld, %Ld, %Ld)\n" i j k

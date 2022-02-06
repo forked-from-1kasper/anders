@@ -66,6 +66,6 @@ let defaults = function
 let rec main () =
   try Array.to_list Sys.argv |> List.tl |> parseArgs |> defaults |> List.iter cmd;
     if !repl then Repl.repl () else ()
-  with Restart -> main ()
+  with Restart -> Radio.wipe (); main ()
 
 let () = main ()

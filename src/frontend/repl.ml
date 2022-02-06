@@ -12,7 +12,7 @@ let help =
   :r             restart
   :h             display this message
 
-Information about command line options can be found at “anders help”."
+Information about command line options can be found at ‘anders help’."
 
 let banner =
   Printf.sprintf "Anders Proof Assisant version %Ld.%Ld.%Ld
@@ -33,7 +33,7 @@ let main : command -> unit = function
 let check filename = loaded := handleErrors (checkFile !loaded) filename !loaded
 
 let repl () =
-  print_endline ("\n" ^ banner ^ "\n\nFor help type “:h”.\n");
+  print_endline ("\n" ^ banner ^ "\n\nFor help type ‘:h’.\n");
   try while true do
     print_string "> "; let line = read_line () in
     handleErrors (fun x -> main (Reader.parseErr Parser.repl

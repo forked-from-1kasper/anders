@@ -36,3 +36,16 @@ classical-mp (A × B) A φ (IPC→CL ((A × B) → A) (λ (w : A × B), w.1))
 def classical-pr₂ (A B : U) (φ : CL (A × B)) : CL B :=
 classical-mp (A × B) B φ (IPC→CL ((A × B) → B) (λ (w : A × B), w.2))
 
+def classical-or-inl (A B : U) (a : CL A) : CL (+ A B) :=
+classical-mp A (+ A B) a (IPC→CL (A → + A B) (inl A B))
+
+def classical-or-inr (A B : U) (b : CL B) : CL (+ A B) :=
+classical-mp B (+ A B) b (IPC→CL (B → + A B) (inr A B))
+
+def classical-or-elim (A B C : U) (φ : CL A → CL C) (ψ : CL B → CL C) : CL (+ A B → C) :=
+classical-mp ((A → C) × (B → C)) (+ A B → C)
+  (classical-prod-intro (A → C) (B → C)
+    (classical-deduction A C φ)
+    (classical-deduction B C ψ))
+  (IPC→CL (((A → C) × (B → C)) → (+ A B) → C)
+    (λ (w : ((A → C) × (B → C))), +-rec A B C w.1 w.2))

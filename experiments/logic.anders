@@ -29,3 +29,10 @@ classical-mp B (A × B) b
   (classical-mp A (B → A × B) a
     (IPC→CL (A → B → A × B)
       (λ (a′ : A) (b′ : B), (a′, b′))))
+
+def classical-pr₁ (A B : U) (φ : CL (A × B)) : CL A :=
+classical-mp (A × B) A φ (IPC→CL ((A × B) → A) (λ (w : A × B), w.1))
+
+def classical-pr₂ (A B : U) (φ : CL (A × B)) : CL B :=
+classical-mp (A × B) B φ (IPC→CL ((A × B) → B) (λ (w : A × B), w.2))
+

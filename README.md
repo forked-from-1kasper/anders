@@ -86,7 +86,7 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 ```
 
 ```shell
-$ anders check library/path.anders
+$ anders check library/book.anders
 ```
 
 MLTT

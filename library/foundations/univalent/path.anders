@@ -52,6 +52,7 @@ def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
 def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b) (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
 def SET : U₁ := Σ (X : U), isSet X
+def Ω : U₁ := Σ (A : U), isProp A
 
 -- Computational Properties
 

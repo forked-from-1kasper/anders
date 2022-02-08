@@ -1,0 +1,7 @@
+module ski where
+import library/foundations/univalent/path
+
+def S := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1
+def K := Π (p q: Ω) (x: p.1), q.1 → p.1
+def I := Π (p : Ω), p.1 → p.1
+

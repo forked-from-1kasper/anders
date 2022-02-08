@@ -12,3 +12,6 @@ def classical-dneg (A : U) : CL (¬ (¬ A) → A) :=
 
 def classical-lem (A : U) : CL (+ (¬ A) A) :=
 λ (f : ¬ (+ (¬ A) A)), f (0₂, λ (x : A), f (1₂, x))
+
+def classical-mp (A B : U) : CL A → CL (A → B) → CL B :=
+λ (f : CL A) (g : CL (A → B)) (h : ¬ B), g (λ (φ : A → B), f (λ (x : A), h (φ x)))

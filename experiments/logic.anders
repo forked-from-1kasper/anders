@@ -1,0 +1,14 @@
+module logic where
+import library/foundations/mltt/either
+
+def ¬ (A : U) := A → 𝟎
+def CL (A : U) := ¬ (¬ A)
+
+def IPC→CL (A : U) : A → CL A :=
+λ (x : A) (φ : ¬ A), φ x
+
+def classical-dneg (A : U) : CL (¬ (¬ A) → A) :=
+λ (f : ¬ (¬ (¬ A) → A)), f (λ (g : ¬ (¬ A)), ind₀ A (g (λ (x : A), f (λ (h : ¬ (¬ A)), x))))
+
+def classical-lem (A : U) : CL (+ (¬ A) A) :=
+λ (f : ¬ (+ (¬ A) A)), f (0₂, λ (x : A), f (1₂, x))

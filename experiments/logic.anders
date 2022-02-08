@@ -54,5 +54,8 @@ classical-mp ((A → C) × (B → C)) (+ A B → C)
 def classical-contrapos₁ (A B : U) (f : CL (¬ B → ¬ A)) : CL (A → B) :=
 λ (g : ¬ (A → B)), f (λ (h : ¬ B → ¬ A), g (λ (x : A), ind₀ B (h (λ (y : B), g (λ (x′ : A), y)) x)))
 
+def contrapos (A B : U) : (A → B) → (¬ B → ¬ A) :=
+λ (g : A → B) (h : ¬ B) (x : A), h (g x)
+
 def classical-contrapos₂ (A B : U) (f : CL (A → B)) : CL (¬ B → ¬ A) :=
-classical-mp (A → B) (¬ B → ¬ A) f (IPC→CL ((A → B) → ¬ B → ¬ A) (λ (g : A → B) (h : ¬ B) (x : A), h (g x)))
+classical-mp (A → B) (¬ B → ¬ A) f (IPC→CL ((A → B) → ¬ B → ¬ A) (contrapos A B))

@@ -1,12 +1,15 @@
-module logic where
+{- Glivenko Theorem.
+   - Translation from implicational propositional calculus to classical logic
+
+   https://en.wikipedia.org/wiki/Glivenko%27s_translation
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module glivenko where
 import library/foundations/mltt/either
 
 def ¬ (A : U) := A → 𝟎
 def CL (A : U) := ¬ (¬ A)
-
--- Consequences from Glivenko’s Theorem
--- https://electives.hse.ru/data/2017/10/16/1159321542/Book-Part2.pdf (Theorem 1.17)
--- https://en.wikipedia.org/wiki/Glivenko%27s_translation
 
 def IPC→CL (A : U) : A → CL A := λ (x : A) (φ : ¬ A), φ x
 
@@ -19,18 +22,17 @@ def classical-deduction (A B : U) : (CL A → CL B) → CL (A → B)
 
 def classical-prod-intro (A B : U) (a : CL A) (b : CL B) : CL (A × B)
  := classical-mp B (A × B) b (classical-mp A (B → A × B) a (IPC→CL (A → B → A × B) (λ (a′ : A) (b′ : B), (a′, b′))))
-
 def classical-pr₁ (A B : U) (φ : CL (A × B)) : CL A := classical-mp (A × B) A φ (IPC→CL (A × B → A) (λ (w : A × B), w.1))
 def classical-pr₂ (A B : U) (φ : CL (A × B)) : CL B := classical-mp (A × B) B φ (IPC→CL (A × B → B) (λ (w : A × B), w.2))
+
 def classical-or-inl (A B : U) (a : CL A) : CL (+ A B) := classical-mp A (+ A B) a (IPC→CL (A → + A B) (inl A B))
 def classical-or-inr (A B : U) (b : CL B) : CL (+ A B) := classical-mp B (+ A B) b (IPC→CL (B → + A B) (inr A B))
-
 def classical-or-elim (A B C : U) (φ : CL A → CL C) (ψ : CL B → CL C) : CL (+ A B → C)
  := classical-mp ((A → C) × (B → C)) (+ A B → C) (classical-prod-intro (A → C) (B → C) (classical-deduction A C φ) (classical-deduction B C ψ))
                  (IPC→CL ((A → C) × (B → C) → (+ A B) → C) (λ (w : ((A → C) × (B → C))), +-rec A B C w.1 w.2))
 
+def contrapos (A B : U) : (A → B) → (¬ B → ¬ A) := λ (g : A → B) (h : ¬ B) (x : A), h (g x)
+def classical-contrapos₂ (A B : U) (f : CL (A → B)) : CL (¬ B → ¬ A) := classical-mp (A → B) (¬ B → ¬ A) f (IPC→CL ((A → B) → ¬ B → ¬ A) (contrapos A B))
 def classical-contrapos₁ (A B : U) (f : CL (¬ B → ¬ A)) : CL (A → B)
  := λ (g : ¬ (A → B)), f (λ (h : ¬ B → ¬ A), g (λ (x : A), ind₀ B (h (λ (y : B), g (λ (x′ : A), y)) x)))
 
-def contrapos (A B : U) : (A → B) → (¬ B → ¬ A) := λ (g : A → B) (h : ¬ B) (x : A), h (g x)
-def classical-contrapos₂ (A B : U) (f : CL (A → B)) : CL (¬ B → ¬ A) := classical-mp (A → B) (¬ B → ¬ A) f (IPC→CL ((A → B) → ¬ B → ¬ A) (contrapos A B))

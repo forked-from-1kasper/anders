@@ -23,3 +23,9 @@ def classical-linearity (A B : U) : CL (+ (A → B) (B → A))
 
 def classical-deduction (A B : U) : (CL A → CL B) → CL (A → B)
  := λ (f : CL A → CL B) (g : ¬ (A → B)), f (λ (h : ¬ A), g (λ (x : A), ind₀ B (h x))) (λ (y : B), g (λ (x : A), y))
+
+def classical-prod-intro (A B : U) (a : CL A) (b : CL B) : CL (A × B) :=
+classical-mp B (A × B) b
+  (classical-mp A (B → A × B) a
+    (IPC→CL (A → B → A × B)
+      (λ (a′ : A) (b′ : B), (a′, b′))))

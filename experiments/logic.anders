@@ -10,52 +10,27 @@ def CL (A : U) := ¬ (¬ A)
 
 def IPC→CL (A : U) : A → CL A := λ (x : A) (φ : ¬ A), φ x
 
-def classical-dneg (A : U) : CL (¬ (¬ A) → A)
- := λ (f : ¬ (¬ (¬ A) → A)), f (λ (g : ¬ (¬ A)), ind₀ A (g (λ (x : A), f (λ (h : ¬ (¬ A)), x))))
-
-def classical-lem (A : U) : CL (+ (¬ A) A)
- := λ (f : ¬ (+ (¬ A) A)), f (0₂, λ (x : A), f (1₂, x))
-
-def classical-mp (A B : U) : CL A → CL (A → B) → CL B
- := λ (f : CL A) (g : CL (A → B)) (h : ¬ B), g (λ (φ : A → B), f (λ (x : A), h (φ x)))
-
-def classical-linearity (A B : U) : CL (+ (A → B) (B → A))
- := λ (f : ¬ (+ (A → B) (B → A))), f (0₂, λ (x : A), ind₀ B (f (1₂, λ (y : B), x)))
-
+def classical-dneg (A : U) : CL (¬ (¬ A) → A) := λ (f : ¬ (¬ (¬ A) → A)), f (λ (g : ¬ (¬ A)), ind₀ A (g (λ (x : A), f (λ (h : ¬ (¬ A)), x))))
+def classical-lem (A : U) : CL (+ (¬ A) A) := λ (f : ¬ (+ (¬ A) A)), f (0₂, λ (x : A), f (1₂, x))
+def classical-mp (A B : U) : CL A → CL (A → B) → CL B := λ (f : CL A) (g : CL (A → B)) (h : ¬ B), g (λ (φ : A → B), f (λ (x : A), h (φ x)))
+def classical-linearity (A B : U) : CL (+ (A → B) (B → A)) := λ (f : ¬ (+ (A → B) (B → A))), f (0₂, λ (x : A), ind₀ B (f (1₂, λ (y : B), x)))
 def classical-deduction (A B : U) : (CL A → CL B) → CL (A → B)
  := λ (f : CL A → CL B) (g : ¬ (A → B)), f (λ (h : ¬ A), g (λ (x : A), ind₀ B (h x))) (λ (y : B), g (λ (x : A), y))
 
-def classical-prod-intro (A B : U) (a : CL A) (b : CL B) : CL (A × B) :=
-classical-mp B (A × B) b
-  (classical-mp A (B → A × B) a
-    (IPC→CL (A → B → A × B)
-      (λ (a′ : A) (b′ : B), (a′, b′))))
+def classical-prod-intro (A B : U) (a : CL A) (b : CL B) : CL (A × B)
+ := classical-mp B (A × B) b (classical-mp A (B → A × B) a (IPC→CL (A → B → A × B) (λ (a′ : A) (b′ : B), (a′, b′))))
 
-def classical-pr₁ (A B : U) (φ : CL (A × B)) : CL A :=
-classical-mp (A × B) A φ (IPC→CL (A × B → A) (λ (w : A × B), w.1))
+def classical-pr₁ (A B : U) (φ : CL (A × B)) : CL A := classical-mp (A × B) A φ (IPC→CL (A × B → A) (λ (w : A × B), w.1))
+def classical-pr₂ (A B : U) (φ : CL (A × B)) : CL B := classical-mp (A × B) B φ (IPC→CL (A × B → B) (λ (w : A × B), w.2))
+def classical-or-inl (A B : U) (a : CL A) : CL (+ A B) := classical-mp A (+ A B) a (IPC→CL (A → + A B) (inl A B))
+def classical-or-inr (A B : U) (b : CL B) : CL (+ A B) := classical-mp B (+ A B) b (IPC→CL (B → + A B) (inr A B))
 
-def classical-pr₂ (A B : U) (φ : CL (A × B)) : CL B :=
-classical-mp (A × B) B φ (IPC→CL (A × B → B) (λ (w : A × B), w.2))
+def classical-or-elim (A B C : U) (φ : CL A → CL C) (ψ : CL B → CL C) : CL (+ A B → C)
+ := classical-mp ((A → C) × (B → C)) (+ A B → C) (classical-prod-intro (A → C) (B → C) (classical-deduction A C φ) (classical-deduction B C ψ))
+                 (IPC→CL ((A → C) × (B → C) → (+ A B) → C) (λ (w : ((A → C) × (B → C))), +-rec A B C w.1 w.2))
 
-def classical-or-inl (A B : U) (a : CL A) : CL (+ A B) :=
-classical-mp A (+ A B) a (IPC→CL (A → + A B) (inl A B))
+def classical-contrapos₁ (A B : U) (f : CL (¬ B → ¬ A)) : CL (A → B)
+ := λ (g : ¬ (A → B)), f (λ (h : ¬ B → ¬ A), g (λ (x : A), ind₀ B (h (λ (y : B), g (λ (x′ : A), y)) x)))
 
-def classical-or-inr (A B : U) (b : CL B) : CL (+ A B) :=
-classical-mp B (+ A B) b (IPC→CL (B → + A B) (inr A B))
-
-def classical-or-elim (A B C : U) (φ : CL A → CL C) (ψ : CL B → CL C) : CL (+ A B → C) :=
-classical-mp ((A → C) × (B → C)) (+ A B → C)
-  (classical-prod-intro (A → C) (B → C)
-    (classical-deduction A C φ)
-    (classical-deduction B C ψ))
-  (IPC→CL ((A → C) × (B → C) → (+ A B) → C)
-    (λ (w : ((A → C) × (B → C))), +-rec A B C w.1 w.2))
-
-def classical-contrapos₁ (A B : U) (f : CL (¬ B → ¬ A)) : CL (A → B) :=
-λ (g : ¬ (A → B)), f (λ (h : ¬ B → ¬ A), g (λ (x : A), ind₀ B (h (λ (y : B), g (λ (x′ : A), y)) x)))
-
-def contrapos (A B : U) : (A → B) → (¬ B → ¬ A) :=
-λ (g : A → B) (h : ¬ B) (x : A), h (g x)
-
-def classical-contrapos₂ (A B : U) (f : CL (A → B)) : CL (¬ B → ¬ A) :=
-classical-mp (A → B) (¬ B → ¬ A) f (IPC→CL ((A → B) → ¬ B → ¬ A) (contrapos A B))
+def contrapos (A B : U) : (A → B) → (¬ B → ¬ A) := λ (g : A → B) (h : ¬ B) (x : A), h (g x)
+def classical-contrapos₂ (A B : U) (f : CL (A → B)) : CL (¬ B → ¬ A) := classical-mp (A → B) (¬ B → ¬ A) f (IPC→CL ((A → B) → ¬ B → ¬ A) (contrapos A B))

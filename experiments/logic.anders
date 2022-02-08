@@ -4,8 +4,9 @@ import library/foundations/mltt/either
 def ¬ (A : U) := A → 𝟎
 def CL (A : U) := ¬ (¬ A)
 
--- Theorem 1.17
--- https://electives.hse.ru/data/2017/10/16/1159321542/Book-Part2.pdf
+-- Consequences from Glivenko’s Theorem
+-- https://electives.hse.ru/data/2017/10/16/1159321542/Book-Part2.pdf (Theorem 1.17)
+-- https://en.wikipedia.org/wiki/Glivenko%27s_translation
 
 def IPC→CL (A : U) : A → CL A := λ (x : A) (φ : ¬ A), φ x
 

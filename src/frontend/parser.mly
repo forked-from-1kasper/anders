@@ -64,7 +64,8 @@
 %left APPFORMULA
 %left OR
 %left AND
-%right ARROW PROD
+%right ARROW
+%right PROD
 
 %nonassoc NEGATE
 %nonassoc DOT

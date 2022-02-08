@@ -15,3 +15,6 @@ def classical-lem (A : U) : CL (+ (¬ A) A) :=
 
 def classical-mp (A B : U) : CL A → CL (A → B) → CL B :=
 λ (f : CL A) (g : CL (A → B)) (h : ¬ B), g (λ (φ : A → B), f (λ (x : A), h (φ x)))
+
+def classical-linearity (A B : U) : CL (+ (A → B) (B → A)) :=
+λ (f : ¬ (+ (A → B) (B → A))), f (0₂, λ (x : A), ind₀ B (f (1₂, λ (y : B), x)))

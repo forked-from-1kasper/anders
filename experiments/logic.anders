@@ -4,17 +4,19 @@ import library/foundations/mltt/either
 def ¬ (A : U) := A → 𝟎
 def CL (A : U) := ¬ (¬ A)
 
-def IPC→CL (A : U) : A → CL A :=
-λ (x : A) (φ : ¬ A), φ x
+-- Theorem 1.17
+-- https://electives.hse.ru/data/2017/10/16/1159321542/Book-Part2.pdf
 
-def classical-dneg (A : U) : CL (¬ (¬ A) → A) :=
-λ (f : ¬ (¬ (¬ A) → A)), f (λ (g : ¬ (¬ A)), ind₀ A (g (λ (x : A), f (λ (h : ¬ (¬ A)), x))))
+def IPC→CL (A : U) : A → CL A := λ (x : A) (φ : ¬ A), φ x
 
-def classical-lem (A : U) : CL (+ (¬ A) A) :=
-λ (f : ¬ (+ (¬ A) A)), f (0₂, λ (x : A), f (1₂, x))
+def classical-dneg (A : U) : CL (¬ (¬ A) → A)
+ := λ (f : ¬ (¬ (¬ A) → A)), f (λ (g : ¬ (¬ A)), ind₀ A (g (λ (x : A), f (λ (h : ¬ (¬ A)), x))))
 
-def classical-mp (A B : U) : CL A → CL (A → B) → CL B :=
-λ (f : CL A) (g : CL (A → B)) (h : ¬ B), g (λ (φ : A → B), f (λ (x : A), h (φ x)))
+def classical-lem (A : U) : CL (+ (¬ A) A)
+ := λ (f : ¬ (+ (¬ A) A)), f (0₂, λ (x : A), f (1₂, x))
 
-def classical-linearity (A B : U) : CL (+ (A → B) (B → A)) :=
-λ (f : ¬ (+ (A → B) (B → A))), f (0₂, λ (x : A), ind₀ B (f (1₂, λ (y : B), x)))
+def classical-mp (A B : U) : CL A → CL (A → B) → CL B
+ := λ (f : CL A) (g : CL (A → B)) (h : ¬ B), g (λ (φ : A → B), f (λ (x : A), h (φ x)))
+
+def classical-linearity (A B : U) : CL (+ (A → B) (B → A))
+ := λ (f : ¬ (+ (A → B) (B → A))), f (0₂, λ (x : A), ind₀ B (f (1₂, λ (y : B), x)))

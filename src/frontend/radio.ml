@@ -6,7 +6,10 @@ open Error
 
 module Kernel =
 struct
-  let chm  = "./_build/install/default/bin/chm"
+  let chm = match Sys.getenv_opt "ANDERS" with
+    | Some path -> path
+    | None      -> "./_build/install/default/bin/chm"
+
   let args = Array.make 0 ""
   let env  = Array.make 0 ""
 
@@ -25,6 +28,12 @@ end)
 
 module Fuze =
 struct
+  let () =
+    if not (Sys.file_exists Kernel.chm) then begin
+      Printf.printf "ERROR: kernel under path “%s” was not found.\n" Kernel.chm;
+      exit (-1)
+    end else ()
+
   let (year, month, patch) =
     (* ping-pong *)
     Request.req Ping; flush Kernel.stdin;

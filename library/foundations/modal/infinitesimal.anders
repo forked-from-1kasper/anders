@@ -80,8 +80,8 @@ def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (�
                      (λ (a : A), ℑ-unit (ind-ℑ A (B (ℑ-unit a)) (f a))) x) y)
 
 -- more direct derivation of ℑ-app
-
 def ℑ-lift (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
+
 def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
 def ℑ-Ω-elim (A : U) (a b : ℑ A) (ρ : ℑ (Path (ℑ A) a b)) : Path (ℑ A) a b
  := <i> ℑ-rec′ (Path (ℑ A) a b) A (λ (p : Path (ℑ A) a b), p @ i) ρ

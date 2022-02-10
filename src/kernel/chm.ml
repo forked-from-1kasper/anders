@@ -21,10 +21,10 @@ let promote fn = try fn () with exc -> Error (extErr exc)
 let proto : req -> resp = function
   | Check (e0, t0)     -> promote (fun () -> let t = freshExp t0 in
     ignore (extSet (infer !ctx t)); check !ctx (freshExp e0) (eval !ctx t); OK)
-  | Infer e            -> promote (fun () -> Term (rbV (infer !ctx e)))
-  | Eval e             -> promote (fun () -> Term (rbV (eval !ctx e)))
-  | Conv (e1, e2)      -> promote (fun () ->
-    Bool (conv (eval !ctx e1) (eval !ctx e2)))
+  | Infer e            -> promote (fun () -> Term (rbV (infer !ctx (freshExp e))))
+  | Eval e             -> promote (fun () -> Term (rbV (eval !ctx (freshExp e))))
+  | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
+                                                        (eval !ctx (freshExp e2))))
   | Def (x, t0, e0)    -> promote (fun () ->
     if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in

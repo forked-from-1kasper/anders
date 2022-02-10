@@ -82,7 +82,6 @@ def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (�
 -- more direct derivation of ℑ-app
 def ℑ-lift (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
 
-def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
 def ℑ-Ω-elim (A : U) (a b : ℑ A) (ρ : ℑ (Path (ℑ A) a b)) : Path (ℑ A) a b
  := <i> ℑ-rec′ (Path (ℑ A) a b) A (λ (p : Path (ℑ A) a b), p @ i) ρ
 
@@ -95,6 +94,13 @@ def ℑ-path-coreduced (A : U) (a b : ℑ A)
                      (λ (μ : ℑ (Path (ℑ A) a b)), Path (ℑ (Path (ℑ A) a b)) (ℑ-unit (ℑ-Ω-elim A a b μ)) μ)
                      (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
     (λ (p : Path (ℑ A) a b), <_> p)
+
+def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
+
+def ℑ-idfun=idfun (A : U) : Π (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x :=
+ℑ-ind A (λ (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x)
+        (λ (x : ℑ A), ℑ-path-coreduced A (ℑ-idfun A x) x)
+        (λ (a : A), <_> ℑ-unit a)
 
 def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B)
   : Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))

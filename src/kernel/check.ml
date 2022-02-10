@@ -231,6 +231,11 @@ and homcom t r i u u0 = match t, r, u, u0 with
       (System.map (fun (_, w, x) -> app (vfst w, x (dim i))) ts)
       (System.map (unglue phi (VSystem t)) u))) (unglue phi (VSystem t) u0) in
     glue phi (VSystem t1) a1
+  (* hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀)) ~>
+     sup A B (hcomp A r a (ouc a₀))
+             (hcomp (B (hcomp A r a (ouc a₀)) → (W (x : A), B x)) r
+                    (λ (i : I), [(r = 1) → λ (b : B (a 1 1=1)), (f i 1=1) (transp (<j> B (a (-j ∨ i) 1=1)) 0 b)])
+                    (λ (b : B (hcomp A r a (ouc a₀))), (ouc f₀) (transp (<j> B (hfill A r a a₀ -j)) 0 b))) *)
   | W (t, (x, b)), _, VSystem u, VApp (VApp (VSup (_, b'), a0), f0) when System.for_all (fun _ -> isSup) u ->
     let u' = System.map extSup u in let a' = hfill t r i (VSystem (System.map fst u')) a0 in
     let a1 = a' vone in let j = freshName "ι" in let y = freshName "b" in

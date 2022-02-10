@@ -32,6 +32,11 @@ def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glu
 def glue′ (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
 def unglue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue φ e b
 
+def hcomp-Glue (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
+   (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
+   (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1] :=
+hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
+
 -- The notion of Univalence was discovered by Vladimir Voevodsky
 -- as forth and back transport between fibrational equivalence
 -- as contractability of fibers and homotopical multi-dimentional

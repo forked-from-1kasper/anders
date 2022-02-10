@@ -104,7 +104,7 @@ and transport i p phi u0 = match p, phi, u0 with
      λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x -i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)
   | VPi (t, (_, b)), _, _ -> let x = fresh (ident "x") in
-  let j = freshName "ι" in let k = freshName "κ" in
+    let j = freshName "ι" in let k = freshName "κ" in
     VLam (act0 i vone t, (x, fun x ->
       let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
       transport k (swap i k (b (v (VNeg (dim k)))))
@@ -223,6 +223,14 @@ and homcom t r i u u0 = match t, r, u, u0 with
   | VKan _, _, _, _ ->
     app (VApp (VGlue u0, r), VSystem (walk (fun e ->
       pairv (act0 i vone e) (idtoeqv i (act0 i (VNeg (dim i)) e))) r u))
+  | VApp (VApp (VGlue a, phi), VSystem t), _, VSystem u, _ ->
+    let ts = System.map (fun (t, w) -> (t, w, hfill t r i (VSystem u) u0)) (System.map eta t) in
+    let t1 = System.map (fun (t, w, x) -> pairv t (pairv w (x vone))) ts in
+
+    let a1 = homcom a (evalOr r phi) i (VSystem (unionSystem
+      (System.map (fun (_, w, x) -> app (vfst w, x (dim i))) ts)
+      (System.map (unglue phi (VSystem t)) u))) (unglue phi (VSystem t) u0) in
+    glue phi (VSystem t1) a1
   (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
        ℑ-unit (hcomp A r u (ouc u₀)) *)
   | VIm t, _, VSystem u, VInf u0 when System.for_all (fun _ -> isInf) u ->

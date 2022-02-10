@@ -124,13 +124,14 @@ struct
     | ExpectedIm e           -> W.put '\x0B'; exp e
     | ExpectedInf e          -> W.put '\x0C'; exp e
     | ExpectedGlue e         -> W.put '\x0D'; exp e
-    | DNFSolverError (e, d)  -> W.put '\x0E'; exp e; dir d
-    | AlreadyDeclared x      -> W.put '\x0F'; string x
-    | VariableNotFound x     -> W.put '\x10'; ident x
-    | InferError e           -> W.put '\x11'; exp e
-    | Traceback (e, es)      -> W.put '\x12'; error e; int (List.length es); List.iter (uncurry exp2) es
-    | InvalidOpt p           -> W.put '\x13'; string p
-    | InvalidOptValue (p, x) -> W.put '\x14'; string p; string x
+    | ExpectedSup e          -> W.put '\x0E'; exp e
+    | DNFSolverError (e, d)  -> W.put '\x0F'; exp e; dir d
+    | AlreadyDeclared x      -> W.put '\x10'; string x
+    | VariableNotFound x     -> W.put '\x11'; ident x
+    | InferError e           -> W.put '\x12'; exp e
+    | Traceback (e, es)      -> W.put '\x13'; error e; int (List.length es); List.iter (uncurry exp2) es
+    | InvalidOpt p           -> W.put '\x14'; string p
+    | InvalidOptValue (p, x) -> W.put '\x15'; string p; string x
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

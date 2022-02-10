@@ -28,8 +28,15 @@ let extInf : value -> value = function
   | VInf v -> v
   | v      -> raise (Internal (ExpectedInf (rbV v)))
 
+let extSup : value -> value * value = function
+  | VApp (VApp (VSup _, a), f) -> (a, f)
+  | v                          -> raise (Internal (ExpectedSup (rbV v)))
+
 let isInf : value -> bool = function
   | VInf _ -> true | _ -> false
+
+let isSup : value -> bool = function
+  | VApp (VApp (VSup _, _), _) -> true | _ -> false
 
 let join = function
   | VInf v -> v

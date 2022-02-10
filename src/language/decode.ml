@@ -134,14 +134,15 @@ struct
     | '\x0B' -> ExpectedIm (exp ())
     | '\x0C' -> ExpectedInf (exp ())
     | '\x0D' -> ExpectedGlue (exp ())
-    | '\x0E' -> let e = exp () in let d = dir () in DNFSolverError (e, d)
-    | '\x0F' -> AlreadyDeclared (string ())
-    | '\x10' -> VariableNotFound (ident ())
-    | '\x11' -> InferError (exp ())
-    | '\x12' -> let err = error () in let n = int () in
+    | '\x0E' -> ExpectedSup (exp ())
+    | '\x0F' -> let e = exp () in let d = dir () in DNFSolverError (e, d)
+    | '\x10' -> AlreadyDeclared (string ())
+    | '\x11' -> VariableNotFound (ident ())
+    | '\x12' -> InferError (exp ())
+    | '\x13' -> let err = error () in let n = int () in
       Traceback (err, List.init n (fun _ -> exp2 ()))
-    | '\x13' -> InvalidOpt (string ())
-    | '\x14' -> let p = string () in let x = string () in InvalidOptValue (p, x)
+    | '\x14' -> InvalidOpt (string ())
+    | '\x15' -> let p = string () in let x = string () in InvalidOptValue (p, x)
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

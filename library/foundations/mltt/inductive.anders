@@ -61,3 +61,9 @@ def hcomp-W′ (A : U) (B : A → U) (r : I) (a : I → Partial A r)
     (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
     (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
  := hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀))
+
+def hcomp-W-is-correct (A : U) (B : A → U) (r : I) (a : I → Partial A r)
+    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) :
+    Path (W (x : A), B x) (hcomp-W A B r a f a₀ f₀) (hcomp-W′ A B r a f a₀ f₀) :=
+<_> hcomp-W A B r a f a₀ f₀

@@ -116,6 +116,7 @@ type error =
   | ExpectedIm       of exp
   | ExpectedInf      of exp
   | ExpectedGlue     of exp
+  | ExpectedSup      of exp
   | DNFSolverError   of exp * dir
   | AlreadyDeclared  of string
   | VariableNotFound of ident

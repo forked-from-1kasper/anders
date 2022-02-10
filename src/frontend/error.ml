@@ -28,6 +28,7 @@ let rec prettyPrintError : error -> string = function
   | ExpectedIm x           -> Printf.sprintf "“%s” expected to be a modality" (showExp x)
   | ExpectedInf x          -> Printf.sprintf "“%s” expected to be a unit of modality" (showExp x)
   | ExpectedGlue x         -> Printf.sprintf "“%s” expected to be a Glue-type" (showExp x)
+  | ExpectedSup x          -> Printf.sprintf "“%s” expected to be a sup" (showExp x)
   | DNFSolverError (e, d)  -> Printf.sprintf "Cannot solve: %s = %s" (showExp e) (showDir d)
   | AlreadyDeclared p      -> Printf.sprintf "“%s” is already declared.\n" p
   | VariableNotFound p     -> Printf.sprintf "Variable %s was not found\n" (showIdent p)

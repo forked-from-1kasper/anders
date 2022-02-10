@@ -154,7 +154,7 @@ and transport i p phi u0 = match p, phi, u0 with
         appFormula (vsnd p) (dim i)) fib') (border phi1 a1))) a1 in
 
     glue chi (VSystem (System.map (fun p -> let (t, w, u) = p in
-      VPair (ref None, t, VPair (ref None, w, vfst u))) fib')) a1'
+      pairv t (pairv w (vfst u))) fib')) a1'
   (* transp (<i> W (x : A i), B i x) φ (sup (A 0) (B 0) a f) ~>
      sup (A 1) (B 1) (transp (<i> A i) φ a)
          (transp (<i> B i (transFill (<i> A i) φ a i) → (W (x : A i), B i x)) φ f) *)

@@ -13,7 +13,10 @@ import library/foundations/mltt/proto
 
 def S := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1
 def K := Π (p q: Ω) (x: p.1), q.1 → p.1
-def I := Π (p : Ω), p.1 → p.1
+
+def Ix := Π (p : Ω), p.1 → p.1
+def i : Ix := \ (p : Ω) (x: p.1), x
+
 
 -- [Łukashewicz]
 

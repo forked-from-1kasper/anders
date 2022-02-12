@@ -324,8 +324,8 @@ and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
 (* This is part of evaluator, not type checker *)
 and inferV v = traceInferV v; match v with
-  | VPi (t, (x, f)) | VSig (t, (x, f)) | W (t, (x, f)) ->
-    imax (inferV t) (inferV (f (Var (x, t))))
+  | VPi (t, (x, f)) -> inferVTele (if !Prefs.impredicativity then impred else imax) t x f
+  | VSig (t, (x, f)) | W (t, (x, f)) -> inferVTele imax t x f
   | VLam (t, (x, f)) -> VPi (t, (x, fun x -> inferV (f x)))
   | VPLam (VLam (VI, (_, g))) -> let t = VLam (VI, (freshName "ι", g >> inferV)) in
     VApp (VApp (VPathP (VPLam t), g vzero), g vone)
@@ -380,6 +380,8 @@ and inferV v = traceInferV v; match v with
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
+
+and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
 
 and recUnit t = let x = freshName "x" in
   implv (app (t, VStar)) (VPi (VUnit, (x, fun x -> app (t, x))))
@@ -619,7 +621,8 @@ and checkOverlapping ctx ts =
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup ctx x
   | EKan u -> VKan (Z.succ u)
-  | ESig (a, (p, b)) | EPi (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx p a b
+  | EPi (a, (p, b)) -> inferTele ctx (if !Prefs.impredicativity then impred else imax) p a b
+  | ESig (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx imax p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EPLam (ELam (EI, (i, e))) ->
     let ctx' = upLocal ctx i VI (Var (i, VI)) in ignore (infer ctx' e);
@@ -708,11 +711,11 @@ and inferInd fibrant ctx t e f =
 
 and inferField ctx p e = snd (getField p (eval ctx e) (infer ctx e))
 
-and inferTele ctx p a b =
+and inferTele ctx g p a b =
   ignore (extSet (infer ctx a));
   let t = eval ctx a in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in
-  let v = infer ctx' b in imax (infer ctx a) v
+  let v = infer ctx' b in g (infer ctx a) v
 
 and inferLam ctx p a e =
   ignore (extSet (infer ctx a)); let t = eval ctx a in

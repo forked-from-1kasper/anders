@@ -42,11 +42,12 @@ let proto : req -> resp = function
   | Wipe               -> ctx := Env.empty; OK
   | Set (p, x)         ->
   begin match p with
-    | "trace"       -> Prefs.trace       := getBoolVal p x; OK
-    | "pre-eval"    -> Prefs.preeval     := getBoolVal p x; OK
-    | "girard"      -> Prefs.girard      := getBoolVal p x; OK
-    | "irrelevance" -> Prefs.irrelevance := getBoolVal p x; OK
-    | _             -> Error (InvalidOpt p)
+    | "trace"           -> Prefs.trace           := getBoolVal p x; OK
+    | "pre-eval"        -> Prefs.preeval         := getBoolVal p x; OK
+    | "girard"          -> Prefs.girard          := getBoolVal p x; OK
+    | "irrelevance"     -> Prefs.irrelevance     := getBoolVal p x; OK
+    | "impredicativity" -> Prefs.impredicativity := getBoolVal p x; OK
+    | _                 -> Error (InvalidOpt p)
   end
   | Version            -> Version (1L, 3L, 0L)
   | Ping               -> Pong

@@ -69,6 +69,12 @@ let imax a b = match a, b with
   | VKan _, _ | VPre _, _ -> raise (Internal (ExpectedType (rbV b)))
   | _, _ -> raise (Internal (ExpectedType (rbV a)))
 
+let impred a b = match a, b with
+  | VKan _, VKan v -> VKan v
+  | VPre _, VKan v | VKan _, VPre v | VPre _, VPre v -> VPre v
+  | VKan _, _ | VPre _, _ -> raise (Internal (ExpectedType (rbV b)))
+  | _, _ -> raise (Internal (ExpectedType (rbV a)))
+
 let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 let prodv a b = VSig (a, (Irrefutable, fun _ -> b))

@@ -7,7 +7,6 @@
 
 module inductive where
 import library/foundations/univalent/path
---option girard true
 
 -- Steve Awodey, Nicola Gambino, Kristina Sojakova
 -- Inductive Types in Homotopy Type Theory

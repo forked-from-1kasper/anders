@@ -1,5 +1,11 @@
 module control where
-option girard true
+
+-- compilation scheme
+
+-- record pure (P: U → U) (A: U) := (return: P A)
+-- record functor (F: U → U) (A B: U) := (fmap: (A → B) → F A → F B)
+-- record applicative (F: U → U) (A B: U) extends pure F A, functor F A B := (ap: F (A → B) → F A → F B)
+-- record monad (F: U → U) (A B: U) extends pure F A, functor F A B := (join: F (F A) → F B)
 
 def return_sig (F: U → U): U₁ := Π (A: U), A → F A
 def ap_sig     (F: U → U): U₁ := Π (A B: U), F (A → B) → F A → F B

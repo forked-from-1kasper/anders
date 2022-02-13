@@ -8,6 +8,7 @@
 module hilbert where
 import library/foundations/univalent/path
 import library/foundations/mltt/proto
+option girard true
 
 -- [Schönfinkel]
 
@@ -29,6 +30,8 @@ def x₁ : X := \ (p q r x y z h w: Ω)
                 v (\ (x: p.1) (y: q.1), x)
                   (\ (a: x.1 → y.1 → z.1) (b: x.1 → y.1) (c: x.1), a c (b c))
                   (\ (e: r.1) (f: w.1), e)
+
+def x=x₁ : PathP (<_>X) x x₁ := idp X x
 
 -- [Łukashewicz]
 

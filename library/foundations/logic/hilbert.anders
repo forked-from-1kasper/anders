@@ -18,7 +18,7 @@ def E := Π (p : Ω), p.1 → p.1
 def k : K := \ (p q : Ω) (x: p.1) (y: q.1), x
 def s : S := \ (p q r: Ω) (f: p.1 → q.1 → r.1) (g: p.1 → q.1) (h: p.1), f (h) (g (h))
 def e : E := \ (p : Ω) (x: p.1), x
-def e₁ : E := \ (p : Ω) (x: p.1), s p p p (k p p) (id p.1) (k p p x x)
+def e₁ : E := \ (p : Ω) (x: p.1), s p p p (k p p) (k p p x) x
 
 -- [SKI-X]
 

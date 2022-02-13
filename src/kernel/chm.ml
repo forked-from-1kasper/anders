@@ -8,6 +8,10 @@ open Rbv
 
 let ctx : ctx ref = ref Env.empty
 
+let getUnitVal opt = function
+  | "tt" | "true" -> true
+  | value -> raise (Internal (InvalidOptValue (opt, value)))
+
 let getBoolVal opt = function
   | "tt" | "true"  -> true
   | "ff" | "false" -> false
@@ -42,11 +46,11 @@ let proto : req -> resp = function
   | Wipe               -> ctx := Env.empty; OK
   | Set (p, x)         ->
   begin match p with
-    | "trace"           -> Prefs.trace           := getBoolVal p x; OK
-    | "pre-eval"        -> Prefs.preeval         := getBoolVal p x; OK
-    | "girard"          -> Prefs.girard          := getBoolVal p x; OK
-    | "irrelevance"     -> Prefs.irrelevance     := getBoolVal p x; OK
-    | "impredicativity" -> Prefs.impredicativity := getBoolVal p x; OK
+    | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)
+    | "pre-eval"        -> promote (fun () -> Prefs.preeval         := getBoolVal p x; OK)
+    | "girard"          -> promote (fun () -> Prefs.girard          := getUnitVal p x; OK)
+    | "irrelevance"     -> promote (fun () -> Prefs.irrelevance     := getUnitVal p x; OK)
+    | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
     | _                 -> Error (InvalidOpt p)
   end
   | Version            -> Version (1L, 3L, 0L)

@@ -98,17 +98,22 @@ corresponds to the type defined in OCaml module:
 \begin{table}[ht]
 \centering
 \begin{tabular}{rl}
- cosmos :=&$\mathbf{U}_j \ |\ \mathbf{V}_k$ \\
-    var :=&$\mathbf{var}\ name\ |\ \mathbf{hole}$ \\
+ cosmos :=&$\textbf{U}_j \ |\ \textbf{V}_k$ \\
+    var :=&$\textbf{var}\ name\ |\ \textbf{hole}$ \\
      pi :=&$\Pi\ name\ E\ E\ |\ \lambda\ name\ E\ E\ |\ E\ E$ \\
   sigma :=&$\Sigma\ name\ E\ E\ |\ (E,E)\ |\ E.1\ |\ E.2$ \\
-     id :=&$\mathbf{Id}\ E\ |\ \mathbf{ref}\ E\ |\ \mathbf{idJ}\ E$ \\
-   path :=&$\mathbf{Path}\ E\ |\ E^i\ |\ E\ @\ E$ \\
-      I :=&$\mathbf{I}\ |\ 0\ |\ 1\ |\ E\ \bigvee\ E\ |\ E\ \bigwedge\ E\ |\ \neg E$ \\
-   part :=&$\mathbf{Partial}\ E\ E\ |\ \mathbf{[}\ (E=I) \rightarrow E, ...\ \mathbf{]}$ \\
-    sub :=&$\mathbf{inc}\ E\ |\ \mathbf{ouc}\ E\ |\ E\ \mathbf{[}\ I\ \mapsto\ E\ \mathbf{]}$ \\
-    kan :=&$\mathbf{transp}\ E\ E\ |\ \mathbf{hcomp}\ E$ \\
-   glue :=&$\mathbf{Glue}\ E\ |\ \mathbf{glue}\ E\ |\ \mathbf{unglue}\ E\ E$ \\
+      0 :=&$\textbf{0}\ |\ \textbf{ind$_0$}\ \textrm{E}\ \textrm{E}\ \textrm{E}$ \\
+      1 :=&$\textbf{1}\ |\ \star\ |\ \textbf{ind$_1$}\ \textrm{E}\ \textrm{E}\ \textrm{E}$ \\
+      2 :=&$\textbf{2}\ |\ 0_2\ |\ 1_2\ |\ \textbf{ind$_2$}\ \textrm{E}\ \textrm{E}\ \textrm{E}$ \\
+      W :=&$\textbf{W}\ \textrm{ident}\ \textrm{E}\ \textrm{E}\ |\ \textbf{sup}\ \textrm{E}\ \textrm{E}\ |\ \textbf{ind$_W$}\ \textrm{E}\ \textrm{E}$ \\
+     id :=&$\textbf{Id}\ E\ |\ \textbf{ref}\ E\ |\ \textbf{id$_J$}\ E$ \\
+   path :=&$\textbf{Path}\ E\ |\ E^i\ |\ E\ @\ E$ \\
+      I :=&$\textbf{I}\ |\ 0\ |\ 1\ |\ E\ \bigvee\ E\ |\ E\ \bigwedge\ E\ |\ \neg E$ \\
+   part :=&$\textbf{Partial}\ E\ E\ |\ \textbf{[}\ (E=I) \rightarrow E, ...\ \textbf{]}$ \\
+    sub :=&$\textbf{inc}\ E\ |\ \textbf{ouc}\ E\ |\ E\ \textbf{[}\ I\ \mapsto\ E\ \textbf{]}$ \\
+    kan :=&$\textbf{transp}\ E\ E\ |\ \textbf{hcomp}\ E$ \\
+   glue :=&$\textbf{Glue}\ E\ |\ \textbf{glue}\ E\ |\ \textbf{unglue}\ E\ E$ \\
+     Im :=&$\textbf{Im}\ \mathrm{E}\ |\ \textbf{Inf}\ \mathrm{E}\ |\ \textbf{Join}\ \mathrm{E}\ |\ \textbf{ind$_{Im}$}\ \mathrm{E}\ \mathrm{E}$ \\
 \end{tabular}
 \end{table}
 
@@ -117,10 +122,9 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
 \begin{table}[ht]
 \centering
 \begin{tabular}{rl}
-      E :=&$cosmos\ |\ var\ |\ MLTT\ |\ CCHM\ |\ HIT$ \\
-    HIT :=&$\mathbf{inductive}\ E\ E\ |\ \mathbf{ctor}\ name\ E\ |\ \mathbf{match}\ E\ E$ \\
-   CCHM :=&$path\ |\ I\ |\ part\ |\ sub\ |\ kan\ |\ glue$ \\
-   MLTT :=&$pi\ |\ sigma\ |\ id$ \\
+      E :=&$\textrm{cosmos}\ |\ \textrm{var}\ |\ \textrm{MLTT}\ |\ \textrm{CCHM}\ |\ \textrm{Im}$ \\
+   CCHM :=&$\textrm{path}\ |\ \textrm{I}\ |\ \textrm{part}\ |\ \textrm{sub}\ |\ \textrm{kan}\ |\ \textrm{glue}$ \\
+   MLTT :=&$\textrm{pi}\ |\ \textrm{sigma}\ |\ \textrm{id}$ \\
 \end{tabular}
 \end{table}
 
@@ -280,11 +284,11 @@ Large elimination to upper universes is prohibited. This is extendable to Agda m
 \tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} cosmos : \textbf{U}& := & prop: nat $\rightarrow$ cosmos \\
-   &|& fibrant: nat $\rightarrow$ cosmos \\
-   &|& pretypes: nat $\rightarrow$ cosmos \\
-   &|& strict: nat $\rightarrow$ cosmos \\
-   &|& omega: cosmos \\
-   &|& lock: cosmos \\
+   &|& fibrant: nat \\
+   &|& pretypes: nat \\
+   &|& strict: nat \\
+   &|& omega \\
+   &|& lock \\
 \end{tabular}
 \end{table}
 
@@ -316,8 +320,8 @@ for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and 
 \tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} pure (lang : U) : \textbf{U}& := & pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
-  &|& lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
-  &|& app: lang $\rightarrow$ lang $\rightarrow$ pure lang \\
+  &|& lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang \\
+  &|& app: lang $\rightarrow$ lang \\
 \end{tabular}
 \end{table}
 
@@ -328,9 +332,9 @@ The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and
 \tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} total (lang : U) : \textbf{U}& := & sigma: name $\rightarrow$ lang $\rightarrow$ total lang \\
-  &|& pair: lang $\rightarrow$ lang $\rightarrow$ total lang \\
-  &|& fst: lang $\rightarrow$ total lang \\
-  &|& snd: lang $\rightarrow$ total lang \\
+  &|& pair: lang $\rightarrow$ lang \\
+  &|& fst: lang \\
+  &|& snd: lang \\
 \end{tabular}
 \end{table}
 
@@ -358,11 +362,189 @@ The presheaf with only Pi and Sigma is called \textbf{MLTT-72}. Its internalizat
 \newpage
 \subsection{Path Equality}
 
+The fundamental development of equality inside MLTT provers led us to the
+notion of $\infty$-groupoid as spaces. In this way Path identity type appeared
+in the core of type checker along with De Morgan algebra on built-in interval type.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{rcl}
+  \textbf{inductive} homotopy (lang : U) : U & := & PathP: lang $\rightarrow$ lang $\rightarrow$ lang \\
+  &|& plam: name $\rightarrow$ lang $\rightarrow$ lang \\
+  &|& papp: lang $\rightarrow$ lang \\
+  &|& I \\
+  &|& zero \\
+  &|& one \\
+  &|& meet: lang $\rightarrow$ lang \\
+  &|& join: lang $\rightarrow$ lang \\
+  &|& neg: lang \\
+  &|& system: lang \\
+  &|& Partial: lang \\
+  &|& transp: lang $\rightarrow$ lang \\
+  &|& hcomp: lang \\
+  &|& Sub: lang \\
+  &|& inc: lang \\
+  &|& ouc: lang \\
+\end{tabular}
+\end{table}
+
+$\textbf{Definition}$ (Cubical Presheaf $\mathbb{I}$).
+The identity types modeled with another presheaf, the presheaf on Lawvere
+category of distributive lattices (theory of De Morgan algebras) denoted
+with $\Box$ — $\textbf{I} : \Box^{op} \rightarrow \textrm{Set}$.
+
+$\textbf{Definition}$ Properties of $\textbf{I}$. The presheaf $\textbf{I}$:
+i) has to distinct global elements $0$ and $1$ (B$_1$);
+ii) $\textbf{I}$(I) has a decidable equality for each $I$ (B$_2$);
+iii) $\textbf{I}$ is tiny so the path functor $X \mapsto X^\textbf{I}$ has right adjoint (B$_3$).;
+iv) $\textbf{I}$ has meet and join (connections).\\
+
+$\textbf{Interval\ Pretypes}$. While having pretypes universe V with interval and
+associated De Morgan algebra ($\wedge$, $\vee$, $-$, $0$, $1$, $\textrm{I}$) is enough to
+perform DNF normalization and proving some basic statements about path, including:
+contractability of singletons, homotopy transport, congruence, functional
+extensionality; it is not enough for proving $\beta$ rule for Path type or path composition.\\
+
+$\textbf{Generalized\ Transport}$. Generalized transport transp adresses
+first problem of deriving the computational $\beta$ rule for Path types:
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+\textbf{theorem} Path-$\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
+\ \ \ \ : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) \\
+\ \ \ \ := $\lambda$ (A : U), $\lambda$ (a : A), $\lambda$ (C : $\Pi$ (x : A), $\Pi$ (y : A), PathP (<\_> A) x y $\rightarrow$ U), \\
+\ \ \ \ \ \ \ $\lambda$ (d : C a a (<\_> a)), <j> transp (<\_> C a a (<\_> a)) -j d \\
+\end{tabular}
+\end{table}
+
+Transport is defined on fibrant types (only) and type checker should cover all the cases
+Note that transp$^i$ (Path$^j$ A v w) $\varphi$ u$_0$ case is relying on comp operation which depends on hcomp primitive.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+transp$^{i}$ N $\varphi$ u$_0$ = u$_0$ \\
+transp$^{i}$ U $\varphi$ A = A \\
+transp$^{i}$ ($\Pi$ (x : A), B) $\varphi$ u$_0$ v = transp$^i$ B(x/w) $\varphi$ (u$_0$ w(i/0)) \\
+transp$^{i}$ ($\Sigma$ (x : A), B) $\varphi$ u$_0$ = (transp$^i$ A $\varphi$ (u$_0$.1),transp$^i$ B(x/v) $\varphi$ (u$_0$.2)) \\
+transp$^{i}$ (Path$^j$ v w) $varphi$ u$_0$ = <j> comp$^i$ A [$\phi$ u$_0$ j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] (u$_0$ j) \\
+transp$^{i}$ (Glue [$\varphi$ $\mapsto$ (T,w)] A) $\psi$ u$_0$ = glue [$\phi$(i/1) $\mapsto$ t'$_1$] a'$_1$ : B(i/1) \\
+\end{tabular}
+\end{table}
+
+\newpage
+$\textbf{Partial\ Elements}$. In order to explicitly define hcomp we need to specify
+n-cubes where some faces are missing. Partial primitives isOne, 1=1 and UIP on pretypes
+are derivable in Anders due to landing strict equality Id in V universe. The idea is
+that (Partial A r) is the type of cubes in A that are only defined when IsOne r holds.
+(Partial A r) is a special version of the function space IsOne r → A with a more
+extensional equality: two of its elements are considered judgmentally equal if
+they represent the same subcube of A. They are equal whenever they reduce to
+equal terms for all the possible assignment of variables that make r equal to 1.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+def Partial' (A : U) (i : I) := Partial A i \\
+def isOne : I -> V := Id I 1 \\
+def 1=>1 : isOne 1 := ref 1 \\
+def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p \\
+\end{tabular}
+\end{table}
+
+$\textbf{Cubical\ Subtypes}$. For (A : U) (i : I) (Partial A i) we can define
+subtype A [ i $\mapsto$ u ]. A term of this type is a term of type A that is
+definitionally equal to u when (IsOne i) is satisfied. We have forth and back
+fusion rules ouc (inc v) = v and inc (outc v) = v. Moreover, ouc v will reduce to u 1=1 when i=1.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+def sub' (A : U) (i : I) (u : Partial A i) : V := A [i $\mapsto$ u ] \\
+def inc' (A : U) (i : I) (a : A) : A [i $\mapsto$ [(i = 1) $\rightarrow$ a]] := inc A i a \\
+def ouc' (A : U) (i : I) (u : Partial A i) (a : A [i $\mapsto$ u]) : A := ouc a \\
+\end{tabular}
+\end{table}
+
+$\textbf{Homogeneous\ Composition}$. hcomp is the answer to second problem: with hcomp and transp
+one can express path composition, groupoid, category of groupoids (groupoid interpretation and
+internalization in type theory). One of the main roles of homogeneous composition is to be a
+carrier in [higher] inductive type constructors for calculating of homotopy colimits and direct
+encoding of CW-complexes (or internal models as gluening of pushout cells).
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+hcomp$^i$ N [$\phi$ $\mapsto$ 0] 0 = 0 \\
+hcomp$^i$ N [$\phi$ $\mapsto$ S u] (S u$_0$) = S (hcomp$^i$ N [$\phi$ $\mapsto$ u] u$_0$) \\
+hcomp$^i$ U [$\phi$ $\mapsto$ E] A = Glue [$\phi$ $\mapsto$ (E(i/1), equiv$^i$ E(i/1-i))] A \\
+hcomp$^i$ ($\Pi$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ v = hcomp$^i$ B(x/v) [$\phi$ $\mapsto$ u v] (u$_0$ v) \\
+hcomp$^i$ ($\Sigma$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ = (v(i/1), comp$^i$ B(x/v) [$\phi$ $\mapsto$ u.2] u$_0$.2) \\
+hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ = <j> hcomp$^i$ A [ $\phi$ $\mapsto$ u j, (j = 0) $\mapsto$ v, (j = 1) $\mapsto$ w ] (u$_0$ j) \\
+hcomp$^i$ (Glue [$\phi$ $\mapsto$ (T,w)] A) [$\psi$ $\mapsto$ u] u$_0$ \\
+\ \ \ \ = glue [$\phi$ $\mapsto$ t$_1$] a$_1$ \\
+\ \ \ \ = glue [$\phi$ $\mapsto$ u(i/1)] (unglue u(i/1)) \\
+\ \ \ \ = u(i/1) : Glue [$\phi$ $\mapsto$ (T,w)] A \\
+
+hfill$^i$ A [$\phi$ $\mapsto$ u] u$_0$ = hcomp$^j$ A [$\phi$ $\mapsto$ u(i/i$\vee$j), (i=0) $\mapsto$ u$_0$] u$_0$ : A \\
+v = hfill$^i$ A [$\phi$ $\mapsto$ u.1] u$_0$.1 \\
+t$_1$ = u(i/1) : T \\
+a$_1$ = unglue u(i/1) : A \\
+glue [$\phi$ $\mapsto$ t$_1$] a1 = t$_1$ : T \\
+\end{tabular}
+\end{table}
+
 \subsection{Strict Equality}
 
+To avoid conflicts with path equalities which live in fibrant universes strict
+equalities live in pretypes universes.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{rcl}
+  \textbf{inductive} strict (lang : U) : U & := & Id: name $\rightarrow$ lang \\
+  &|& ref: lang $\rightarrow$ lang \\
+  &|& idJ: lang $\rightarrow$ lang $\rightarrow$ lang \\
+\end{tabular}
+\end{table}
+
+We use strict equality in HTS for pretypes and partial elements which live in V.
+The presheaf configuration with Pi, Sigma and Id is called MLTT-73. The presheaf
+configuration with Pi, Sigma, Id and Path is called HTS.
+
+\newpage
 \subsection{Glue Types}
 
+The main purpose of Glue types is to construct a cube where some faces have
+been replaced by equivalent types. This is analogous to how hcomp lets us
+replace some faces of a cube by composing it with other cubes, but for Glue
+types you can compose with equivalences instead of paths. This implies the
+univalence principle and it is what lets us transport along paths built
+out of equivalences.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{rcl}
+  \textbf{inductive} glue (lang : U) : U & := & Glue: lang $\rightarrow$ lang $\rightarrow$ lang \\
+  &|& glue: lang $\rightarrow$ lang \\
+  &|& unglue: lang $\rightarrow$ lang \\
+\end{tabular}
+\end{table}
+
 \subsection{Higher Inductive Types}
+
+Anders currently don’t support Lean-compatible generic inductive schemes
+definition. So instead of generic inductive schemes Anders supports well-founded trees (W-types).
+Basic data types like List, Nat, Fin, Vec are implemented as W-types in base library.
+As for higher inductive types Anders has Three-HIT basis (Coequalizer, HubSpoke and Colimit) to express other HIT.
+
+\subsection{de Rham Stack}
+
+Stack de Rham or Infinitezemal Shape Modality is a basic primitive for proving theorems
+from synthetic differential geometry. This type-theoretical framework was developed
+for the first time by Felix Cherubini under the guidance of Urs Schreiber. The Anders
+prover implements the computational semantics of the de Rham stack.
 
 \bibliography{anders}
 

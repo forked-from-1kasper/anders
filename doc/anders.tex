@@ -58,31 +58,42 @@
 Here is presented a reincarnation of \textbf{cubicaltt} called \textbf{anders}.
 \end{abstract}
 
-\section{Motivation}
+\section{Introduction}
 \label{sec:typesetting-summary}
 
-The \textbf{HTS} \cite{Voevodsky13} language proposed by Voevodsky exposes two different
-presheaf models of type theory: the inner one is homotopy type system presheaf that
-models HoTT and the outer one is traditional Martin-Löf type system presheaf that
-models set theory with UIP. The motivation is to have an ability to express
-semisemplicial types. Theoretical work was continued in \textbf{2LTT} \cite{Annenkov19}.
+\textbf{Anders} is a Modal HoTT proof assistant based on: classical MLTT-80 \cite{MLTT80}
+with 0, 1, 2, W types; CCHM \cite{CCHM} in CHM flavour as cubical type system with
+hcomp/transp Kan operations; HTS \cite{HTS} strict equality on pretypes; de Rham \cite{deRham}
+stack modality primitives. We tend not to touch general recursive higher inductive schemes yet,
+instead we will try to express as much HIT as possible through W, Coequlizer and HubSpokes
+Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
 
-Our aim is to preserve \textbf{cubicaltt} programs and remain \textbf{anders}
-implementation compatible with original \textbf{CCHM} \cite{Mortberg15} publications
-along with \textbf{HTS} and \textbf{2LTT}. While we are on our road
-to subset of \textbf{Lean} tactic language, currently we are at the stage of
-regular cubical type checker with \textbf{CHM} \cite{Huber18} primitives.
-You may try it at Github \footnote{\url{https://github.com/groupoid/anders}}
-or install through OPAM: \textbf{opam install anders}.
+The HTS language proposed by Voevodsky exposes two different presheaf models of type theory:
+the inner one is homotopy type system presheaf that models HoTT and the outer one is
+traditional Martin-Löf type system presheaf that models set theory with UIP.
+The motivation behind this doubling is to have an ability to express semisemplicial types.
+Theoretical work on merging inner and outer languages was continued in 2LTT \cite{2LTT}.
+
+While we are on our road to Lean-like tactic language, currently we are at the stage of
+regular cubical HTS type checker with CHM-style [5] primitives. You may try it from Github
+sources: \footnote{\url{https://github.com/groupoid/anders}}{groupoid/anders} or install
+through OPAM package manager. Main commands are \textbf{check} (to check a program)
+and \textbf{repl} (to enter the proof shell).
+
+Anders is fast, idiomatic and educational (think of optimized Mini-TT). We carefully draw the favourite Lean-compatible
+syntax to fit 200 LOC in Menhir. The CHM kernel is 1K LOC. Whole Anders compiles under 2
+seconds and checks all the base library under 1 second [i7-8700]. Anders proof assistant
+as Homotopy Type System comes with its own Homotopy Library.
 
 \section{Syntax}
 
-The syntax of \textbf{anders} resembles original syntax of the reference \textbf{CCHM} 
-type checker \textbf{cubicaltt}, is slightly compatible with \textbf{Lean}
-syntax and contains the full set of \textbf{Cubical Agda} \cite{Vezzosi19}
-primitives. Here is given the mathematical pseudo-code notation of the language
-expressions that comes immediately after parsing. The core syntax definition
-of language E corresponds to the type defined in the OCaml module.
+The syntax resembles original syntax of the reference CCHM type checker cubicaltt,
+is slightly compatible with Lean syntax and contains the full set of Cubical Agda \cite{CubicalAgda}
+primitives (except generic higher inductive schemes).
+
+Here is given the mathematical pseudo-code notation of the language
+expressions that come immediately after parsing. The core syntax definition of HTS language
+corresponds to the type defined in OCaml module:
 
 \begin{table}[ht]
 \centering
@@ -113,6 +124,7 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
 \end{tabular}
 \end{table}
 
+\newpage
 
 \textbf{Keywords}. The words of a top-level language (file or repl) consist of keywords or identifiers.
 The keywords are following: \textbf{module}, \textbf{where}, \textbf{import}, \textbf{option}, \textbf{def}, \textbf{axiom},
@@ -199,7 +211,7 @@ Types in a telescope, type of a declaration and a proof-terms are a language exp
 exp0 (pair constructions), exp1 (non neutral constructions), exp2 (path and pi applcations),
 exp3 (neutral constructions).
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{ll}
 \textbf{menhir} \\
@@ -339,7 +351,7 @@ The presheaf with only Pi and Sigma is called \textbf{MLTT-72}. Its internalizat
 \ \ ($\Sigma$-elim$_2$ : $\Pi$ (p : Sigma A B), B (pr$_1$ A B p)) \\
 \ \ ($\Sigma$-comp$_1$ : $\Pi$ (a : A) (b: B a), a = $\Sigma$-elim$_1$ ($\Sigma$-ctor$_1$ a b)) \\
 \ \ ($\Sigma$-comp$_2$ : $\Pi$ (a : A) (b: B a), b = $\Sigma$-elim$_2$ (a, b)) \\
-\ \ ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), U
+\ \ ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), \textbf{1}
 \end{tabular}
 \end{table}
 

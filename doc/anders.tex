@@ -74,11 +74,18 @@ traditional Martin-Löf type system presheaf that models set theory with UIP.
 The motivation behind this doubling is to have an ability to express semisemplicial types.
 Theoretical work on merging inner and outer languages was continued in 2LTT \cite{2LTT}.
 
-While we are on our road to Lean-like tactic language, currently we are at the stage of
+$\mathbf{Installation}$. While we are on our road to Lean-like tactic language, currently we are at the stage of
 regular cubical HTS type checker with CHM-style [5] primitives. You may try it from Github
 sources: \footnote{\url{https://github.com/groupoid/anders}}{groupoid/anders} or install
 through OPAM package manager. Main commands are \textbf{check} (to check a program)
 and \textbf{repl} (to enter the proof shell).
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l}
+\$ opam install anders
+\end{tabular}
+\end{table}
 
 Anders is fast, idiomatic and educational (think of optimized Mini-TT). We carefully draw the favourite Lean-compatible
 syntax to fit 200 LOC in Menhir. The CHM kernel is 1K LOC. Whole Anders compiles under 2

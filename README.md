@@ -162,7 +162,7 @@ Acknowledgements
 Mentions
 --------
 
-* Максим Сохацький. <a href="https://www.youtube.com/watch?v=KHDgytozLv4">Презентація кубічного CCHM прувера Anders 0.7.2 від Групоїд Інфініті.</a>. 2021-07-18
+* Максим Сохацький. <a href="https://www.youtube.com/watch?v=KHDgytozLv4">Презентація кубічного CCHM прувера Anders 0.7.2 від Групоїд Інфініті</a>. 2021-07-18
 * Максим Сохацкий. <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a>. 2022-01-17
 * Namdak Topna, Siegmentation Fault. <a href="https://groupoid.github.io/anders/doc/anders.pdf">Anders: Modal Homotopy Type System</a>. 2022-01-17
 

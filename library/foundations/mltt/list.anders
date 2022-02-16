@@ -40,5 +40,20 @@ def tail (A: U): List A → Maybe (List A)
                (nothing (List A))
                (λ (a: A) (x: List A) (_: Maybe (List A)), just (List A) x)
 
+def z0 : List 𝟏 := nil 𝟏
+def z1 : List 𝟏 := cons 𝟏 ★ z0
+def z2 : List 𝟏 := cons 𝟏 ★ z1
 
+def append (A: U): List A -> List A -> List A
+ := λ (x: List A), List-rec A (List A) x (λ (z: A) (_: List A)(zs: List A), cons A z zs)
 
+def z1=z1+z0 : Path (List 𝟏) z1 (append 𝟏 z0 z1)
+ := List-ind 𝟏 (\(C: List 𝟏), Path (List 𝟏) z1 C) ? ? (append 𝟏 z0 z1)
+
+def append-assoc (A: U)
+  : Π (xs ys zs: List A), Path (List A) (append A (append A xs ys) zs) (append A xs (append A ys zs))
+ := λ (xs ys zs: List A),
+    List-ind A (\(C: List A), Path (List A) (append A (append A xs ys) zs) C)
+               ?
+               ?
+               (append A xs (append A ys zs))

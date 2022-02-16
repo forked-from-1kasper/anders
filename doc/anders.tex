@@ -418,7 +418,7 @@ first problem of deriving the computational $\beta$ rule for Path types:
 \begin{table}[ht]
 \tabstyle
 \begin{tabular}{l}
-\textbf{theorem} Path-$\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
+\textbf{theorem} Path$_\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
 \ \ \ \ : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) \\
 \ \ \ \ := $\lambda$ (A : U), $\lambda$ (a : A), $\lambda$ (C : $\Pi$ (x : A), $\Pi$ (y : A), PathP (<\_> A) x y $\rightarrow$ U), \\
 \ \ \ \ \ \ \ $\lambda$ (d : C a a (<\_> a)), <j> transp (<\_> C a a (<\_> a)) -j d \\

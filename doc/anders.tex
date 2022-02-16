@@ -11,7 +11,7 @@
 <ccs2012>
 <concept>
 <concept_id>10003752.10003753.10003754.10003733</concept_id>
-<concept_desc>Theory of computation~Lambda calculus</concept_desc>
+<concept_desc>Theory of computation ~ Lambda calculus</concept_desc>
 <concept_significance>300</concept_significance>
 </concept>
 </ccs2012>
@@ -21,19 +21,17 @@
 \keywords{Homotopy Type System, Cubical Type Theory, Modal HoTT}
 
 %\category{} %optional, e.g. invited paper
-
 %\relatedversion{https://groupoid.space/anders.pdf} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
 %\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
 %\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
 %\supplementdetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93, subcategory={Description, Subcategory}, swhid={Software Heritage Identifier}]{General Classification (e.g. Software, Dataset, Model, ...)}{URL to related version} %linktext, cite, and subcategory are optional
 %\funding{(Optional) general funding statement \dots}%optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
-
 %\acknowledgements{Univalent people}%optional
 
 \nolinenumbers %uncomment to disable line numbering
-\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
+\hideLIPIcs %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
 
-%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Editor-only macros:: begin (do not touch as author) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\EventEditors{John Q. Open and Joan R. Access}
 %\EventNoEds{2}
 %\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
@@ -76,7 +74,7 @@ Theoretical work on merging inner and outer languages was continued in 2LTT \cit
 
 $\mathbf{Installation}$. While we are on our road to Lean-like tactic language, currently we are at the stage of
 regular cubical HTS type checker with CHM-style [5] primitives. You may try it from Github
-sources: groupoid/anders\footnote{\url{https://github.com/groupoid/anders}} or install
+sources: groupoid/anders\footnote{\url{https://github.com/groupoid/anders/}} or install
 through OPAM package manager. Main commands are \textbf{check} (to check a program)
 and \textbf{repl} (to enter the proof shell).
 
@@ -135,16 +133,19 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
 \end{tabular}
 \end{table}
 
-\textbf{Keywords}. The words of a top-level language (file or repl) consist of keywords or identifiers.
+\textbf{Keywords}. The words of a top-level language, file or repl, consist of keywords or identifiers.
 The keywords are following: \texttt{module}, \texttt{where}, \texttt{import}, \texttt{option}, \texttt{def}, \texttt{axiom},
 \texttt{postulate}, \texttt{theorem}, \texttt{(}, \texttt{)}, \texttt{[}, \texttt{]}, \texttt{<}, \texttt{>},
-\texttt{/}, \texttt{.1}, \texttt{.2}, \texttt{$\Pi$}, \texttt{$\Sigma$}, \texttt{,}, \texttt{$\lambda$}, \texttt{$\times$}, \texttt{$\rightarrow$}, \texttt{:}, \texttt{:=},
-\texttt{$\mapsto$}, \texttt{U}, \texttt{V}, \texttt{$\bigvee$}, \texttt{$\bigwedge$}, \texttt{-}, \texttt{+}, \texttt{@}, \texttt{PathP},
+\texttt{/}, \texttt{.1}, \texttt{.2}, \texttt{$\Pi$}, \texttt{$\Sigma$}, \texttt{,}, \texttt{$\lambda$},
+\texttt{V}, \texttt{$\bigvee$}, \texttt{$\bigwedge$}, \texttt{-}, \texttt{+}, \texttt{@}, \texttt{PathP},
 \texttt{transp}, \texttt{hcomp}, \texttt{zero}, \texttt{one}, \texttt{Partial}, \texttt{inc},
-\texttt{ouc}, \texttt{interval}, \texttt{inductive}, \texttt{Glue}, \texttt{glue}, \texttt{unglue}.\\
+\texttt{$\times$}, \texttt{$\rightarrow$}, \texttt{:}, \texttt{:=}, \texttt{$\mapsto$}, \texttt{U},
+\texttt{ouc}, \texttt{interval}, \texttt{inductive}, \texttt{Glue}, \texttt{glue}, \texttt{unglue}.
 
-\textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't start with $\texttt{:}$, $\texttt{-}$, $\rightarrow$. Sample identifiers:
-$\neg\texttt{-of-}\vee$, $\texttt{1}$$\rightarrow$$\texttt{1}$, $\texttt{is-?}$, $\texttt{=}$, $\texttt{\$$\sim$]!}$$\texttt{005x}$, $\infty$, $\texttt{x}$$\rightarrow$$\texttt{Nat}$.\\
+\textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't
+start with $\texttt{:}$, $\texttt{-}$, $\rightarrow$. Sample identifiers:
+$\neg\texttt{-of-}\vee$, $\texttt{1}$$\rightarrow$$\texttt{1}$, $\texttt{is-?}$,
+$\texttt{=}$, $\texttt{\$$\sim$]!}$$\texttt{005x}$, $\infty$, $\texttt{x}$$\rightarrow$$\texttt{Nat}$.
 
 \textbf{Modules}. Modules represent files with declarations. More accurate, BNF notation of module consists of imports, options and declarations.
 \begin{table}[ht]
@@ -160,11 +161,15 @@ $\neg\texttt{-of-}\vee$, $\texttt{1}$$\rightarrow$$\texttt{1}$, $\texttt{is-?}$,
 \end{tabular}
 \end{table}
 
-\textbf{Imports}. The import construction supports file folder structure (without file extensions) by using reserved symbol / for hierarchy walking.\\
+\textbf{Imports}. The import construction supports file folder structure (without file extensions)
+by using reserved symbol / for hierarchy walking.
 
-\textbf{Options}. Each option holds bool value. Language supports following options: 1) girard (enables U : U); 2) pre-eval (normalization cache);
+\textbf{Options}. Each option holds bool value. Language supports following options:
+1) girard (enables U : U);
+2) pre-eval (normalization cache);
 3) impredicative (infinite hierarchy with impredicativity rule);
-In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker.\\
+In Anders you can enable or disable language core types, adjust syntaxes or
+tune inner variables of the type checker.
 
 \textbf{Declarations}. Language supports following top level declarations:
 1) axiom (non-computable declaration that breakes normalization);
@@ -395,10 +400,10 @@ iv) $\textbf{I}$ has meet and join (connections).
 \end{definition}
 
 $\textbf{Interval\ Pretypes}$. While having pretypes universe V with interval and
-associated De Morgan algebra ($\wedge$, $\vee$, $-$, $0$, $1$, $\textrm{I}$) is enough to
+associated De Morgan algebra ($\wedge$, $\vee$, -, 0, 1, I) is enough to
 perform DNF normalization and proving some basic statements about path, including:
 contractability of singletons, homotopy transport, congruence, functional
-extensionality; it is not enough for proving $\beta$ rule for Path type or path composition.\\
+extensionality; it is not enough for proving $\beta$ rule for Path type or path composition.
 
 $\textbf{Generalized\ Transport}$. Generalized transport transp adresses
 first problem of deriving the computational $\beta$ rule for Path types:
@@ -408,7 +413,8 @@ first problem of deriving the computational $\beta$ rule for Path types:
 \begin{tabular}{l}
 \textbf{theorem} Path$_\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
 \ \ \ \ : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) \\
-\ \ \ \ := $\lambda$ (A : U), $\lambda$ (a : A), $\lambda$ (C : $\Pi$ (x : A), $\Pi$ (y : A), PathP (<\_> A) x y $\rightarrow$ U), \\
+\ \ \ \ := $\lambda$ (A : U), $\lambda$ (a : A), \\
+\ \ \ \ \ \ \ $\lambda$ (C : $\Pi$ (x : A), $\Pi$ (y : A), PathP (<\_> A) x y $\rightarrow$ U), \\
 \ \ \ \ \ \ \ $\lambda$ (d : C a a (<\_> a)), <j> transp (<\_> C a a (<\_> a)) -j d \\
 \end{tabular}
 \end{table}
@@ -476,7 +482,10 @@ hcomp$^i$ N [$\phi$ $\mapsto$ S u] (S u$_0$) = S (hcomp$^i$ N [$\phi$ $\mapsto$ 
 hcomp$^i$ U [$\phi$ $\mapsto$ E] A = Glue [$\phi$ $\mapsto$ (E(i/1), equiv$^i$ E(i/1-i))] A \\
 hcomp$^i$ ($\Pi$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ v = hcomp$^i$ B(x/v) [$\phi$ $\mapsto$ u v] (u$_0$ v) \\
 hcomp$^i$ ($\Sigma$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ = (v(i/1), comp$^i$ B(x/v) [$\phi$ $\mapsto$ u.2] u$_0$.2) \\
-hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ = <j> hcomp$^i$ A[$\phi$ $\mapsto$ u j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] u$_0$j \\
+\\
+hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ \\
+\ \ \ \ \ \ \ = <j> hcomp$^i$ A[$\phi$ $\mapsto$ u j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] (u$_0$ j) \\
+\\
 hcomp$^i$ (Glue [$\phi$ $\mapsto$ (T,w)] A) [$\psi$ $\mapsto$ u] u$_0$ \\
 \ \ \ \ \ \ \ = glue [$\phi$ $\mapsto$ t$_1$] a$_1$ \\
 \ \ \ \ \ \ \ = glue [$\phi$ $\mapsto$ u(i/1)] (unglue u(i/1)) \\

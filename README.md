@@ -162,7 +162,8 @@ Acknowledgements
 Mentions
 --------
 
-* <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a> 2022-01-17
+* Максим Сохацкий. <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a> 2022-01-17
+* Namdak Topna, Siegmentation Fault. <a href="https://groupoid.github.io/anders/doc/anders.pdf">Anders: Modal Homotopy Type System</a> 2012-01-17
 
 Authors
 -------

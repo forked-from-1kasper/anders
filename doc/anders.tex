@@ -1,7 +1,7 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 \bibliographystyle{plainurl}
 \title{Anders: Modal Homotopy Type System}
-\titlerunning{CCHM/HTS}
+\titlerunning{Anders 1.3.0}
 \author{Namdak Tonpa}{Groupoid Infinity}{maxim@synrc.com}{https://orcid.org/0000-0001-7127-8796}{}
 \author{Siegmentation Fault}{Groupoid Infinity}{siegmentationfault@yandex.ru}{}{}
 \authorrunning{Namdak Tonpa and Siegmentation Fault} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
@@ -138,15 +138,15 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
 \newpage
 
 \textbf{Keywords}. The words of a top-level language (file or repl) consist of keywords or identifiers.
-The keywords are following: \textbf{module}, \textbf{where}, \textbf{import}, \textbf{option}, \textbf{def}, \textbf{axiom},
-\textbf{postulate}, \textbf{theorem}, \textbf{(}, \textbf{)}, \textbf{[}, \textbf{]}, \textbf{<}, \textbf{>},
-\textbf{/}, \textbf{.1}, \textbf{.2}, \textbf{$\Pi$}, \textbf{$\Sigma$}, \textbf{,}, \textbf{$\lambda$}, \textbf{$\times$}, \textbf{$\rightarrow$}, \textbf{:}, \textbf{:=},
-\textbf{$\mapsto$}, \textbf{U}, \textbf{V}, \textbf{$\bigvee$}, \textbf{$\bigwedge$}, \textbf{-}, \textbf{+}, \textbf{@}, \textbf{PathP},
-\textbf{transp}, \textbf{hcomp}, \textbf{zero}, \textbf{one}, \textbf{Partial}, \textbf{inc},
-\textbf{ouc}, \textbf{interval}, \textbf{inductive}, \textbf{Glue}, \textbf{glue}, \textbf{unglue}.\\
+The keywords are following: \texttt{module}, \texttt{where}, \texttt{import}, \texttt{option}, \texttt{def}, \texttt{axiom},
+\texttt{postulate}, \texttt{theorem}, \texttt{(}, \texttt{)}, \texttt{[}, \texttt{]}, \texttt{<}, \texttt{>},
+\texttt{/}, \texttt{.1}, \texttt{.2}, \texttt{$\Pi$}, \texttt{$\Sigma$}, \texttt{,}, \texttt{$\lambda$}, \texttt{$\times$}, \texttt{$\rightarrow$}, \texttt{:}, \texttt{:=},
+\texttt{$\mapsto$}, \texttt{U}, \texttt{V}, \texttt{$\bigvee$}, \texttt{$\bigwedge$}, \texttt{-}, \texttt{+}, \texttt{@}, \texttt{PathP},
+\texttt{transp}, \texttt{hcomp}, \texttt{zero}, \texttt{one}, \texttt{Partial}, \texttt{inc},
+\texttt{ouc}, \texttt{interval}, \texttt{inductive}, \texttt{Glue}, \texttt{glue}, \texttt{unglue}.\\
 
-\textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't start with $:$, $-$, $\rightarrow$. Sample identifiers:
-$\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\rightarrow$Nat.\\
+\textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't start with $\texttt{:}$, $\texttt{-}$, $\rightarrow$. Sample identifiers:
+$\neg\texttt{-of-}\vee$, $\texttt{1}$$\rightarrow$$\texttt{1}$, $\texttt{is-?}$, $\texttt{=}$, $\texttt{\$$\sim$]!}$$\texttt{005x}$, $\infty$, $\texttt{x}$$\rightarrow$$\texttt{Nat}$.\\
 
 \textbf{Modules}. Modules represent files with declarations. More accurate, BNF notation of module consists of imports, options and declarations.
 \begin{table}[ht]
@@ -166,18 +166,7 @@ $\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\righ
 
 \textbf{Options}. Each option holds bool value. Language supports following options: 1) girard (enables U : U); 2) pre-eval (normalization cache);
 3) impredicative (infinite hierarchy with impredicativity rule);
-In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker.
-Here is the example how to setup minimal core able to prove internalization of \textbf{MLTT-73} variation (Path instead of Id and no inductive types, see base library):
-In order to turn HIT into ordinary CiC calculus you may say:
-
-\begin{table}[ht]
-\tabstyle
-\begin{tabular}{l}
-\textbf{option} HIT false \\
-\textbf{option} CCHM false \\
-\textbf{option} MLTT true \\
-\end{tabular}
-\end{table}
+In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker.\\
 
 \textbf{Declarations}. Language supports following top level declarations:
 1) axiom (non-computable declaration that breakes normalization);
@@ -185,7 +174,6 @@ In order to turn HIT into ordinary CiC calculus you may say:
 3) definition (almost any explicit term or type in type theory);
 4) lemma (helper in big game);
 5) theorem (something valuable or complex enough).
-
 
 \begin{table}[ht!]
 \tabstyle
@@ -351,18 +339,18 @@ The presheaf with only Pi and Sigma is called \textbf{MLTT-72}. Its internalizat
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} MLTT-72 (A : U) (B : A $\rightarrow$ U) : U := $\Sigma$ \\
-\ \ ($\Pi$-form$_1$ : U) \\
-\ \ ($\Pi$-ctor$_1$ : Pi A B $\rightarrow$ Pi A B) \\
-\ \ ($\Pi$-elim$_1$ : Pi A B $\rightarrow$ Pi A B) \\
-\ \ ($\Pi$-comp$_1$ : (a : A) (f : Pi A B), $\Pi$-elim$_1$ ($\Pi$-ctor$_1$ f) a = f a) \\
-\ \ ($\Pi$-comp$_2$ : (a : A) (f : Pi A B), f = $\lambda$ (x : A), f x) \\
-\ \ ($\Sigma$-form$_1$ : U) \\
-\ \ ($\Sigma$-ctor$_1$ : $\Pi$ (a : A) (b : B a) , Sigma A B) \\
-\ \ ($\Sigma$-elim$_1$ : $\Pi$ (p : Sigma A B), A) \\
-\ \ ($\Sigma$-elim$_2$ : $\Pi$ (p : Sigma A B), B (pr$_1$ A B p)) \\
-\ \ ($\Sigma$-comp$_1$ : $\Pi$ (a : A) (b: B a), a = $\Sigma$-elim$_1$ ($\Sigma$-ctor$_1$ a b)) \\
-\ \ ($\Sigma$-comp$_2$ : $\Pi$ (a : A) (b: B a), b = $\Sigma$-elim$_2$ (a, b)) \\
-\ \ ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), \textbf{1}
+\ \ \ \ ($\Pi$-form$_1$ : U) \\
+\ \ \ \ ($\Pi$-ctor$_1$ : Pi A B $\rightarrow$ Pi A B) \\
+\ \ \ \ ($\Pi$-elim$_1$ : Pi A B $\rightarrow$ Pi A B) \\
+\ \ \ \ ($\Pi$-comp$_1$ : (a : A) (f : Pi A B), $\Pi$-elim$_1$ ($\Pi$-ctor$_1$ f) a = f a) \\
+\ \ \ \ ($\Pi$-comp$_2$ : (a : A) (f : Pi A B), f = $\lambda$ (x : A), f x) \\
+\ \ \ \ ($\Sigma$-form$_1$ : U) \\
+\ \ \ \ ($\Sigma$-ctor$_1$ : $\Pi$ (a : A) (b : B a) , Sigma A B) \\
+\ \ \ \ ($\Sigma$-elim$_1$ : $\Pi$ (p : Sigma A B), A) \\
+\ \ \ \ ($\Sigma$-elim$_2$ : $\Pi$ (p : Sigma A B), B (pr$_1$ A B p)) \\
+\ \ \ \ ($\Sigma$-comp$_1$ : $\Pi$ (a : A) (b: B a), a = $\Sigma$-elim$_1$ ($\Sigma$-ctor$_1$ a b)) \\
+\ \ \ \ ($\Sigma$-comp$_2$ : $\Pi$ (a : A) (b: B a), b = $\Sigma$-elim$_2$ (a, b)) \\
+\ \ \ \ ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), \textbf{1}
 \end{tabular}
 \end{table}
 
@@ -395,16 +383,18 @@ in the core of type checker along with De Morgan algebra on built-in interval ty
 \end{tabular}
 \end{table}
 
-$\textbf{Definition}$ (Cubical Presheaf $\mathbb{I}$).
+\begin{definition}[Cubical Presheaf $\mathbb{I}$].
 The identity types modeled with another presheaf, the presheaf on Lawvere
 category of distributive lattices (theory of De Morgan algebras) denoted
 with $\Box$ — $\textbf{I} : \Box^{op} \rightarrow \textrm{Set}$.
+\end{definition}
 
-$\textbf{Definition}$ Properties of $\textbf{I}$. The presheaf $\textbf{I}$:
+\begin{definition}[Properties of $\textbf{I}$. The presheaf $\textbf{I}$]:
 i) has to distinct global elements $0$ and $1$ (B$_1$);
 ii) $\textbf{I}$(I) has a decidable equality for each $I$ (B$_2$);
 iii) $\textbf{I}$ is tiny so the path functor $X \mapsto X^\textbf{I}$ has right adjoint (B$_3$).;
-iv) $\textbf{I}$ has meet and join (connections).\\
+iv) $\textbf{I}$ has meet and join (connections).
+\end{definition}
 
 $\textbf{Interval\ Pretypes}$. While having pretypes universe V with interval and
 associated De Morgan algebra ($\wedge$, $\vee$, $-$, $0$, $1$, $\textrm{I}$) is enough to
@@ -435,7 +425,7 @@ transp$^{i}$ N $\varphi$ u$_0$ = u$_0$ \\
 transp$^{i}$ U $\varphi$ A = A \\
 transp$^{i}$ ($\Pi$ (x : A), B) $\varphi$ u$_0$ v = transp$^i$ B(x/w) $\varphi$ (u$_0$ w(i/0)) \\
 transp$^{i}$ ($\Sigma$ (x : A), B) $\varphi$ u$_0$ = (transp$^i$ A $\varphi$ (u$_0$.1),transp$^i$ B(x/v) $\varphi$ (u$_0$.2)) \\
-transp$^{i}$ (Path$^j$ v w) $varphi$ u$_0$ = <j> comp$^i$ A [$\phi$ u$_0$ j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] (u$_0$ j) \\
+transp$^{i}$ (Path$^j$ v w) $\varphi$ u$_0$ = <j> comp$^i$ A [$\phi$ u$_0$ j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] (u$_0$ j) \\
 transp$^{i}$ (Glue [$\varphi$ $\mapsto$ (T,w)] A) $\psi$ u$_0$ = glue [$\phi$(i/1) $\mapsto$ t'$_1$] a'$_1$ : B(i/1) \\
 \end{tabular}
 \end{table}
@@ -488,17 +478,11 @@ hcomp$^i$ N [$\phi$ $\mapsto$ S u] (S u$_0$) = S (hcomp$^i$ N [$\phi$ $\mapsto$ 
 hcomp$^i$ U [$\phi$ $\mapsto$ E] A = Glue [$\phi$ $\mapsto$ (E(i/1), equiv$^i$ E(i/1-i))] A \\
 hcomp$^i$ ($\Pi$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ v = hcomp$^i$ B(x/v) [$\phi$ $\mapsto$ u v] (u$_0$ v) \\
 hcomp$^i$ ($\Sigma$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ = (v(i/1), comp$^i$ B(x/v) [$\phi$ $\mapsto$ u.2] u$_0$.2) \\
-hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ = <j> hcomp$^i$ A [ $\phi$ $\mapsto$ u j, (j = 0) $\mapsto$ v, (j = 1) $\mapsto$ w ] (u$_0$ j) \\
+hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ = <j> hcomp$^i$ A[$\phi$ $\mapsto$ u j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] u$_0$j \\
 hcomp$^i$ (Glue [$\phi$ $\mapsto$ (T,w)] A) [$\psi$ $\mapsto$ u] u$_0$ \\
-\ \ \ \ = glue [$\phi$ $\mapsto$ t$_1$] a$_1$ \\
-\ \ \ \ = glue [$\phi$ $\mapsto$ u(i/1)] (unglue u(i/1)) \\
-\ \ \ \ = u(i/1) : Glue [$\phi$ $\mapsto$ (T,w)] A \\
-
-hfill$^i$ A [$\phi$ $\mapsto$ u] u$_0$ = hcomp$^j$ A [$\phi$ $\mapsto$ u(i/i$\vee$j), (i=0) $\mapsto$ u$_0$] u$_0$ : A \\
-v = hfill$^i$ A [$\phi$ $\mapsto$ u.1] u$_0$.1 \\
-t$_1$ = u(i/1) : T \\
-a$_1$ = unglue u(i/1) : A \\
-glue [$\phi$ $\mapsto$ t$_1$] a1 = t$_1$ : T \\
+\ \ \ \ \ \ \ = glue [$\phi$ $\mapsto$ t$_1$] a$_1$ \\
+\ \ \ \ \ \ \ = glue [$\phi$ $\mapsto$ u(i/1)] (unglue u(i/1)) \\
+\ \ \ \ \ \ \ = u(i/1) : Glue [$\phi$ $\mapsto$ (T,w)] A
 \end{tabular}
 \end{table}
 
@@ -507,7 +491,7 @@ glue [$\phi$ $\mapsto$ t$_1$] a1 = t$_1$ : T \\
 To avoid conflicts with path equalities which live in fibrant universes strict
 equalities live in pretypes universes.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} strict (lang : U) : U & := & Id: name $\rightarrow$ lang \\
@@ -539,19 +523,19 @@ out of equivalences.
 \end{tabular}
 \end{table}
 
-\subsection{Higher Inductive Types}
-
-Anders currently don’t support Lean-compatible generic inductive schemes
-definition. So instead of generic inductive schemes Anders supports well-founded trees (W-types).
-Basic data types like List, Nat, Fin, Vec are implemented as W-types in base library.
-As for higher inductive types Anders has Three-HIT basis (Coequalizer, HubSpoke and Colimit) to express other HIT.
-
 \subsection{de Rham Stack}
 
 Stack de Rham or Infinitezemal Shape Modality is a basic primitive for proving theorems
 from synthetic differential geometry. This type-theoretical framework was developed
 for the first time by Felix Cherubini under the guidance of Urs Schreiber. The Anders
 prover implements the computational semantics of the de Rham stack.
+
+\subsection{Higher Inductive Types}
+
+Anders currently don’t support Lean-compatible generic inductive schemes
+definition. So instead of generic inductive schemes Anders supports well-founded trees (W-types).
+Basic data types like List, Nat, Fin, Vec are implemented as W-types in base library.
+As for higher inductive types Anders has Three-HIT basis (Coequalizer, HubSpoke and Colimit) to express other HIT.
 
 \bibliography{anders}
 

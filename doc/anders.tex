@@ -647,8 +647,6 @@ Geometric Modal HoTT Framework: Infinitesimal Proximity, Formal Disk, Formal Dis
 \textbf{def} $\mathbb{D}$ (X : U) (a : X) : U := $\Sigma$ (x' : X), $\sim$ X a x' \\
 \textbf{def} inf-prox-ap (X Y : U) (f : X → Y) (x x' : X) (p : $\sim$ X x x') \\
 \ \ : $\sim$ Y (f x) (f x') := <i> $\Im-$app X Y f (p @ i) \\
-\textbf{def} d (X Y : U) (f : X → Y) (x : X) ($\varepsilon$ : $\mathbb{D}$ X x) \\
-\ \ : $\mathbb{D}$ Y (f x) := (f $\varepsilon$.1, inf-prox-ap X Y f x $\varepsilon$.1 $\varepsilon$.2) \\
 \textbf{def} T$^\infty$ (A : U) : U := $\Sigma$ (a : A), $\mathbb{D}$ A a \\
 \textbf{def} inf-prox-ap (X Y : U) (f : X → Y) (x x' : X) (p : $\sim$ X x x') \\
 \ \ : $\sim$ Y (f x) (f x') := <i> $\Im-$app X Y f (p @ i) \\

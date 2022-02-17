@@ -420,7 +420,8 @@ first problem of deriving the computational $\beta$ rule for Path types:
 \end{table}
 
 Transport is defined on fibrant types (only) and type checker should cover all the cases
-Note that transp$^i$ (Path$^j$ A v w) $\varphi$ u$_0$ case is relying on comp operation which depends on hcomp primitive.
+Note that transp$^i$ (Path$^j$ A v w) $\varphi$ u$_0$ case is relying on comp
+operation which depends on hcomp primitive. Here is given the first part of Huber equations for \textbf{transp}.
 
 \begin{table}[ht]
 \tabstyle
@@ -447,10 +448,10 @@ equal terms for all the possible assignment of variables that make r equal to 1.
 \begin{table}[ht]
 \tabstyle
 \begin{tabular}{l}
-def Partial' (A : U) (i : I) := Partial A i \\
-def isOne : I -> V := Id I 1 \\
-def 1=>1 : isOne 1 := ref 1 \\
-def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p \\
+\textbf{def} Partial' (A : U) (i : I) := Partial A i \\
+\textbf{def} isOne : I -> V := Id I 1 \\
+\textbf{def} 1=>1 : isOne 1 := ref 1 \\
+\textbf{def} UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p \\
 \end{tabular}
 \end{table}
 
@@ -462,9 +463,9 @@ fusion rules ouc (inc v) = v and inc (outc v) = v. Moreover, ouc v will reduce t
 \begin{table}[ht]
 \tabstyle
 \begin{tabular}{l}
-def sub' (A : U) (i : I) (u : Partial A i) : V := A [i $\mapsto$ u ] \\
-def inc' (A : U) (i : I) (a : A) : A [i $\mapsto$ [(i = 1) $\rightarrow$ a]] := inc A i a \\
-def ouc' (A : U) (i : I) (u : Partial A i) (a : A [i $\mapsto$ u]) : A := ouc a \\
+\textbf{def} sub' (A : U) (i : I) (u : Partial A i) : V := A [i $\mapsto$ u ] \\
+\textbf{def} inc' (A : U) (i : I) (a : A) : A [i $\mapsto$ [(i = 1) $\rightarrow$ a]] := inc A i a \\
+\textbf{def} ouc' (A : U) (i : I) (u : Partial A i) (a : A [i $\mapsto$ u]) : A := ouc a \\
 \end{tabular}
 \end{table}
 
@@ -472,7 +473,7 @@ $\textbf{Homogeneous\ Composition}$. hcomp is the answer to second problem: with
 one can express path composition, groupoid, category of groupoids (groupoid interpretation and
 internalization in type theory). One of the main roles of homogeneous composition is to be a
 carrier in [higher] inductive type constructors for calculating of homotopy colimits and direct
-encoding of CW-complexes (or internal models as gluening of pushout cells).
+encoding of CW-complexes. Here is given the second part of Huber equations for $\textbf{hcomp}$.
 
 \begin{table}[ht]
 \tabstyle
@@ -530,6 +531,74 @@ out of equivalences.
 \end{tabular}
 \end{table}
 
+Basic Fibrational HoTT core by Pelayo, Warren, and Voevodsky (2012).
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} fiber (A B : U) (f: A → B) (y : B): U := $\Sigma$ (x : A), Path B y (f x) \\
+\textbf{def} isEquiv (A B : U) (f : A → B) : U := $\Pi$ (y : B), isContr (fiber A B f y) \\
+\textbf{def} equiv (A B : U) : U := $\Sigma$ (f : A → B), isEquiv A B f \\
+\textbf{def} contrSingl (A : U) (a b : A) (p : Path A a b) \\
+\ \ \ \ : Path ($\Sigma$ (x : A), Path A a x) (a,<i>a) (b,p) := <i> (p @ i, <j> p @ i $\vee$ j) \\
+\textbf{def} idIsEquiv (A : U) : isEquiv A A (id A) := \\
+\ \ \ \ $\lambda$ (a : A), ((a,<i>a), $\lambda$ (z : fiber A A (id A) a), contrSingl A a z.1 z.2) \\
+\textbf{def} idEquiv (A : U) : equiv A A := (id A, isContrSingl A) \\
+\end{tabular}
+\end{table}
+
+The notion of Univalence was discovered by Vladimir Voevodsky
+as forth and back transport between fibrational equivalence
+as contractability of fibers and homotopical multi-dimentional
+heterogeneous path equality. The Equiv → Path type is called Univalence type,
+where univalence intro is obtained by Glue type and elim (Path → Equiv) is
+obtained by sigma transport from constant map.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} univ-formation (A B : U) := equiv A B → PathP (<i> U) A B \\
+\textbf{def} univ-intro (A B : U) : univ-formation A B := $\lambda$ (e : equiv A B), \\
+\ \ \ \ <i> Glue B ($\partial$ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)] \\
+\textbf{def} univ-elim (A B : U) (p : PathP (<i> U) A B) \\
+\ \ : equiv A B := transp (<i> equiv A (p @ i)) 0 (idEquiv A) \\
+\textbf{def} univ-computation (A B : U) (p : PathP (<i> U) A B) \\
+\ \ : PathP (<i> PathP (<i> U) A B) (univ-intro A B (univ-elim A B p)) p \\
+\ \ := <j i> Glue B (j $\vee$ $\partial$ i) \\
+\ \ \ \ \ [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B), \\
+\ \ \ \ \ \ (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i $\vee$ k)))] \\
+\end{tabular}
+\end{table}
+
+Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphism could be introduced
+as forth-back transport between isomorphism and path equality. This notion is somehow cannonical to all
+cubical systems and is called Unimorphism here.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} iso-Form (A B: U) : U$_1$ := iso A B -> PathP (<i>U) A B \\
+\textbf{def} iso-Intro (A B: U) : iso-Form A B := \ (x : iso A B), isoPath A B x.f x.g x.s x.t \\
+\textbf{def} iso-Elim (A B : U) : PathP (<i> U) A B -> iso A B \\
+\ := $\lambda$ (p : PathP (<i> U) A B), \\
+\ \ \ \ \ \ ( coerce A B p, coerce B A (<i> p @ -i), \\
+\ \ \ \ \ \ \ \ trans$^{-1}$-trans A B p, $\lambda$ (a : A), <k> trans-trans$^{-1}$ A B p a @ -k, $\star$) \\
+\end{tabular}
+\end{table}
+
+Orton-Pitts basis for univalence computability (2017):
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} ua (A B : U) (p : equiv A B) : PathP (<i> U) A B := univ-intro A B p \\
+\textbf{def} ua$-\beta$ (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1 \\
+ := <i> $\lambda$ (x : A), (idfun=idfun'' B @ -i) \\
+\ \ \ \ ( (idfun=idfun'' B @ -i) ((idfun=idfun' B @ -i) (e.1 x)) ) \\
+\end{tabular}
+\end{table}
+
+\newpage
 \subsection{de Rham Stack}
 
 Stack de Rham or Infinitezemal Shape Modality is a basic primitive for proving theorems
@@ -537,6 +606,58 @@ from synthetic differential geometry. This type-theoretical framework was develo
 for the first time by Felix Cherubini under the guidance of Urs Schreiber. The Anders
 prover implements the computational semantics of the de Rham stack.
 
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} $\iota$ (A : U) (a : A) : $\Im$ A := $\Im-$unit a \\
+\textbf{def} $\mu$ (A : U) (a : $\Im$ ($\Im$ A)) := $\Im-$join a \\
+\\
+\textbf{def} is-coreduced (A : U) : U := isEquiv A ($\Im$ A) ($\iota$ A) \\
+\textbf{def} $\Im$-coreduced (A : U) : is-coreduced ($\Im$ A) := isoToEquiv \\
+\ \ \ \ ($\Im$ A) ($\Im$ ($\Im$ A)) ($\iota$ ($\Im$ A)) ($\mu$ A) ($\lambda$ (x : $\Im$ ($\Im$ A)), <i>x) ($\lambda$ (y : $\Im$ A),<i>y) \\
+\textbf{def} ind$-\Im\beta$ (A : U) (B : $\Im$ A → U) (f : $\Pi$ (a : A), $\Im$ (B ($\iota$ A a))) (a : A) \\
+\ \ : Path ($\Im$ (B ($\iota$ A a))) (ind$-\Im$ A B f ($\iota$ A a)) (f a) := <i> f a \\
+\textbf{def} ind$-\Im-$const (A B : U) (b : $\Im$ B) (x : $\Im$ A) \\
+\ \ : Path ($\Im$ B) (ind$-\Im$ A ($\lambda$ (i : $\Im$ A), B) ($\lambda$ (i : A), b) x) b := <i> b \\
+\end{tabular}
+\end{table}
+
+Coreduced induction and its $\beta-$quation.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} $\Im-$ind (A : U) (B : $\Im$ A → U) (c : $\Pi$ (a : $\Im$ A), \\
+\ \ \ \ is-coreduced (B a)) (f : $\Pi$ (a : A), B ($\iota$ A a)) (a : $\Im$ A) : B a \\
+\ \ \ \ := (c a (ind$-\Im$ A B ($\lambda$ (x : A), $\iota$ (B ($\iota$ A x)) (f x)) a)).1.1 \\
+\textbf{def} $\Im-$ind$\beta$ (A : U) (B : $\Im$ A → U) (c : $\Pi$ (a : $\Im$ A), \\
+\ \ \ \ is-coreduced (B a)) (f : $\Pi$ (a : A), B ($\iota$ A a)) (a : A) \\
+\ \ : Path (B ($\iota$ A a)) (f a) (($\Im-$ind A B c f) ($\iota$ A a)) \\
+\ := <i> sec-equiv (B ($\iota$ A a)) ($\Im$ (B ($\iota$ A a))) ($\iota$ (B ($\iota$ A a)), c ($\iota$ A a)) (f a) @-i \\
+\end{tabular}
+\end{table}
+
+Geometric Modal HoTT Framework: Infinitesimal Proximity, Formal Disk, Formal Disk Bundle, Differential.
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} $\sim$ (X : U) (a x' : X) : U := Path ($\Im$ X) ($\iota$ X a) ($\iota$ X x') \\
+\textbf{def} $\mathbb{D}$ (X : U) (a : X) : U := $\Sigma$ (x' : X), $\sim$ X a x' \\
+\textbf{def} inf-prox-ap (X Y : U) (f : X → Y) (x x' : X) (p : $\sim$ X x x') \\
+\ \ : $\sim$ Y (f x) (f x') := <i> $\Im-$app X Y f (p @ i) \\
+\textbf{def} d (X Y : U) (f : X → Y) (x : X) ($\varepsilon$ : $\mathbb{D}$ X x) \\
+\ \ : $\mathbb{D}$ Y (f x) := (f $\varepsilon$.1, inf-prox-ap X Y f x $\varepsilon$.1 $\varepsilon$.2) \\
+\textbf{def} T$^\infty$ (A : U) : U := $\Sigma$ (a : A), $\mathbb{D}$ A a \\
+\textbf{def} inf-prox-ap (X Y : U) (f : X → Y) (x x' : X) (p : $\sim$ X x x') \\
+\ \ : $\sim$ Y (f x) (f x') := <i> $\Im-$app X Y f (p @ i) \\
+\textbf{def} d (X Y : U) (f : X → Y) (x : X) ($\varepsilon$ : $\mathbb{D}$ X x) \\
+\ \ : $\mathbb{D}$ Y (f x) := (f $\varepsilon$.1, inf-prox-ap X Y f x $\varepsilon$.1 $\varepsilon$.2) \\
+\textbf{def} T$^\infty$-map (X Y : U) (f : X → Y) ($\tau$ : T$^\infty$ X) : T$^\infty$ Y := (f $\tau$.1, d X Y f $\tau$.1 $\tau$.2) \\
+\end{tabular}
+\end{table}
+
+\newpage
 \subsection{Higher Inductive Types}
 
 Anders currently don’t support Lean-compatible generic inductive schemes

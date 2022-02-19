@@ -3,6 +3,7 @@ import library/foundations/mltt/inductive
 import library/mathematics/algebra/algebra
 import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/quotient
 
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 

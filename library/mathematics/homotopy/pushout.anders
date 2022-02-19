@@ -1,4 +1,5 @@
 module pushout where
+import library/foundations/mltt/either
 import library/mathematics/homotopy/coequalizer
 
 -- [Caglayan] 2014

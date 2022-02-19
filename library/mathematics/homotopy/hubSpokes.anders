@@ -1,4 +1,5 @@
 module hubSpokes where
+import library/foundations/univalent/path
 
 -- [Lumsdaine] 2012 Hubs and Spokes Disc
 

@@ -7,6 +7,7 @@
 
 module inductive where
 import library/foundations/univalent/path
+option irrelevance true
 
 -- Steve Awodey, Nicola Gambino, Kristina Sojakova
 -- Inductive Types in Homotopy Type Theory
@@ -23,7 +24,14 @@ import library/foundations/univalent/path
 -- Primitives: 0, 1, 2, W
 
 def 0-ind (C: 𝟎 → U) (z: 𝟎) : C z := ind₀ (C z) z
+
+def trans_c (a : 𝟏) : Path 𝟏 a (transport 𝟏 𝟏 (<i> 𝟏) a) := <j> transp (<_> 𝟏) -j a
+
+def 1-rec (C: U) (x: C) (z: 𝟏) : C := ind₁ (\(_:𝟏), C) x z
 def 1-ind (C: 𝟏 → U) (x: C ★) (z: 𝟏) : C z := ind₁ C x z
+def 1-β (C: U) (c: C): Path C (1-rec C c ★) c := idp C c
+def 1-η (z: 𝟏) : Path 𝟏 ★ z := idp 𝟏 ★ -- 𝟏-irrelevance enabled
+
 def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) (z: 𝟐) : C z := ind₂ C x y z
 
 def W′ (A : U) (B : A → U) : U := W (x: A), B x

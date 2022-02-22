@@ -1,0 +1,12 @@
+module sharp where
+import library/foundations/univalent/path
+
+-- Riehl, Finster, Licata. Synthetic Spectra via a Monadic and Comonadic Modality. 2021
+-- https://arxiv.org/pdf/2102.04099.pdf
+
+axiom ♯ (A : U) : U
+axiom ♯-intro (A : U) : A → ♯ A
+axiom ♯-elim (A : U) : ♯ A → A
+axiom ♯-β (A : U) (a : ♯ A) : Path (♯ A) (♯-intro A (♯-elim A a)) a
+axiom ♯-η (A : U) (a : A) : Path A (♯-elim A (♯-intro A a)) a
+

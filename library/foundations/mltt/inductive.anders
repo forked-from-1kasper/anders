@@ -25,8 +25,6 @@ option irrelevance true
 
 def 0-ind (C: 𝟎 → U) (z: 𝟎) : C z := ind₀ (C z) z
 
-def trans_c (a : 𝟏) : Path 𝟏 a (transport 𝟏 𝟏 (<i> 𝟏) a) := <j> transp (<_> 𝟏) -j a
-
 def 1-rec (C: U) (x: C) (z: 𝟏) : C := ind₁ (\(_:𝟏), C) x z
 def 1-ind (C: 𝟏 → U) (x: C ★) (z: 𝟏) : C z := ind₁ C x z
 def 1-β (C: U) (c: C): Path C (1-rec C c ★) c := idp C c

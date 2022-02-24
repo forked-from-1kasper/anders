@@ -25,8 +25,9 @@ def +-β₂ (A B : U) (C : + A B → U) (b: B)
   : PathP (<_>C (inr A B b)) (g b) (+-ind A B C f g (inr A B b))
  := <_> g b
 
-def +-η (A B : U) (C: + A B → U) 
-        (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y))
-        (h : Π (z : + A B), C z) (c : + A B)
-  : PathP (<_>C c) (+-ind A B C f g c) (h c)
- := ?
+def +-η (A B : U) (c : + A B)
+  : + (Σ (x : A), PathP (<_> + A B) c (inl A B x))
+      (Σ (y : B), PathP (<_> + A B) c (inr A B y)) :=
++-ind A B (λ (c : + A B), + (Σ (x : A), PathP (<_> + A B) c (inl A B x))
+                            (Σ (y : B), PathP (<_> + A B) c (inr A B y)))
+      (λ (x : A), (0₂, (x, <_> (0₂, x)))) (λ (y : B), (1₂, (y, <_> (1₂, y)))) c

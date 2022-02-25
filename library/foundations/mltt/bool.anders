@@ -7,22 +7,23 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module bool where
+
+import library/foundations/mltt/either
 import library/foundations/mltt/proto
 
 def rec₂ (A : U) (a b : A) : 𝟐 → A := ind₂ (λ (_ : 𝟐), A) a b
 
-def 2-β₁ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂) 
+def 𝟐-β₁ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂) 
   : PathP (<_>C 0₂) (f 0₂) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) 0₂)
- := <_> f 0₂             
+ := <_> f 0₂
 
-def 2-β₂ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂) 
+def 𝟐-β₂ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂) 
   : PathP (<_>C 1₂) (g 1₂) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) 1₂)
- := <_> g 1₂             
+ := <_> g 1₂
 
-def 2-η (C: 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂) 
-    (h : Π (z : 𝟐), C z) (c : 𝟐)
-  : PathP (<_>C c) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) c) (h c)
- := ?
+def 𝟐-η (c : 𝟐) : + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂)
+ := ind₂ (λ (c : 𝟐), + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂))
+         (0₂, <_> 0₂) (1₂, <_> 1₂) c
 
 -- data 𝟐 : U := 0₂ | 1₂
 

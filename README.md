@@ -1,9 +1,6 @@
 🧊 Anders
 =========
 
-[![OPAM](https://img.shields.io/github/v/release/groupoid/anders.svg)](https://opam.ocaml.org/packages/anders/)
-[![Actions](https://github.com/groupoid/anders/workflows/opam/badge.svg)](https://github.com/groupoid/anders/actions)
-
 Modal Homotopy Type System.
 
 ```OCaml
@@ -37,7 +34,6 @@ Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Thre
 Features
 --------
 
-* Homepage: https://homotopy.dev/
 * Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
@@ -54,14 +50,14 @@ Features
 * Lean syntax for ΠΣW
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
-* Groupoid Infinity CCHM Homotopy Library: https://homotopy.dev/library/
 * Best suited for academic papers and fast type checking
 
 Setup
 -------------
 
 ```shell
-$ opam install anders
+$ make
+$ dune exec anders help
 ```
 
 Samples
@@ -158,13 +154,6 @@ Acknowledgements
 ----------------
 
 * Univalent People
-
-Mentions
---------
-
-* Максим Сохацький. <a href="https://www.youtube.com/watch?v=KHDgytozLv4">Презентація кубічного CCHM прувера Anders 0.7.2 від Групоїд Інфініті</a>. 2021-07-18
-* Максим Сохацкий. <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a>. 2022-01-17
-* Namdak Topna, Siegmentation Fault. <a href="https://groupoid.github.io/anders/doc/anders.pdf">Anders: Modal Homotopy Type System</a>. 2022-01-17
 
 Authors
 -------

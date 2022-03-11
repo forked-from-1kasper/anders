@@ -1,5 +1,18 @@
 open Language.Spec
 
+module Atom =
+struct
+  type t = ident * dir
+  let compare (a, x) (b, y) =
+    if a = b then Dir.compare x y else Ident.compare a b
+end
+
+module Conjunction = Set.Make(Atom)
+type conjunction = Conjunction.t
+
+module Disjunction = Set.Make(Conjunction)
+type disjunction = Disjunction.t
+
 type scope = Local | Global
 
 (* Intermediate type checker values *)
@@ -11,7 +24,7 @@ type value =
   | VSig of value * clos | VPair of tag * value * value | VFst of value | VSnd of value
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
-  | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
+  | VI | VFormula of disjunction
   | VTransp of value * value | VHComp of value * value * value * value
   | VPartialP of value * value | VSystem of value System.t
   | VSub of value * value * value | VInc of value * value | VOuc of value
@@ -32,12 +45,19 @@ and ctx = record Env.t
 
 (* Implementation *)
 
-let dir d = VDir d
 let dim i = Var (i, VI)
-let vzero = VDir Zero
-let vone  = VDir One
 
-let isOne i = VApp (VApp (VId VI, VDir One), i)
+let vzero = VFormula Disjunction.empty
+let vone  = VFormula (Disjunction.singleton Conjunction.empty)
+
+let dir = function
+  | Zero -> vzero
+  | One  -> vone
+
+let bot = Disjunction.is_empty
+let top = Disjunction.mem Conjunction.empty
+
+let isOne i = VApp (VApp (VId VI, vone), i)
 let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx

@@ -130,7 +130,7 @@ struct
     | '\x07' -> ExpectedPath (exp ())
     | '\x08' -> ExpectedSubtype (exp ())
     | '\x09' -> ExpectedSystem (exp ())
-    | '\x0A' -> ExpectedConj (exp ())
+    | '\x0A' -> ExpectedFormula (exp ())
     | '\x0B' -> ExpectedIm (exp ())
     | '\x0C' -> ExpectedInf (exp ())
     | '\x0D' -> ExpectedGlue (exp ())

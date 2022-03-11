@@ -1,77 +1,22 @@
+open Language.Prelude
 open Language.Spec
 open Term
+open Elab
 open Rbv
-
-module Atom =
-struct
-  type t = ident * dir
-  let compare (a, x) (b, y) =
-    if a = b then Dir.compare x y else Ident.compare a b
-end
-
-module Conjunction = Set.Make(Atom)
-type conjunction = Conjunction.t
-
-module Disjunction = Set.Make(Conjunction)
-type disjunction = Disjunction.t
 
 let negDir : dir -> dir = function
   | Zero -> One | One -> Zero
 
-(* Arbitrary formula φ after calling andFormula/orFormula/negFormula
-   will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
-   where “∧” and “∨” are right-associative,
-   and each αᵢ/βⱼ has form “γ” or “−γ” for some variable “γ”. *)
-let rec orFormula : value * value -> value = function
-  | VDir One, _  | _, VDir One  -> VDir One
-  | VDir Zero, f | f, VDir Zero -> f
-  | VOr (f, g), h -> orFormula (f, orFormula (g, h))
-  | f, g -> VOr (f, g)
+let negAtom = fun (p, d) -> (p, negDir d)
 
-let rec andFormula : value * value -> value = function
-  | VDir Zero, _ | _, VDir Zero -> VDir Zero
-  | VDir One, f  | f, VDir One  -> f
-  | VAnd (f, g), h -> andFormula (f, andFormula (g, h))
-  | VOr (f, g), h | h, VOr (f, g) ->
-    orFormula (andFormula (f, h), andFormula (g, h))
-  | f, g -> VAnd (f, g)
-
-let rec negFormula : value -> value = function
-  | VDir d      -> VDir (negDir d)
-  | VNeg n      -> n
-  | VAnd (f, g) -> orFormula (negFormula f, negFormula g)
-  | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
-  | v           -> VNeg v
-
-(* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of idents equipped with sign. *)
-let rec extAnd : value -> conjunction = function
-  | Var (x, _)        -> Conjunction.singleton (x, One)
-  | VNeg (Var (x, _)) -> Conjunction.singleton (x, Zero)
-  | VAnd (x, y)       -> Conjunction.union (extAnd x) (extAnd y)
-  | v                 -> raise (Internal (ExpectedConj (rbV v)))
-
-(* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
-   into list of extAnd results. *)
-let rec extOr : value -> disjunction = function
-  | VOr (x, y) -> Disjunction.union (extOr x) (extOr y)
-  | k          -> Disjunction.singleton (extAnd k)
-
-(* uniq removes all conjunctions that are superset of another,
+(* simplify removes all conjunctions that are superset of another,
    i. e. xy ∨ x = (x ∧ y) ∨ (x ∧ 1) = x ∧ (y ∨ 1) = x ∧ 1 = x.
-   It does not remove conjunction like (x ∧ −x), because algebra of interval
+   It does not remove conjunctions like (x ∧ −x), because algebra of interval
    is not boolean, it is De Morgan algebra: distributive lattice with De Morgan laws.
    https://ncatlab.org/nlab/show/De+Morgan+algebra *)
-let uniq t =
+let simplify t =
   let super x y = not (Conjunction.equal x y) && Conjunction.subset y x in
   Disjunction.filter (fun x -> not (Disjunction.exists (super x) t)) t
-
-(* orEq checks equivalence of two formulas
-   of the form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ) *)
-let orEq f g = Disjunction.equal (uniq (extOr f)) (uniq (extOr g))
-
-(* andEq check equivalence of two formulas
-   of the form (α₁ ∧ ... ∧ αₙ) *)
-let andEq f g = Conjunction.equal (extAnd f) (extAnd g)
 
 let compatible xs ys =
   Env.merge (fun _ x y -> match x, y with
@@ -107,8 +52,6 @@ let meets xs ys =
 
 let meetss = List.fold_left meets [eps]
 
-let union xs ys = nubRev (List.rev_append xs ys)
-
 let forall i = System.filter (fun mu _ -> not (Env.mem i mu))
 
 let mkSystem xs = System.of_seq (List.to_seq xs)
@@ -121,43 +64,30 @@ let sign x = function
 let getFace xs = Env.fold (fun x d y -> EAnd (y, sign x d)) xs (EDir One)
 let getFormula ts = System.fold (fun x _ e -> EOr (getFace x, e)) ts (EDir Zero)
 
-let singleton p x = Env.add p x Env.empty
-
-let contrAtom : ident * dir -> value = function
-  | (x, Zero) -> VNeg (Var (x, VI))
-  | (x, One)  -> Var (x, VI)
-
-let contrAnd (t : conjunction) : value =
-  Conjunction.fold (fun e e' -> andFormula (contrAtom e, e')) t (VDir One)
-
-let contrOr (t : disjunction) : value =
-  Disjunction.fold (fun e e' -> orFormula (contrAnd e, e')) t (VDir Zero)
-
-let getFaceV xs = Env.fold (fun x d y -> andFormula (y, contrAtom (x, d))) xs vone
-let getFormulaV ts = System.fold (fun x _ v -> orFormula (getFaceV x, v)) ts vzero
-
-let evalAnd a b =
-  match andFormula (a, b) with
-  | VAnd (a, b) -> contrAnd (extAnd (VAnd (a, b)))
-  | v           -> v
-
-let evalOr a b =
-  match orFormula (a, b) with
-  | VOr (a, b) -> contrOr (uniq (extOr (VOr (a, b))))
-  | v          -> v
+let faceInj p x = Env.add p x Env.empty
 
 let reduceSystem ts x =
   match System.find_opt eps ts with
   | Some v -> v
   | None   -> VApp (VSystem ts, x)
 
-let rec solve k x = match k, x with
-  | VDir y, _ -> if x = y then [eps] else []
-  | Var (p, _), _ -> [singleton p x]
-  | VNeg n, _ -> solve n (negDir x)
-  | VOr (f, g), One  | VAnd (f, g), Zero -> union (solve f x) (solve g x)
-  | VOr (f, g), Zero | VAnd (f, g), One  -> meets (solve f x) (solve g x)
-  | _, _ -> raise (Internal (DNFSolverError (rbV k, x)))
+let faceAdd x d mu =
+  match Env.find_opt x mu with
+  | None    -> Some (Env.add x d mu)
+  | Some d' -> if d = d' then Some (Env.add x d mu) else None
+
+let disjZero k = List.map (fun (p, x) -> faceInj p (negDir x)) (Conjunction.elements k)
+
+let disjOne (k : conjunction) : face option =
+  Conjunction.elements k
+  |> List.fold_left (fun nu (x, d) ->
+    Option.bind nu (faceAdd x d)) (Some Env.empty)
+
+let solve k x = match k, x with
+  | Var (p, _), _     -> [faceInj p x]
+  | VFormula ks, Zero -> meetss (List.map disjZero (Disjunction.elements ks))
+  | VFormula ks, One  -> List.filter_map disjOne (Disjunction.elements ks)
+  | _, _              -> raise (Internal (DNFSolverError (rbV k, x)))
 
 let bimap f g ts =
   let ts' =
@@ -173,10 +103,66 @@ let bimap f g ts =
     not (List.exists (fun (beta, _) -> lt beta alpha) ts')) ts'
   |> mkSystem
 
-let keys ts = List.of_seq (Seq.map fst (System.to_seq ts))
-
 let intersectionWith f =
   System.merge (fun _ x y ->
     match x, y with
     | Some a, Some b -> Some (f a b)
     | _,      _      -> None)
+
+let unions t1 t2 =
+  Disjunction.elements t2
+  |> List.map (fun c -> Disjunction.map (Conjunction.union c) t1)
+  |> List.fold_left Disjunction.union Disjunction.empty
+  |> simplify
+
+let unionss = List.fold_left unions (Disjunction.singleton Conjunction.empty)
+
+let negConjunction : conjunction -> disjunction =
+     Conjunction.elements
+  >> List.map (negAtom >> Conjunction.singleton)
+  >> Disjunction.of_list
+
+let negDisjunction = Disjunction.elements >> List.map negConjunction >> unionss >> simplify
+
+let orFormula v1 v2 = match v1, v2 with
+  | Var (x, _), Var (y, _) -> VFormula (Disjunction.of_list [Conjunction.singleton (x, One); Conjunction.singleton (y, One)])
+  | Var (x, _), VFormula t | VFormula t, Var (x, _) ->
+    if top t then VFormula t
+    else VFormula (Disjunction.filter (fun c -> not (Conjunction.mem (x, One) c)) t
+                  |> Disjunction.add (Conjunction.singleton (x, One)))
+  | VFormula t1, VFormula t2 -> VFormula (simplify (Disjunction.union t1 t2))
+  | _, _ -> raise (Internal (ExpectedFormula (EOr (rbV v1, rbV v2))))
+
+let andFormula v1 v2 = match v1, v2 with
+  | Var (x, _), Var (y, _) -> VFormula (Disjunction.singleton (Conjunction.of_list [(x, One); (y, One)]))
+  | Var (x, _), VFormula t | VFormula t, Var (x, _) ->
+    VFormula (simplify (Disjunction.map (Conjunction.add (x, One)) t))
+  | VFormula t1, VFormula t2 -> VFormula (unions t1 t2)
+  | _, _ -> raise (Internal (ExpectedFormula (EAnd (rbV v1, rbV v2))))
+
+let negFormula : value -> value = function
+  | Var (p, _)  -> VFormula (Disjunction.singleton (Conjunction.singleton (p, Zero)))
+  | VFormula ks -> VFormula (negDisjunction ks)
+  | v           -> raise (Internal (ExpectedFormula (rbV v)))
+
+let getFaceV xs = Env.fold (fun x d -> Conjunction.add (x, d)) xs Conjunction.empty
+let getFormulaV ts = VFormula (System.fold (fun x _ -> Disjunction.add (getFaceV x)) ts Disjunction.empty)
+
+let actVar rho i = match Env.find_opt i rho with
+  | Some v -> v
+  | None   -> Var (i, VI)
+
+let boolNatural = function
+  | Zero -> negDisjunction
+  | One  -> id
+
+let actConjunction rho k =
+  Conjunction.elements k
+  |> List.map (fun (p, d) -> boolNatural d (extFormula (actVar rho p)))
+  |> unionss
+
+let actDisjunction rho ks =
+  VFormula (Disjunction.elements ks
+           |> List.map (actConjunction rho)
+           |> List.fold_left Disjunction.union Disjunction.empty
+           |> simplify)

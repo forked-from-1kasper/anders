@@ -1,3 +1,5 @@
+let id = fun x -> x
+
 let flip f a b = f b a
 
 let curry f x y = f (x, y)

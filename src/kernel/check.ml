@@ -28,9 +28,9 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EPLam e              -> VPLam (eval ctx e)
   | EAppFormula (e, x)   -> appFormula (eval ctx e) (eval ctx x)
   | EI                   -> VI
-  | EDir d               -> VDir d
-  | EAnd (e1, e2)        -> evalAnd (eval ctx e1) (eval ctx e2)
-  | EOr (e1, e2)         -> evalOr (eval ctx e1) (eval ctx e2)
+  | EDir d               -> dir d
+  | EAnd (e1, e2)        -> andFormula (eval ctx e1) (eval ctx e2)
+  | EOr (e1, e2)         -> orFormula (eval ctx e1) (eval ctx e2)
   | ENeg e               -> negFormula (eval ctx e)
   | ETransp (p, i)       -> VTransp (eval ctx p, eval ctx i)
   | EHComp (t, r, u, u0) -> hcomp (eval ctx t) (eval ctx r) (eval ctx u) (eval ctx u0)
@@ -66,9 +66,9 @@ and appFormula v x = match v with
   | VPLam f -> app (f, x)
   | _       -> let (_, u0, u1) = extPathP (inferV v) in
     begin match x with
-      | VDir Zero -> u0
-      | VDir One  -> u1
-      | i         -> VAppFormula (v, i)
+      | VFormula ks when bot ks -> u0
+      | VFormula ks when top ks -> u1
+      | i                       -> VAppFormula (v, i)
     end
 
 and border xs v = mkSystem (List.map (fun mu -> (mu, upd mu v)) xs)
@@ -80,18 +80,18 @@ and transp p phi u0 = match p with
   | _ -> VApp (VTransp (p, phi), u0)
 
 and glue r u a = match r, a with
-  | VDir One, _ -> vsnd (vsnd (app (u, VRef vone)))
+  | VFormula ks, _ when top ks -> vsnd (vsnd (app (u, VRef vone)))
   | _, VUnglue (_, _, b) -> b
   | _, _ -> VGlueElem (r, u, a)
 
 and unglue r u b = match r, u, b with
-  | VDir One, _, _ -> app (vfst (vsnd (app (u, VRef vone))), b)
+  | VFormula ks, _, _ when top ks -> app (vfst (vsnd (app (u, VRef vone))), b)
   | _, _, VGlueElem (_, _, a) -> ouc a
   | _, _, _ -> VUnglue (r, u, b)
 
 and transport i p phi u0 = match p, phi, u0 with
   (* transp p 1 u₀ ~> u₀ *)
-  | _, VDir One, _ -> u0
+  | _, VFormula ks, _ when top ks -> u0
   (* transp (<_> U) i A ~> A *)
   | VKan _, _, _ -> u0
   (* transp (<_> 𝟎) i u₀ ~> u₀ *)
@@ -106,8 +106,8 @@ and transport i p phi u0 = match p, phi, u0 with
   | VPi (t, (_, b)), _, _ -> let x = fresh (ident "x") in
     let j = freshName "ι" in let k = freshName "κ" in
     VLam (act0 i vone t, (x, fun x ->
-      let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
-      transport k (swap i k (b (v (VNeg (dim k)))))
+      let v = transFill j (act0 i (negFormula (dim j)) t) phi x in
+      transport k (swap i k (b (v (negFormula (dim k)))))
         phi (app (u0, v vone))))
   (* transp (<i> Σ (x : A i), B i x) φ u₀ ~>
     (transp (<j> A j) φ u₀.1,
@@ -123,7 +123,7 @@ and transport i p phi u0 = match p, phi, u0 with
   | VApp (VApp (VPathP p, v), w), _, _ ->
     let j = freshName "ι" in let k = freshName "κ" in
     VPLam (VLam (VI, (j, fun j ->
-      let uj = appFormula u0 j in let r = evalOr phi (evalOr j (negFormula j)) in
+      let uj = appFormula u0 j in let r = orFormula phi (orFormula j (negFormula j)) in
       comp (fun k -> appFormula (act0 i k p) j) r k
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
@@ -137,7 +137,7 @@ and transport i p phi u0 = match p, phi, u0 with
     let uj k = bimap (fun j -> if i = j then k else dim j) upd u in
     let uzero = uj vzero in let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
 
-    let phi1 = solve phi One in let ksi = evalOr phi psi' in
+    let phi1 = solve phi One in let ksi = orFormula phi psi' in
     let a1 = comp (fun j -> act0 i j a) ksi i (VSystem (unionSystem (border phi1 a0) ts)) a0 in
 
     let fib = System.map (fun x -> VPair (ref None, x, idp a1))
@@ -149,7 +149,7 @@ and transport i p phi u0 = match p, phi, u0 with
       (t, w, contr (fiber b t (vfst w) a1) (app (vsnd w, a1)) ksi fib)) u1 in
 
     let chi = getFormulaV u1 in
-    let a1' = homcom b (evalOr chi phi) i
+    let a1' = homcom b (orFormula chi phi) i
       (VSystem (unionSystem (System.map (fun (_, _, p) ->
         appFormula (vsnd p) (dim i)) fib') (border phi1 a1))) a1 in
 
@@ -168,7 +168,7 @@ and transport i p phi u0 = match p, phi, u0 with
   | _, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in
-  transport k (act0 i (evalAnd (dim k) j) p) (evalOr phi (negFormula j)) u0
+  transport k (act0 i (andFormula (dim k) j) p) (orFormula phi (negFormula j)) u0
 
 and hcomp t r u u0 = let i = freshName "ι" in homcom t r i (app (u, dim i)) u0
 
@@ -184,7 +184,7 @@ and idEquiv t =
           VPLam (VLam (VI, (freshName "i", fun i ->
             let p = vsnd u in pairv (appFormula p i)
               (VPLam (VLam (VI, (freshName "j", fun j ->
-                appFormula p (evalAnd i j))))))))))))))
+                appFormula p (andFormula i j))))))))))))))
 
 and idtoeqv i e = let a = act0 i vzero e in
   transport i (equiv a e) vzero (idEquiv a)
@@ -196,7 +196,7 @@ and walk f r = function
 
 and homcom t r i u u0 = match t, r, u, u0 with
   (* hcomp A 1 u u₀ ~> u 1 1=1 *)
-  | _, VDir One, _, _ -> app (act0 i vone u, VRef vone)
+  | _, VFormula ks, _, _ when top ks -> app (act0 i vone u, VRef vone)
   (* hcomp (Π (x : A), B x) φ u u₀ ~> λ (x : A), hcomp (B x) φ (λ (i : I), [φ → u i 1=1 x]) (u₀ x) *)
   | VPi (t, (x, b)), _, _, _ -> VLam (t, (fresh x, fun y -> homcom (b y) r i
     (VSystem (walk (fun v -> app (v, y)) r u)) (app (u0, y))))
@@ -214,7 +214,7 @@ and homcom t r i u u0 = match t, r, u, u0 with
   | VApp (VApp (VPathP t, v), w), _, _, _ ->
     let j = freshName "ι" in
     VPLam (VLam (VI, (j, fun j ->
-      homcom (appFormula t j) (evalOr r (evalOr j (negFormula j))) i
+      homcom (appFormula t j) (orFormula r (orFormula j (negFormula j))) i
           (VSystem (unionSystem (walk (flip appFormula j) r u)
                    (unionSystem (border (solve j One)  w)
                                 (border (solve j Zero) v))))
@@ -222,12 +222,12 @@ and homcom t r i u u0 = match t, r, u, u0 with
   (* hcomp U φ E A ~> Glue A φ [(φ = 1) → (E 1 1=1, idtoeqvⁱ (E -i 1=1))] *)
   | VKan _, _, _, _ ->
     app (VApp (VGlue u0, r), VSystem (walk (fun e ->
-      pairv (act0 i vone e) (idtoeqv i (act0 i (VNeg (dim i)) e))) r u))
+      pairv (act0 i vone e) (idtoeqv i (act0 i (negFormula (dim i)) e))) r u))
   | VApp (VApp (VGlue a, phi), VSystem t), _, VSystem u, _ ->
     let ts = System.map (fun (t, w) -> (t, w, hfill t r i (VSystem u) u0)) (System.map eta t) in
     let t1 = System.map (fun (t, w, x) -> pairv t (pairv w (x vone))) ts in
 
-    let a1 = homcom a (evalOr r phi) i (VSystem (unionSystem
+    let a1 = homcom a (orFormula r phi) i (VSystem (unionSystem
       (System.map (fun (_, w, x) -> app (vfst w, x (dim i))) ts)
       (System.map (unglue phi (VSystem t)) u))) (unglue phi (VSystem t) u0) in
     glue phi (VSystem t1) a1
@@ -241,8 +241,8 @@ and homcom t r i u u0 = match t, r, u, u0 with
     let a1 = a' vone in let j = freshName "ι" in let y = freshName "b" in
     let f1 = homcom (implv (b a1) (W (t, (x, b)))) r i
       (VSystem (System.map (fun (a, f) -> VLam (act0 i vone a, (y, fun y ->
-          app (f, transport j (b (act0 i (evalOr (negFormula (dim j)) (dim i)) a)) vzero y)))) u'))
-      (VLam (b a1, (y, fun y -> app (f0, transport j (b (a' (VNeg (dim j)))) vzero y)))) in
+          app (f, transport j (b (act0 i (orFormula (negFormula (dim j)) (dim i)) a)) vzero y)))) u'))
+      (VLam (b a1, (y, fun y -> app (f0, transport j (b (a' (negFormula (dim j)))) vzero y)))) in
     VApp (VApp (VSup (t, b'), a1), f1)
   (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
        ℑ-unit (hcomp A r u (ouc u₀)) *)
@@ -251,16 +251,16 @@ and homcom t r i u u0 = match t, r, u, u0 with
   | _, _, _, _ -> VHComp (t, r, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r u))), u0)
 
 and comp t r i u u0 = let j = freshName "ι" in
-  homcom (t vone) r i (VSystem (walk (transport j (t (evalOr (dim i) (dim j))) (dim i)) r u))
+  homcom (t vone) r i (VSystem (walk (transport j (t (orFormula (dim i) (dim j))) (dim i)) r u))
     (transport j (t (dim j)) vzero u0)
 
 and hfill t r i u u0 j = let k = freshName "κ" in
-  homcom t (evalOr (negFormula j) r) k
-    (VSystem (unionSystem (walk (act0 i (evalAnd (dim k) j)) r u)
+  homcom t (orFormula (negFormula j) r) k
+    (VSystem (unionSystem (walk (act0 i (andFormula (dim k) j)) r u)
       (border (solve j Zero) u0))) u0
 
 and ouc v = match v, inferV v with
-  | _, VSub (_, VDir One, u) -> app (u, VRef vone)
+  | _, VSub (_, VFormula ks, u) when top ks -> app (u, VRef vone)
   | VApp (VInc _, v), _ -> v
   | _, _ -> VOuc v
 
@@ -285,7 +285,7 @@ and app : value * value -> value = function
   (* J A C a φ a (ref a) ~> φ *)
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
   (* Glue A 1 u ~> (u 1=1).1 *)
-  | VApp (VGlue _, VDir One), u -> vfst (app (u, VRef vone))
+  | VApp (VGlue _, VFormula ks), u when top ks -> vfst (app (u, VRef vone))
   | VTransp (p, i), u0 -> transp p i u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
@@ -354,7 +354,7 @@ and inferV v = traceInferV v; match v with
   | VJ v -> inferJ v (inferV v)
   | VPathP p -> let (_, _, v) = freshDim () in let t = inferV (appFormula p v) in
     let v0 = appFormula p vzero in let v1 = appFormula p vone in implv v0 (implv v1 t)
-  | VDir _ | VOr _ | VAnd _ | VNeg _ -> VI
+  | VFormula _ -> VI
   | VTransp (p, _) -> implv (appFormula p vzero) (appFormula p vone)
   | VHComp (t, _, _, _) -> t
   | VSub (t, _, _) -> VPre (extSet (inferV t))
@@ -436,7 +436,7 @@ and updTerm alpha = function
 
 and faceEnv alpha ctx =
   Env.map (fun (p, t, v) -> if p = Local then (p, updTerm alpha t, updTerm alpha v) else (p, t, v)) ctx
-  |> Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir))) alpha
+  |> Env.fold (fun p d -> Env.add p (Local, Value VI, Value (dir d))) alpha
 
 and act rho = function
   | VLam (t, (x, g))     -> VLam (act rho t, (x, g >> act rho))
@@ -463,10 +463,7 @@ and act rho = function
   | VRef v               -> VRef (act rho v)
   | VJ v                 -> VJ (act rho v)
   | VI                   -> VI
-  | VDir d               -> VDir d
-  | VAnd (u, v)          -> evalAnd (act rho u) (act rho v)
-  | VOr (u, v)           -> evalOr (act rho u) (act rho v)
-  | VNeg u               -> negFormula (act rho u)
+  | VFormula ks          -> actDisjunction rho ks
   | VInc (t, r)          -> VInc (act rho t, act rho r)
   | VOuc v               -> ouc (act rho v)
   | VGlue v              -> VGlue (act rho v)
@@ -488,10 +485,6 @@ and act rho = function
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
   | VIndIm (a, b)        -> VIndIm (act rho a, act rho b)
-
-and actVar rho i = match Env.find_opt i rho with
-  | Some v -> v
-  | None   -> Var (i, VI)
 
 and act0 i j = act (Env.add i j Env.empty)
 
@@ -519,18 +512,14 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPathP a, VPathP b -> conv a b
     | VPartialP (t1, r1), VPartialP (t2, r2) -> conv t1 t2 && conv r1 r2
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
-    | VSystem xs, VSystem ys -> keys xs = keys ys && System.for_all (fun _ b -> b) (intersectionWith conv xs ys)
+    | VSystem xs, VSystem ys -> System.equal conv xs ys
     | VSystem xs, x | x, VSystem xs -> System.for_all (fun alpha y -> conv (app (upd alpha x, VRef vone)) y) xs
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp (t1, r1, u1, v1), VHComp (t2, r2, u2, v2) -> conv t1 t2 && conv r1 r2 && conv u1 u2 && conv v1 v2
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
-    | VOr (x, y), VDir Zero | VAnd (x, y), VDir One  -> conv x v2 && conv y v2
-    | VOr (x, y), VDir One  | VAnd (x, y), VDir Zero -> conv x v2 || conv y v2
-    | VOr _,  _ | _, VOr _  -> orEq v1 v2
-    | VAnd _, _ | _, VAnd _ -> andEq v1 v2
-    | VNeg x, VNeg y -> conv x y
+    | VFormula ks, Var (x, _) | Var (x, _), VFormula ks -> Disjunction.for_all (Conjunction.for_all (fun (y, d) -> x = y && d = One)) ks
+    | VFormula ks1, VFormula ks2 -> Disjunction.equal ks1 ks2
     | VI, VI -> true
-    | VDir u, VDir v -> u = v
     | VId u, VId v | VJ u, VJ v -> conv u v
     | VInc (t1, r1), VInc (t2, r2) -> conv t1 t2 && conv r1 r2
     | VOuc u, VOuc v -> conv u v

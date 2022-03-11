@@ -120,7 +120,7 @@ struct
     | ExpectedPath e         -> W.put '\x07'; exp e
     | ExpectedSubtype e      -> W.put '\x08'; exp e
     | ExpectedSystem e       -> W.put '\x09'; exp e
-    | ExpectedConj e         -> W.put '\x0A'; exp e
+    | ExpectedFormula e      -> W.put '\x0A'; exp e
     | ExpectedIm e           -> W.put '\x0B'; exp e
     | ExpectedInf e          -> W.put '\x0C'; exp e
     | ExpectedGlue e         -> W.put '\x0D'; exp e

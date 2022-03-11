@@ -24,7 +24,7 @@ let rec prettyPrintError : error -> string = function
   | ExpectedPath x         -> Printf.sprintf "“%s” expected to be a path.\n" (showExp x)
   | ExpectedSubtype x      -> Printf.sprintf "  %s\nexpected to be a cubical subtype\n" (showExp x)
   | ExpectedSystem x       -> Printf.sprintf "  %s\nexpected to be a system\n" (showExp x)
-  | ExpectedConj x         -> Printf.sprintf "“%s” expected to be conjunction\n" (showExp x)
+  | ExpectedFormula x      -> Printf.sprintf "“%s” expected to be a formula\n" (showExp x)
   | ExpectedIm x           -> Printf.sprintf "“%s” expected to be a modality" (showExp x)
   | ExpectedInf x          -> Printf.sprintf "“%s” expected to be a unit of modality" (showExp x)
   | ExpectedGlue x         -> Printf.sprintf "“%s” expected to be a Glue-type" (showExp x)

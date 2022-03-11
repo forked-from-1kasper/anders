@@ -32,6 +32,11 @@ let extSup : value -> value * value = function
   | VApp (VApp (VSup _, a), f) -> (a, f)
   | v                          -> raise (Internal (ExpectedSup (rbV v)))
 
+let extFormula : value -> disjunction = function
+  | VFormula ks -> ks
+  | Var (p, _)  -> Disjunction.singleton (Conjunction.singleton (p, One))
+  | v           -> raise (Internal (ExpectedFormula (rbV v)))
+
 let isInf : value -> bool = function
   | VInf _ -> true | _ -> false
 
@@ -172,6 +177,11 @@ let freshExp = salt Env.empty
 
 (* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
    >This increases efficiency as it won’t trigger computation. *)
+let swapVar i j k = if i = k then j else k
+let swapAtom i j = fun (k, d) -> (swapVar i j k, d)
+let swapConjunction i j = Conjunction.map (swapAtom i j)
+let swapDisjunction i j = Disjunction.map (swapConjunction i j)
+
 let rec swap i j = function
   | VLam (t, (x, g))     -> VLam (swap i j t, (x, g >> swap i j))
   | VPair (r, u, v)      -> VPair (r, swap i j u, swap i j v)
@@ -197,10 +207,7 @@ let rec swap i j = function
   | VRef v               -> VRef (swap i j v)
   | VJ v                 -> VJ (swap i j v)
   | VI                   -> VI
-  | VDir d               -> VDir d
-  | VAnd (u, v)          -> VAnd (swap i j u, swap i j v)
-  | VOr (u, v)           -> VOr (swap i j u, swap i j v)
-  | VNeg u               -> VNeg (swap i j u)
+  | VFormula t           -> VFormula (swapDisjunction i j t)
   | VInc (t, r)          -> VInc (swap i j t, swap i j r)
   | VOuc v               -> VOuc (swap i j v)
   | VGlue v              -> VGlue (swap i j v)
@@ -223,7 +230,9 @@ let rec swap i j = function
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
   | VJoin v              -> VJoin (swap i j v)
 
-and swapVar i j k = if i = k then j else k
+let memAtom y = fun (x, _) -> x = y
+let memConjunction y = Conjunction.exists (memAtom y)
+let memDisjunction y = Disjunction.exists (memConjunction y)
 
 let rec mem y = function
   | Var (x, _) -> x = y
@@ -231,16 +240,17 @@ let rec mem y = function
   | VSig (t, (x, g)) | W (t, (x, g)) -> memClos y t x g
   | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts
   | VKan _ | VPre _ | VHole | VI | VEmpty | VUnit
-  | VStar | VBool | VFalse | VTrue | VDir _ -> false
+  | VStar | VBool | VFalse | VTrue -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
-  | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
+  | VJ a | VOuc a | VGlue a | VIndEmpty a
   | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
-  | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)
-  | VSup (a, b) | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
+  | VTransp (a, b) | VInc (a, b) | VSup (a, b)
+  | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
   | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
   | VIndW (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
+  | VFormula t -> memDisjunction y t
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 

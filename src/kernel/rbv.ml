@@ -1,6 +1,18 @@
 open Language.Spec
 open Term
 
+let rbVAtom : ident * dir -> exp = function
+  | (x, Zero) -> ENeg (EVar x)
+  | (x, One)  -> EVar x
+
+let rbVAnd (t : conjunction) : exp = match Conjunction.elements t with
+  | []      -> EDir One
+  | x :: xs -> List.fold_left (fun e1 e2 -> EAnd (e1, rbVAtom e2)) (rbVAtom x) xs
+
+let rbVOr (t : disjunction) : exp = match Disjunction.elements t with
+  | []      -> EDir Zero
+  | x :: xs -> List.fold_left (fun e1 e2 -> EOr (e1, rbVAnd e2)) (rbVAnd x) xs
+
 (* Readback *)
 let rec rbV v = (*traceRbV v;*) match v with
   | VLam (t, g)          -> rbVTele eLam t g
@@ -26,10 +38,7 @@ let rec rbV v = (*traceRbV v;*) match v with
   | VRef v               -> ERef (rbV v)
   | VJ v                 -> EJ (rbV v)
   | VI                   -> EI
-  | VDir d               -> EDir d
-  | VAnd (u, v)          -> EAnd (rbV u, rbV v)
-  | VOr (u, v)           -> EOr (rbV u, rbV v)
-  | VNeg u               -> ENeg (rbV u)
+  | VFormula t           -> rbVOr t
   | VInc (t, r)          -> EInc (rbV t, rbV r)
   | VOuc v               -> EOuc (rbV v)
   | VGlue v              -> EGlue (rbV v)

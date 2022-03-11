@@ -112,7 +112,7 @@ type error =
   | ExpectedPath     of exp
   | ExpectedSubtype  of exp
   | ExpectedSystem   of exp
-  | ExpectedConj     of exp
+  | ExpectedFormula  of exp
   | ExpectedIm       of exp
   | ExpectedInf      of exp
   | ExpectedGlue     of exp

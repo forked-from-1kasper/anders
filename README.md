@@ -64,8 +64,8 @@ Samples
 You can find some examples in [`library/`](https://github.com/forked-from-1kasper/anders/tree/master/library).
 
 ```Lean
-def comp-inv-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
-<k j> hcomp A (∂ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (p @ j ∧ -k)
+def inv′ (A : U) (a b : A) (p : Path A a b) : Path A b a :=
+<i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → a]) a
 
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d :=
 <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (r @ i)
@@ -75,7 +75,6 @@ hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j> A (i ∨ j)) i (u i 1=1)]) (
 
 def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A :=
 hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u₀)
-
 ```
 
 ```shell

@@ -8,8 +8,8 @@ import library/foundations/mltt/pi
 import library/foundations/mltt/sigma
 import library/foundations/univalent/path
 
-def MLTT (A : U) : U₁ ≔ Σ
-  (Π-form  : Π (B : A → U), U)
+def MLTT (A : U) : U₁ :=
+Σ (Π-form  : Π (B : A → U), U)
   (Π-ctor₁ : Π (B : A → U), Pi A B → Pi A B)
   (Π-elim₁ : Π (B : A → U), Pi A B → Pi A B)
   (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B), Path (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
@@ -28,7 +28,7 @@ def MLTT (A : U) : U₁ ≔ Σ
 
 -- Theorem. β-rule for pretypes is derivable with generalized transport
 
-theorem internalizing (A : U) : MLTT A ≔
-  (Pi A, lambda A, apply A, Π-β A, Π-η A,
-   Sigma A, pair A, pr₁ A, pr₂ A, Σ-β₁ A, Σ-β₂ A, Σ-η A,
-   Path A, idp A, J A, J-β A, ★)
+theorem internalizing (A : U) : MLTT A :=
+(Pi A, lambda A, apply A, Π-β A, Π-η A,
+ Sigma A, pair A, pr₁ A, pr₂ A, Σ-β₁ A, Σ-β₂ A, Σ-η A,
+ Path A, idp A, J A, J-β A, ★)

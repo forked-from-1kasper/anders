@@ -41,21 +41,21 @@ def incl (α : ℕ∞) : ℕ → 𝟐 := α.1
 def tail∞ (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
 
 def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
-  Σ (isSet : isSet A)
-    (idempodent : Π (a : A), Path A (O a a) a)
-    (commutative : Π (x y : A), Path A (O x y) (O y x))
-    (transpositional : Π (a b c d : A), Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
+Σ (isSet : isSet A)
+  (idempodent : Π (a : A), Path A (O a a) a)
+  (commutative : Π (x y : A), Path A (O x y) (O y x))
+  (transpositional : Π (a b c d : A), Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
 
 def convex-body : U₁ :=
-  Σ (A : U)
-    (O : A → A → A)
-    (midpoint : midpoint-alg A O)
-    (cancelative : Π (a b c : A), Path A (O a c) (O b c) → Path A a b)
-    (iterative :
-    Σ (M : Π (_ : ℕ → A), A)
-      (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail∞ A a)))),
-    Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
-      Path A (a zero) (M x)), U
+Σ (A : U)
+  (O : A → A → A)
+  (midpoint : midpoint-alg A O)
+  (cancelative : Π (a b c : A), Path A (O a c) (O b c) → Path A a b)
+  (iterative :
+  Σ (M : Π (_ : ℕ → A), A)
+    (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail∞ A a)))),
+  Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
+    Path A (a zero) (M x)), U
 
 def ∃! (A : U) (B : A -> U) : U := isContr (Σ (x: A), B x)
 
@@ -63,9 +63,9 @@ def Interval-Object : U₁ :=
   Σ (J : convex-body) (u v : J.A),
   Π (K : convex-body) (a b : K.A),
  ∃! (J.A -> K.A)
-    ( λ (h : J.A -> K.A),
-      Σ (_ : Path (K.A) (h u) a) (_ : Path (K.A) (h v) b),
-      Π (x y : J.A), Path K.A (h (J.O x y)) (K.O (h x) (h y)))
+    (λ (h : J.A -> K.A),
+     Σ (_ : Path (K.A) (h u) a) (_ : Path (K.A) (h v) b),
+     Π (x y : J.A), Path K.A (h (J.O x y)) (K.O (h x) (h y)))
 
 {- The key structure of the axiomatisation: an interval object.
    An interval object is defined by a convex-body J and two points u,v : J.A, such that

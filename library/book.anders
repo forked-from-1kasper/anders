@@ -37,6 +37,5 @@ import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/KGn
 
 import library/mathematics/meta/favonia
-import library/mathematics/meta/kraus
 -- Impredicativity starts here
 import library/mathematics/meta/awodey

@@ -2,13 +2,15 @@ module quotient where
 import library/mathematics/homotopy/coequalizer
 
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
-def quot (A : U) (R : A → A → U)
- := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot₁ (A : U) (R : A → A → U) : A → quot A R
- := ι₂ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
-  : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
- := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
+
+def quot (A : U) (R : A → A → U) :=
+coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+
+def quot₁ (A : U) (R : A → A → U) : A → quot A R :=
+ι₂ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+
+def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y) : Path (quot A R) (quot₁ A R x) (quot₁ A R y) :=
+resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
 
 -- [van Doorn] 2016 2-quotient
 -- Reducing higher inductive types to quotients
@@ -22,7 +24,7 @@ axiom −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R
 
 axiom 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
 axiom 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (a: A) : 2-quot A R Q
-axiom 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y)
-    : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
-axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R x y)
-    : Path (Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)) (2-quot₂ A R Q x y r1) (2-quot₂ A R Q x y r2)
+axiom 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y) :
+  Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
+axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R x y) :
+  Path (Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)) (2-quot₂ A R Q x y r1) (2-quot₂ A R Q x y r2)

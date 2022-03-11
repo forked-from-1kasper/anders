@@ -12,4 +12,4 @@ axiom spoke₋₂ (S A : U) (x y : A) (p : S → Path A x y) (s : S) : Path (hs 
 
 axiom isNull (S A : U) : U
 axiom hs-ind (S A : U) (B : hs S A → U) (nB : Π (x : hs S A), isNull S (B x))
-      (nC : Π (a : A), B (center S A a)) (x : hs S A) : B x
+  (nC : Π (a : A), B (center S A a)) (x : hs S A) : B x

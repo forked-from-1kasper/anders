@@ -14,7 +14,7 @@ import library/foundations/univalent/path
 
 -- [Pelayo, Warren, Voevodsky] 2012
 
-def fiber (A B : U) (f: A → B) (y : B): U := Σ (x : A), Path B y (f x)
+def fiber (A B : U) (f : A → B) (y : B) : U := Σ (x : A), Path B y (f x)
 def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
 def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
 def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
@@ -49,13 +49,13 @@ hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (
 def univ-formation (A B : U) := equiv A B → PathP (<_> U) A B
 def univ-intro (A B : U) : univ-formation A B := λ (e : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
 def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
-def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
- := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
-                            (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
+def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p :=
+<j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
+                        (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
 -- [Orton, Pitts] 2017
 
 def ua (A B : U) (p : equiv A B) : PathP (<_> U) A B := univ-intro A B p
 
-def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1
- := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
+def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1 :=
+<i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))

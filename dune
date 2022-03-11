@@ -20,7 +20,6 @@
                 library/mathematics/topoi/topos.anders
                 library/mathematics/meta/favonia.anders
                 library/mathematics/meta/awodey.anders
-                library/mathematics/meta/kraus.anders
                 library/mathematics/geometry/bundle.anders
                 library/mathematics/geometry/etale.anders
                 library/mathematics/geometry/formalDisc.anders

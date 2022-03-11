@@ -46,7 +46,7 @@ Features
 * Lexer in 80 LOC
 * UTF-8 support including universe levels
 * Lean syntax for ΠΣW
-* Poor man's records as Σ with named accessors to telescope variables
+* Poor man’s records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
 * Best suited for academic papers and fast type checking
 
@@ -61,18 +61,17 @@ $ dune exec anders help
 Samples
 -------
 
-You can find some examples in the `share` directory of the Anders package.
+You can find some examples in [`library/`](https://github.com/forked-from-1kasper/anders/tree/master/library).
 
 ```Lean
-def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) :
-  Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
+def comp-inv-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
 <k j> hcomp A (∂ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (p @ j ∧ -k)
 
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d :=
 <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (r @ i)
 
 def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1 :=
-hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j>A (i ∨ j)) i (u i 1=1)]) (transp(<i> A i) 0 (ouc u₀))
+hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j> A (i ∨ j)) i (u i 1=1)]) (transp (<i> A i) 0 (ouc u₀))
 
 def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A :=
 hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u₀)
@@ -83,17 +82,15 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 $ anders check library/book.anders
 ```
 
-MLTT
-----
+## Related publications
+
+### MLTT
 
 Type Checker is based on classical MLTT-80 with 0, 1, 2 and W-types.
 
 * <a href="https://raw.githubusercontent.com/michaelt/martin-lof/master/pdfs/Bibliopolis-Book-retypeset-1984.pdf">Intuitionistic Type Theory</a> [Martin-Löf]
 
-CCHM
-----
-
-Anders was built by strictly following CCHM publications:
+### CCHM
 
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/cubicaltt.pdf">CTT: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalhits.pdf">On Higher Inductive Types in Cubical Type Theory</a> [Coquand, Huber, Mörtberg]
@@ -106,19 +103,13 @@ Anders was built by strictly following CCHM publications:
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/p.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
 * <a href="https://doi.org/10.1017/S0960129521000311">Cubical Methods in HoTT/UF</a> [Mörtberg]
 
-We tried to bring in as little of ourselves as possible. 
-
-HTS
----
-
-Anders supports classical Homotopy Type System with two identities.
+### HTS
 
 * <a href="https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf">A simple type system with two identity types</a> [Voevodsky]
 * <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications</a> [Annenkov, Capriotti, Kraus, Sattler]
 * <a href="https://types21.liacs.nl/download/syntax-for-two-level-type-theory/">Syntax for two-level type theory</a> [Bonacina, Ahrens]
 
-Modalities
-----------
+### Modalities
 
 Infinitesimal Modality was added for direct support of Synthetic Differential Geometry.
 

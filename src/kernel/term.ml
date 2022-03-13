@@ -54,6 +54,9 @@ let dir = function
   | Zero -> vzero
   | One  -> vone
 
+let negDir : dir -> dir = function
+  | Zero -> One | One -> Zero
+
 let bot = Disjunction.is_empty
 let top = Disjunction.mem Conjunction.empty
 

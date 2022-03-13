@@ -1,9 +1,10 @@
 open Language.Prelude
 open Language.Spec
-open Formula
 open Trace
+open Cofib
 open Elab
 open Term
+open Dnf
 open Gen
 open Rbv
 

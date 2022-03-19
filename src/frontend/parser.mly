@@ -12,7 +12,8 @@
               ("𝟐", EBool);      ("bool", EBool);
               ("★", EStar);      ("star", EStar);
               ("false", EFalse); ("0₂", EFalse);
-              ("true", ETrue);   ("1₂", ETrue)] in
+              ("true", ETrue);   ("1₂", ETrue);
+              ("L", ELevel)] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
   let rec telescope ctor e : tele list -> exp = function
@@ -46,6 +47,10 @@
 %token <string> IDENT
 %token <Z.t> KAN
 %token <Z.t> PRE
+%token <Z.t> LEVEL
+%token <Z.t> KANOMEGA
+%token <Z.t> PREOMEGA
+%token PREPARAM KANPARAM
 %token <string> EXT
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
@@ -60,6 +65,7 @@
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
 %token IM INF INDIM JOIN
+%token SUCC ADD MAX
 
 %left APPFORMULA
 %left OR
@@ -129,6 +135,11 @@ exp4 :
   | INF exp6 { EInf $2 }
   | INDIM exp6 exp6 { EIndIm ($2, $3) }
   | JOIN exp6 { EJoin $2 }
+  | SUCC exp6 { ESucc $2 }
+  | ADD exp6 exp6 { EAdd ($2, $3) }
+  | MAX exp6 exp6 { EMax ($2, $3) }
+  | PREPARAM exp6 { EType (Pretype, Finite $2) }
+  | KANPARAM exp6 { EType (Kan, Finite $2) }
   | exp5 { $1 }
 
 exp5:
@@ -137,8 +148,13 @@ exp5:
 
 exp6:
   | HOLE { EHole }
-  | PRE { EPre $1 }
-  | KAN { EKan $1 }
+  | LEVEL { ELevelElem $1 }
+  | PREOMEGA { EType (Pretype, Omega $1) }
+  | KANOMEGA { EType (Kan, Omega $1) }
+  | PRE { EType (Pretype, Finite (ELevelElem $1)) }
+  | KAN { EType (Kan, Finite (ELevelElem $1)) }
+  | PREPARAM { EType (Pretype, Finite (ELevelElem Z.zero)) }
+  | KANPARAM { EType (Kan, Finite (ELevelElem Z.zero)) }
   | exp6 DOT IDENT { match $3 with | "1" -> EFst $1 | "2" -> ESnd $1 | field -> EField ($1, field) }
   | NEGATE exp6 { ENeg $2 }
   | LSQ separated_list(COMMA, part) RSQ { ESystem (System.of_seq (Seq.filter_map parsePartial (List.to_seq $2))) }

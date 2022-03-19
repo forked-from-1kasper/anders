@@ -5,6 +5,10 @@ let tokenToString : token -> string = function
   | PRE u      -> Printf.sprintf "PRE %s" (Z.to_string u)
   | KAN u      -> Printf.sprintf "KAN %s" (Z.to_string u)
   | EXT s      -> Printf.sprintf "EXT «%s»" s
+  | PREOMEGA u -> Printf.sprintf "PREOMEGA %s" (Z.to_string u)
+  | KANOMEGA u -> Printf.sprintf "KANOMEGA %s" (Z.to_string u)
+  | LEVEL u    -> Printf.sprintf "LEVEL %s" (Z.to_string u)
+  | PREPARAM   -> "PREPARAM"    | KANPARAM   -> "KANPARAM"
   | DEF        -> "DEF"         | SIGMA      -> "SIGMA"
   | PI         -> "PI"          | HOLE       -> "HOLE"
   | RPARENS    -> "RPARENS"     | LPARENS    -> "LPARENS"
@@ -31,4 +35,5 @@ let tokenToString : token -> string = function
   | INDBOOL    -> "INDBOOL"     | INDW       -> "W"
   | PLUGIN     -> "PLUGIN"      | IM         -> "IM"
   | INF        -> "INF"         | INDIM      -> "INDIM"
-  | JOIN       -> "JOIN"
+  | JOIN       -> "JOIN"        | SUCC       -> "SUCC"
+  | ADD        -> "ADD"         | MAX        -> "MAX"

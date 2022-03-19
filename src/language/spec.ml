@@ -44,8 +44,24 @@ type tag = (string option) ref
 
 (* Language Expressions *)
 
+type cosmos = Pretype | Kan
+
+module Cosmos =
+struct
+  type t = cosmos
+  let max a b = match a, b with
+    | Pretype, _ -> Pretype
+    | _, Pretype -> Pretype
+    | _, _       -> Kan
+end
+
+type 'a level =
+  | Finite of 'a
+  | Omega  of Z.t
+
 type exp =
-  | EPre of Z.t | EKan of Z.t                                                          (* cosmos *)
+  | EType of cosmos * exp level                                                        (* cosmos *)
+  | ELevel | ELevelElem of Z.t | ESucc of exp | EAdd of exp * exp | EMax of exp * exp  (* levels *)
   | EVar of ident | EHole                                                           (* variables *)
   | EPi of exp * (ident * exp) | ELam of exp * (ident * exp) | EApp of exp * exp           (* pi *)
   | ESig of exp * (ident * exp) | EPair of tag * exp * exp                              (* sigma *)
@@ -124,6 +140,7 @@ type error =
   | Traceback        of error * (exp * exp) list
   | InvalidOpt       of string
   | InvalidOptValue  of string * string
+  | ExpectedLevel    of exp
 
 type resp =
   | Version of int64 * int64 * int64

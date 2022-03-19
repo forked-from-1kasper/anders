@@ -7,11 +7,13 @@ open Error
 let fail x = raise (ExtractionError x)
 
 let rec extractExp : exp -> string = function
-  | EKan n -> if Z.equal n Z.zero then "U" else fail "cubicaltt does not support universe hierarchy"
+  | EType (Kan, Finite (ELevelElem n)) when Z.equal n Z.zero -> "u"
+  | EType (Kan, _) -> fail "cubicaltt does not support universe hierarchy"
+  | EType _ -> fail "cubicaltt does not support explicit pretypes"
+  | ELevel | ELevelElem _ | ESucc _ | EAdd _ | EMax _ -> fail "cubicaltt does not support universe polymorphism"
   | EId _ | ERef _ | EJ _ -> fail "cubicaltt does not support strict equality"
   | EPartial _ | EPartialP _ -> fail "cubicaltt does not support explicit partial"
   | EI -> fail "cubicaltt does not support explicit interval"
-  | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | EInc _ | EOuc _ | ESub _ -> fail "cubicaltt does not support explicit cubical subtypes"
   | EEmpty | EIndEmpty _ -> fail "cubicaltt does not have built-in empty type"
   | EUnit | EStar | EIndUnit _ -> fail "cubicaltt does not have built-in unit type"

@@ -38,11 +38,21 @@ struct
       mu := Env.add i d !mu
     done; !mu
 
+  let cosmos () = match R.get () with
+    | '\x00' -> Pretype
+    | '\xFF' -> Kan
+    | _      -> failwith "Cosmos?"
+
   let rec exp () = match R.get () with
     | '\x01' -> EHole
-    | '\x02' -> EPre (integer ())
-    | '\x03' -> EKan (integer ())
-    | '\x04' -> EVar (ident ())
+    | '\x02' -> let c = cosmos () in let e = exp () in EType (c, Finite e)
+    | '\x03' -> let c = cosmos () in let n = integer () in EType (c, Omega n)
+    | '\x04' -> ELevel
+    | '\x05' -> ELevelElem (integer ())
+    | '\x06' -> ESucc (exp ())
+    | '\x07' -> let (l1, l2) = exp2 () in EAdd (l1, l2)
+    | '\x08' -> let (l1, l2) = exp2 () in EMax (l1, l2)
+    | '\x09' -> EVar (ident ())
     | '\x10' -> let (a, p, b) = clos () in EPi (a, (p, b))
     | '\x11' -> let (a, p, b) = clos () in ELam (a, (p, b))
     | '\x12' -> let f = exp () in let x = exp () in EApp (f, x)
@@ -143,6 +153,7 @@ struct
       Traceback (err, List.init n (fun _ -> exp2 ()))
     | '\x14' -> InvalidOpt (string ())
     | '\x15' -> let p = string () in let x = string () in InvalidOptValue (p, x)
+    | '\x16' -> ExpectedLevel (exp ())
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

@@ -54,10 +54,6 @@ let negFormula : value -> value = function
 let getFaceV xs = Env.fold (fun x d -> Conjunction.add (x, d)) xs Conjunction.empty
 let getFormulaV ts = VFormula (System.fold (fun x _ -> Disjunction.add (getFaceV x)) ts Disjunction.empty)
 
-let actVar rho i = match Env.find_opt i rho with
-  | Some v -> v
-  | None   -> Var (i, VI)
-
 let boolNatural = function
   | Zero -> negDisjunction
   | One  -> id

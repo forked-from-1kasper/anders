@@ -5,22 +5,33 @@ let rbVAtom : ident * dir -> exp = function
   | (x, Zero) -> ENeg (EVar x)
   | (x, One)  -> EVar x
 
-let rbVAnd (t : conjunction) : exp = match Conjunction.elements t with
+let rbVAnd t = match Conjunction.elements t with
   | []      -> EDir One
   | x :: xs -> List.fold_left (fun e1 e2 -> EAnd (e1, rbVAtom e2)) (rbVAtom x) xs
 
-let rbVOr (t : disjunction) : exp = match Disjunction.elements t with
+let rbVOr t = match Disjunction.elements t with
   | []      -> EDir Zero
   | x :: xs -> List.fold_left (fun e1 e2 -> EOr (e1, rbVAnd e2)) (rbVAnd x) xs
 
+let rbVSumma (n, t) = match Idents.elements t with
+  | []      -> ELevelElem n
+  | x :: xs -> let e = List.fold_left (fun e1 e2 -> EAdd (e1, EVar e2)) (EVar x) xs in
+    if Z.equal n Z.zero then e else EAdd (e, ELevelElem n)
+
+let rbVMaximum t = match Maximum.elements t with
+  | []      -> failwith "Level?"
+  | x :: xs -> List.fold_left (fun e1 e2 -> EMax (e1, rbVSumma e2)) (rbVSumma x) xs
+
 (* Readback *)
-let rec rbV v = (*traceRbV v;*) match v with
+let rec rbV v = match v with
   | VLam (t, g)          -> rbVTele eLam t g
   | VPair (r, u, v)      -> EPair (r, rbV u, rbV v)
-  | VKan u               -> EKan u
+  | VLevel               -> ELevel
+  | VLevelElem ts        -> rbVMaximum ts
+  | VType (c, Finite ts) -> EType (c, Finite (rbVMaximum ts))
+  | VType (c, Omega n)   -> EType (c, Omega n)
   | VPi (t, g)           -> rbVTele ePi t g
   | VSig (t, g)          -> rbVTele eSig t g
-  | VPre u               -> EPre u
   | VPLam f              -> EPLam (rbV f)
   | Var (x, _)           -> EVar x
   | VApp (f, x)          -> EApp (rbV f, rbV x)

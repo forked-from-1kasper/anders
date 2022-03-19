@@ -38,6 +38,7 @@ let rec prettyPrintError : error -> string = function
     |> String.concat "" |> flip (^) (prettyPrintError e)
   | InvalidOpt x           -> Printf.sprintf "Unknown option “%s”\n" x
   | InvalidOptValue (p, x) -> Printf.sprintf "Unknown value “%s” of option “%s”\n" p x
+  | ExpectedLevel e        -> Printf.sprintf "“%s” expected to be a universe level\n" (showExp e)
 
 let prettyPrintExn : exn -> unit = function
   | Kernel err                         -> print_string (prettyPrintError err)

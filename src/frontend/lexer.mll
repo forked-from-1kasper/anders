@@ -10,10 +10,13 @@
 
   let ten = Z.of_int 10
 
-  let getLevel s =
-    let res = ref Z.zero in let queue = Queue.of_seq (String.to_seq s) in
-    let sym = Queue.take queue in if (sym <> 'U' && sym <> 'V') then
-      failwith "invalid universe";
+  let getLevel prefix s =
+    let n = String.length prefix in let m = String.length s in
+    if not (m >= n && String.sub s 0 n = prefix) then failwith "invalid universe";
+
+    let postfix = String.sub s n (m - n) in
+    let queue = Queue.of_seq (String.to_seq postfix) in
+    let res = ref Z.zero in
 
     while not (Queue.is_empty queue) do
       if (Queue.take queue <> '\xE2' ||
@@ -44,8 +47,11 @@ let arrow = "->"  | "\xE2\x86\x92" (* → *)
 let prod  = "*"   | "\xC3\x97" (* × *)
 
 let subscript = '\xE2' '\x82' ['\x80'-'\x89']
-let kan       = 'U' subscript*
-let pre       = 'V' subscript*
+let level     = 'L' subscript+
+let kan       = 'U' subscript+
+let pre       = 'V' subscript+
+let kanomega  = 'U' '\xCF' '\x89' subscript*
+let preomega  = 'V' '\xCF' '\x89' subscript*
 
 let indempty = "ind-empty" | "ind\xE2\x82\x80" (* ind₀ *)
 let indunit  = "ind-unit"  | "ind\xE2\x82\x81" (* ind₁ *)
@@ -62,18 +68,23 @@ rule main = parse
 | "{-"          { multiline lexbuf }
 | "begin"       { ext "" lexbuf }
 | ws+           { main lexbuf }
-| kan as s      { KAN (getLevel s) } | pre as s      { PRE (getLevel s) }
-| ":"           { COLON }            | ","           { COMMA }
-| "("           { LPARENS }          | ")"           { RPARENS }
-| "["           { LSQ }              | "]"           { RSQ }
-| "<"           { LT }               | ">"           { GT }
-| "."           { DOT }              | "-"           { NEGATE }
-| defeq         { DEFEQ }            | map           { MAP }
-| arrow         { ARROW }            | prod          { PROD }
-| indempty      { INDEMPTY }         | indunit       { INDUNIT }
-| indbool       { INDBOOL }          | indim         { INDIM }
-| im            { IM }               | inf           { INF }
-| join          { JOIN }             | eof           { EOF }
+| level as s    { LEVEL (getLevel "L" s) }
+| kan as s      { KAN (getLevel "U" s) }
+| pre as s      { PRE (getLevel "V" s) }
+| kanomega as s { KANOMEGA (getLevel "Uω" s) }
+| preomega as s { PREOMEGA (getLevel "Vω" s) }
+| 'U'           { KANPARAM } | 'V'           { PREPARAM }
+| ":"           { COLON }    | ","           { COMMA }
+| "("           { LPARENS }  | ")"           { RPARENS }
+| "["           { LSQ }      | "]"           { RSQ }
+| "<"           { LT }       | ">"           { GT }
+| "."           { DOT }      | "-"           { NEGATE }
+| defeq         { DEFEQ }    | map           { MAP }
+| arrow         { ARROW }    | prod          { PROD }
+| indempty      { INDEMPTY } | indunit       { INDUNIT }
+| indbool       { INDBOOL }  | indim         { INDIM }
+| im            { IM }       | inf           { INF }
+| join          { JOIN }     | eof           { EOF }
 | ident as s    {
   match s with
   | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
@@ -97,7 +108,9 @@ rule main = parse
   | "corollary"              | "proposition"     -> DEF
   | "axiom"                  | "postulate"       -> AXIOM
   | "Id"         -> ID       | "ref"             -> REF
-  | "idJ"        -> IDJ      | _                 -> IDENT s
+  | "idJ"        -> IDJ      | "isucc"           -> SUCC
+  | "iadd"       -> ADD      | "imax"            -> MAX
+  | _            -> IDENT s
 }
 
 and multiline = parse

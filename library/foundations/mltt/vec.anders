@@ -1,9 +1,7 @@
 module vec where
 import library/foundations/mltt/nat
 
-option girard true
-
-def Vec (A : U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
+def Vec (A : U) : ℕ → U := ℕ-iterω L₁ U 𝟏 (λ (X : U), A × X)
 def vzero (A : U) : Vec A zero := ★
 def vsucc (A : U) (n : ℕ) (head : A) (tail : Vec A n) : Vec A (succ n) := (head, tail)
 def Vec-ind (A : U) (T : Π (n : ℕ), Vec A n → U) (z : T zero (vzero A))

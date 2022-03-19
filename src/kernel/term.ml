@@ -1,11 +1,44 @@
 open Language.Spec
 
-module Atom =
+module Product (A : Map.OrderedType) (B : Map.OrderedType) =
 struct
-  type t = ident * dir
-  let compare (a, x) (b, y) =
-    if a = b then Dir.compare x y else Ident.compare a b
+  type t = A.t * B.t
+  let compare (a1, b1) (a2, b2) =
+    let k = B.compare b1 b2 in
+    if k = 0 then A.compare a1 a2 else k
 end
+
+module Idents = Set.Make(Ident)
+module Summa = Product(Z)(Idents)
+type summa = Summa.t
+
+module Maximum =
+struct
+  include Set.Make(Summa)
+
+  let simplify t =
+    let ssubset (n, x) (m, y) =
+      not (Idents.equal x y && Z.equal n m)
+      &&  (Idents.subset x y && Z.leq n m) in
+    filter (fun x -> not (exists (ssubset x) t)) t
+
+  let plus n = map (fun (m, xs) -> (Z.add n m, xs))
+  let succ = plus Z.one
+
+  let add a b =
+    elements b
+    |> List.map (fun (n, xs) -> map (fun (m, ys) -> (Z.add n m, Idents.union xs ys)) a)
+    |> List.fold_left union empty
+    |> simplify
+
+  let adds = List.fold_left add (singleton (Z.zero, Idents.empty))
+
+  let max a b = simplify (union a b)
+end
+
+type maximum = Maximum.t
+
+module Atom = Product(Ident)(Dir)
 
 module Conjunction = Set.Make(Atom)
 type conjunction = Conjunction.t
@@ -18,7 +51,8 @@ type scope = Local | Global
 (* Intermediate type checker values *)
 
 type value =
-  | VKan of Z.t | VPre of Z.t
+  | VType of cosmos * maximum level
+  | VLevel | VLevelElem of maximum
   | Var of ident * value | VHole
   | VPi of value * clos | VLam of value * clos | VApp of value * value
   | VSig of value * clos | VPair of tag * value * value | VFst of value | VSnd of value
@@ -71,6 +105,10 @@ let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> 
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
 let freshFace ns = mapFace (freshVar ns)
+
+let actVar rho i = match Env.find_opt i rho with
+  | Some v -> v
+  | None   -> Var (i, VI)
 
 exception Internal of error
 exception IncompatibleFaces

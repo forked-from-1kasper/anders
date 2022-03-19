@@ -12,14 +12,6 @@ let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
   | u -> raise (Internal (ExpectedSig (rbV u)))
 
-let extSet : value -> Z.t = function
-  | VPre n | VKan n -> n
-  | v               -> raise (Internal (ExpectedType (rbV v)))
-
-let extKan : value -> Z.t = function
-  | VKan n -> n
-  | v      -> raise (Internal (ExpectedKan (rbV v)))
-
 let extIm : value -> value = function
   | VIm v -> v
   | v     -> raise (Internal (ExpectedIm (rbV v)))
@@ -68,18 +60,6 @@ let extVar ctx x = match Env.find_opt x ctx with
   | Some (_, _, Exp (EVar y)) -> y
   | _ -> x
 
-let imax a b = match a, b with
-  | VKan u, VKan v -> VKan (max u v)
-  | VPre u, VPre v | VPre u, VKan v | VKan u, VPre v -> VPre (max u v)
-  | VKan _, _ | VPre _, _ -> raise (Internal (ExpectedType (rbV b)))
-  | _, _ -> raise (Internal (ExpectedType (rbV a)))
-
-let impred a b = match a, b with
-  | VKan _, VKan v -> VKan v
-  | VPre _, VKan v | VKan _, VPre v | VPre _, VPre v -> VPre v
-  | VKan _, _ | VPre _, _ -> raise (Internal (ExpectedType (rbV b)))
-  | _, _ -> raise (Internal (ExpectedType (rbV a)))
-
 let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 let prodv a b = VSig (a, (Irrefutable, fun _ -> b))
@@ -91,7 +71,6 @@ let pathv v a b = VApp (VApp (VPathP v, a), b)
 
 let hcompval u = EApp (EApp (u, ezero), ERef eone)
 
-let ieq u v : bool = !Prefs.girard || u = v
 let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
 
 let vfst : value -> value = function
@@ -120,7 +99,13 @@ let rec getField p v = function
 
 let rec salt (ns : ident Env.t) : exp -> exp = function
   | ELam (a, (p, b))     -> saltTele eLam ns p a b
-  | EKan n               -> EKan n
+  | EType (c, Finite e)  -> EType (c, Finite (salt ns e))
+  | EType (c, Omega n)   -> EType (c, Omega n)
+  | ELevel               -> ELevel
+  | ELevelElem n         -> ELevelElem n
+  | ESucc e              -> ESucc (salt ns e)
+  | EAdd (e1, e2)        -> EAdd (salt ns e1, salt ns e2)
+  | EMax (e1, e2)        -> EMax (salt ns e1, salt ns e2)
   | EPi (a, (p, b))      -> saltTele ePi ns p a b
   | ESig (a, (p, b))     -> saltTele eSig ns p a b
   | EPair (r, a, b)      -> EPair (r, salt ns a, salt ns b)
@@ -130,7 +115,6 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EApp (f, x)          -> EApp (salt ns f, salt ns x)
   | EVar x               -> EVar (freshVar ns x)
   | EHole                -> EHole
-  | EPre n               -> EPre n
   | EId e                -> EId (salt ns e)
   | ERef e               -> ERef (salt ns e)
   | EJ e                 -> EJ (salt ns e)
@@ -178,17 +162,22 @@ let freshExp = salt Env.empty
 (* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
    >This increases efficiency as it won’t trigger computation. *)
 let swapVar i j k = if i = k then j else k
+
 let swapAtom i j = fun (k, d) -> (swapVar i j k, d)
 let swapConjunction i j = Conjunction.map (swapAtom i j)
 let swapDisjunction i j = Disjunction.map (swapConjunction i j)
 
+let swapMaximum i j = Maximum.map (fun (n, ts) -> (n, Idents.map (swapVar i j) ts))
+
 let rec swap i j = function
   | VLam (t, (x, g))     -> VLam (swap i j t, (x, g >> swap i j))
   | VPair (r, u, v)      -> VPair (r, swap i j u, swap i j v)
-  | VKan u               -> VKan u
+  | VLevel               -> VLevel
+  | VLevelElem ts        -> VLevelElem (swapMaximum i j ts)
+  | VType (c, Finite ts) -> VType (c, Finite (swapMaximum i j ts))
+  | VType (c, Omega n)   -> VType (c, Omega n)
   | VPi (t, (x, g))      -> VPi (swap i j t, (x, g >> swap i j))
   | VSig (t, (x, g))     -> VSig (swap i j t, (x, g >> swap i j))
-  | VPre u               -> VPre u
   | VPLam f              -> VPLam (swap i j f)
   | Var (k, VI)          -> Var (swapVar i j k, VI)
   | Var (x, t)           -> Var (x, swap i j t)
@@ -234,13 +223,14 @@ let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
 let memDisjunction y = Disjunction.exists (memConjunction y)
 
+let memMaximum y = Maximum.exists (fun (_, ts) -> Idents.exists y ts)
+
 let rec mem y = function
   | Var (x, _) -> x = y
   | VLam (t, (x, g)) | VPi (t, (x, g))
   | VSig (t, (x, g)) | W (t, (x, g)) -> memClos y t x g
-  | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts
-  | VKan _ | VPre _ | VHole | VI | VEmpty | VUnit
-  | VStar | VBool | VFalse | VTrue -> false
+  | VType (_, Omega _) | VLevel | VHole | VI | VEmpty
+  | VUnit | VStar | VBool | VFalse | VTrue -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VOuc a | VGlue a | VIndEmpty a
   | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
@@ -251,6 +241,8 @@ let rec mem y = function
   | VIndW (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
   | VFormula t -> memDisjunction y t
+  | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts
+  | VType (_, Finite ts) | VLevelElem ts -> memMaximum (fun x -> x = y) ts
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 

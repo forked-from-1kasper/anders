@@ -34,11 +34,20 @@ struct
   let face mu = int (Env.cardinal mu);
     Env.iter (fun i d -> ident i; dir d) mu
 
+  let cosmos = function
+    | Pretype -> W.put '\x00'
+    | Kan     -> W.put '\xFF'
+
   let rec exp = function
     | EHole                -> W.put '\x01'
-    | EPre n               -> W.put '\x02'; integer n
-    | EKan n               -> W.put '\x03'; integer n
-    | EVar x               -> W.put '\x04'; ident x
+    | EType (c, Finite e)  -> W.put '\x02'; cosmos c; exp e
+    | EType (c, Omega n)   -> W.put '\x03'; cosmos c; integer n
+    | ELevel               -> W.put '\x04'
+    | ELevelElem n         -> W.put '\x05'; integer n
+    | ESucc l              -> W.put '\x06'; exp l
+    | EAdd (l1, l2)        -> W.put '\x07'; exp l1; exp l2
+    | EMax (l1, l2)        -> W.put '\x08'; exp l1; exp l2
+    | EVar x               -> W.put '\x09'; ident x
     | EPi (a, (p, b))      -> clos '\x10' a p b
     | ELam (a, (p, b))     -> clos '\x11' a p b
     | EApp (f, x)          -> W.put '\x12'; exp2 f x
@@ -132,6 +141,7 @@ struct
     | Traceback (e, es)      -> W.put '\x13'; error e; int (List.length es); List.iter (uncurry exp2) es
     | InvalidOpt p           -> W.put '\x14'; string p
     | InvalidOptValue (p, x) -> W.put '\x15'; string p; string x
+    | ExpectedLevel e        -> W.put '\x16'; exp e
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

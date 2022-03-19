@@ -24,8 +24,19 @@ let showSystem show xs =
 
 let parens b x = if b then "(" ^ x ^ ")" else x
 
+let ppCosmos = function
+  | Pretype -> "V"
+  | Kan     -> "U"
+
 let rec ppExp paren e = let x = match e with
-  | EKan n -> "U" ^ showSubscript n
+  | EType (c, Finite (ELevelElem n)) -> ppCosmos c ^ showSubscript n
+  | EType (c, Finite e) -> ppCosmos c ^ " " ^ ppExp true e
+  | EType (c, Omega n) -> ppCosmos c ^ "ω" ^ showSubscript n
+  | ELevel -> "L"
+  | ELevelElem n -> "L" ^ showSubscript n
+  | ESucc e -> Printf.sprintf "isucc %s" (ppExp true e)
+  | EAdd (e1, e2) -> Printf.sprintf "iadd %s %s" (ppExp true e1) (ppExp true e2)
+  | EMax (e1, e2) -> Printf.sprintf "imax %s %s" (ppExp true e1) (ppExp true e2)
   | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTeleExp (p, a)) (showExp b)
   | EPi (a, (p, b)) -> showPiExp a p b
   | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTeleExp (p, a)) (showExp b)
@@ -36,7 +47,6 @@ let rec ppExp paren e = let x = match e with
   | EApp (f, x) -> Printf.sprintf "%s %s" (showExp f) (ppExp true x)
   | EVar p -> showIdent p
   | EHole -> "?"
-  | EPre n -> "V" ^ showSubscript n
   | EPLam (ELam (_, (i, e))) -> Printf.sprintf "<%s> %s" (showIdent i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
@@ -72,9 +82,9 @@ let rec ppExp paren e = let x = match e with
   | EJoin e -> Printf.sprintf "ℑ-join %s" (ppExp true e)
   | EIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppExp true a) (ppExp true b)
   in match e with
-  | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
-  | EKan _ | EHole | EDir _ | EPair _ | ENeg _
-  | EEmpty | EUnit | EBool | EStar | EFalse | ETrue -> x
+  | ELevel | ELevelElem _ | EType (_, Omega _) | EType (_, Finite (ELevelElem _))
+  | EVar _ | EFst _ | ESnd _ | EI | ESystem _ | EHole | EDir _ | EPair _
+  | ENeg _ | EEmpty | EUnit | EBool | EStar | EFalse | ETrue -> x
   | _ -> parens paren x
 
 and showExp e = ppExp false e

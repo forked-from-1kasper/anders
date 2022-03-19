@@ -14,21 +14,27 @@ def ℕ := W (x : 𝟐), ℕ-ctor x
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 
-def 𝟎⟶ℕ (C : ℕ → U) (f : 𝟎 → ℕ) : C zero → C (sup 𝟐 ℕ-ctor 0₂ f) :=
+def 𝟎⟶ℕ (n : L) (C : ℕ → U n) (f : 𝟎 → ℕ) : C zero → C (sup 𝟐 ℕ-ctor 0₂ f) :=
 transp (<i> C (sup 𝟐 ℕ-ctor 0₂ (λ (x : 𝟎), ind₀ (PathP (<_> ℕ) (ind₀ ℕ x) (f x)) x @ i))) 0
 
-def 𝟏⟶ℕ (C : ℕ → U) (f : 𝟏 → ℕ) : C (succ (f ★)) → C (sup 𝟐 ℕ-ctor 1₂ f) :=
+def 𝟏⟶ℕ (n : L) (C : ℕ → U n) (f : 𝟏 → ℕ) : C (succ (f ★)) → C (sup 𝟐 ℕ-ctor 1₂ f) :=
 transp (<i> C (sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), ind₁ (λ (y : 𝟏), PathP (<_> ℕ) (f ★) (f y)) (<_> f ★) x @ i))) 0
 
-def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) : Π (n : ℕ), C n :=
+def ℕ-indω (n : L) (C : ℕ → U n) (z : C zero) (s : Π (m : ℕ), C m → C (succ m)) : Π (m : ℕ), C m :=
 indᵂ 𝟐 ℕ-ctor C
   (ind₂ (λ (x : 𝟐), Π (f : ℕ-ctor x → ℕ), (Π (b : ℕ-ctor x), C (f b)) → C (sup 𝟐 ℕ-ctor x f))
-        (λ (f : 𝟎 → ℕ) (g : Π (x : 𝟎), C (f x)), 𝟎⟶ℕ C f z)
-        (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ C f (s (f ★) (g ★))))
+        (λ (f : 𝟎 → ℕ) (g : Π (x : 𝟎), C (f x)), 𝟎⟶ℕ n C f z)
+        (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ n C f (s (f ★) (g ★))))
 
-def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ : ℕ), C) z s
-def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
-def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
+def ℕ-recω (n : L) (C : U n) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-indω n (λ (_ : ℕ), C) z s
+def ℕ-iterω (n : L) (C : U n) (z : C) (s : C → C) : ℕ → C := ℕ-recω n C z (λ (_ : ℕ), s)
+def ℕ-caseω (n : L) (C : U n) (z s : C) : ℕ → C := ℕ-iterω n C z (λ (_ : C), s)
+
+def ℕ-ind  := ℕ-indω L₀
+def ℕ-rec  := ℕ-recω L₀
+def ℕ-iter := ℕ-iterω L₀
+def ℕ-case := ℕ-indω L₀
+
 def plus : ℕ → ℕ → ℕ := ℕ-iter (ℕ → ℕ) (idfun ℕ) (∘ ℕ ℕ ℕ succ)
 def mult : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (λ (_ : ℕ), zero) (λ (_ : ℕ) (x : ℕ → ℕ) (m : ℕ), plus m (x m))
 def one : ℕ := succ zero

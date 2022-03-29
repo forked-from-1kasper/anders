@@ -12,4 +12,3 @@ def transp-G (A B : U) (p : PathP (<_> U) A B) (r : I)
 def f (A B : U) (p : PathP (<_> U) A B) (r : I)
     (e : Π (i : I), equiv A (p @ i)) (g₀ : G A B p r e 0) : B
  := unglue r [(r = 1) → (A, e 1)] (transp-G A B p r e g₀)
-

@@ -39,7 +39,7 @@ let meetss = List.fold_left meets [eps]
 let forall i = System.filter (fun mu _ -> not (Env.mem i mu))
 
 let mkSystem xs = System.of_seq (List.to_seq xs)
-let unionSystem xs ys = System.union (fun _ _ _ -> raise (Failure "unionSystem")) xs ys (* ??? *)
+let unionSystem xs ys = System.union (fun _ e _ -> Some e) xs ys
 
 let sign x = function
   | Zero -> ENeg (EVar x)

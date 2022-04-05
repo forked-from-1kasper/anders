@@ -1,5 +1,5 @@
 Anders
-=========
+======
 
 ```OCaml
 type exp =
@@ -32,26 +32,22 @@ Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Thre
 Features
 --------
 
-* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
-* Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
-* Generalized Transport and Homogeneous Composition core Kan operations
-* Partial Elements
-* Cubical Subtypes
-* Glue types
-* Strict Equality on pretypes
-* Coequalizer
-* Hub Spokes Disc
-* Infinitesimal Shape Modality (de Rham Stack)
-* Parser in 80 LOC
-* Lexer in 80 LOC
-* UTF-8 support including universe levels
-* Lean syntax for ΠΣW
-* Poor man’s records as Σ with named accessors to telescope variables
-* 1D syntax with top-level declarations
-* Best suited for academic papers and fast type checking
+* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy.
+* Pretypes hierarchy Vₙ.
+* Generalized Transport and Homogeneous Composition core Kan operations.
+* Partial Elements.
+* Cubical Subtypes.
+* Glue types.
+* Strict Equality on pretypes.
+* Coequalizer.
+* Infinitesimal Shape Modality (de Rham Stack).
+* UTF-8 support including universe levels.
+* Lean syntax for ΠΣW.
+* Poor man’s records as Σ with named accessors to telescope variables.
+* 1D syntax with top-level declarations.
 
 Setup
--------------
+-----
 
 ```shell
 $ make
@@ -116,27 +112,6 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 * <a href="https://arxiv.org/pdf/1806.05966.pdf">Cartan Geometry in Modal Homotopy Type Theory</a> [Cherubini]
 * <a href="https://hott-uf.github.io/2017/abstracts/cohesivett.pdf">Differential Cohesive Type Theory</a> [Gross, Licata, New, Paykin, Riley, Shulman, Cherubini]
 * <a href="https://arxiv.org/abs/1509.07584">Brouwer's fixed-point theorem in real-cohesive homotopy type theory</a> [Shulman]
-
-Benchmarks
-----------
-
-Intel i7-8700.
-
-```
-$ time dune build
-
-real    0m1.456s
-user    0m2.794s
-sys     0m0.564s
-```
-
-```
-$ time dune exec anders check library/book.anders
-
-real    0m0.468s
-user    0m0.051s
-sys     0m0.032s
-```
 
 Acknowledgements
 ----------------

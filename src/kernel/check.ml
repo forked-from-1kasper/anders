@@ -141,8 +141,8 @@ and transport i p phi u0 = match p, phi, u0 with
     let t1 = System.map (fun u -> transFill i (fst u) phi u0 vone) u' in
     let ts = System.map (fun u -> app (vfst (snd u), transFill i (fst u) phi u0 (dim i))) u' in
 
-    let uj k = bimap (fun j -> if i = j then k else dim j) (fun mu -> upd mu >> act0 i k) u in
-    let uzero = uj vzero in let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
+    let uj k = actSystem (Env.add i k Env.empty) u in let uzero = uj vzero in
+    let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
 
     let phi1 = solve phi One in let ksi = orFormula phi psi' in
 
@@ -466,7 +466,7 @@ and act rho = function
   | VHole                -> VHole
   | VPathP v             -> VPathP (act rho v)
   | VPartialP (t, r)     -> VPartialP (act rho t, act rho r)
-  | VSystem ts           -> VSystem (bimap (actVar rho) (fun mu -> upd mu >> act rho) ts)
+  | VSystem ts           -> VSystem (actSystem rho ts)
   | VSub (t, i, u)       -> VSub (act rho t, act rho i, act rho u)
   | VTransp (p, i)       -> VTransp (act rho p, act rho i)
   | VHComp (t, r, u, u0) -> hcomp (act rho t) (act rho r) (act rho u) (act rho u0)
@@ -498,8 +498,9 @@ and act rho = function
   | VJoin v              -> join (act rho v)
   | VIndIm (a, b)        -> VIndIm (act rho a, act rho b)
 
-and act0 i j = act (Env.add i j Env.empty)
+and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
 
+and act0 i j = act (Env.add i j Env.empty)
 and upd mu = act (Env.map dir mu)
 
 (* Convertibility *)

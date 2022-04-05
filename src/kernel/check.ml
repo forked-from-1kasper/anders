@@ -93,7 +93,7 @@ and glue r u a = match r, a with
 
 and unglue r u b = match r, u, b with
   | VFormula ks, _, _ when top ks -> app (vfst (vsnd (app (u, VRef vone))), b)
-  | _, _, VGlueElem (_, _, a) -> ouc a
+  | _, _, VGlueElem (_, _, a) -> a
   | _, _, _ -> VUnglue (r, u, b)
 
 and transport i p phi u0 = match p, phi, u0 with
@@ -141,11 +141,13 @@ and transport i p phi u0 = match p, phi, u0 with
     let t1 = System.map (fun u -> transFill i (fst u) phi u0 vone) u' in
     let ts = System.map (fun u -> app (vfst (snd u), transFill i (fst u) phi u0 (dim i))) u' in
 
-    let uj k = bimap (fun j -> if i = j then k else dim j) upd u in
+    let uj k = bimap (fun j -> if i = j then k else dim j) (fun mu -> upd mu >> act0 i k) u in
     let uzero = uj vzero in let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
 
     let phi1 = solve phi One in let ksi = orFormula phi psi' in
-    let a1 = comp (fun j -> act0 i j a) ksi i (VSystem (unionSystem (border phi1 a0) ts)) a0 in
+
+    let a1 = comp (fun j -> act0 i j a) ksi i (VSystem
+      (unionSystem (border phi1 (unglue phi (VSystem u) u0)) ts)) a0 in
 
     let fib = System.map (fun x -> VPair (ref None, x, idp a1))
       (unionSystem (border phi1 u0) t1) in

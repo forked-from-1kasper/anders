@@ -12,7 +12,6 @@
                 library/foundations/univalent/iso.anders
                 library/foundations/modal/infinitesimal.anders
                 library/mathematics/algebra/algebra.anders
-                library/mathematics/analysis/real.anders
                 library/mathematics/categories/category.anders
                 library/mathematics/categories/functor.anders
                 library/mathematics/categories/abelian.anders

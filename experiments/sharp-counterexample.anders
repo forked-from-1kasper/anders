@@ -1,0 +1,22 @@
+module sharp-counterexample where
+import library/foundations/mltt/proto
+import library/foundations/univalent/iso
+
+-- https://github.com/groupoid/anders/blob/main/lib/foundations/modal/sharp.anders
+
+axiom ♯ (A : U) : U
+axiom ♯-intro (A : U) : A → ♯ A
+axiom ♯-elim (A : U) : ♯ A → A
+def ♯-trip (A : U) : A → A := ∘ A (♯ A) A (♯-elim A) (♯-intro A)
+axiom ♯-β (A : U) (a : ♯ A) : Path (♯ A) (♯-intro A (♯-elim A a)) a
+axiom ♯-η (A : U) (a : A) : Path A (♯-trip A a) a
+def ♯-pred-compose (A B : U) (f : A → B) : A → B := ∘ A A B f (♯-trip A)
+def ♯-post-compose (A B : U) (f : A → B) : A → B := ∘ A B B (♯-trip B) f
+axiom ♯-naturality (A B: U) (f : A → B) : Path (A → B) (♯-pred-compose A B f) (♯-post-compose A B f)
+
+-- and here we go
+def ♯-trivial (A : U) : iso A (♯ A) :=
+(♯-intro A, ♯-elim A, ♯-β A, ♯-η A, ★)
+
+def ♯-Path (A : U) : PathP (<_> A) A (♯ A) :=
+iso-Intro A (♯ A) (♯-trivial A)

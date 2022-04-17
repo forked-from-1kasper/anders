@@ -16,10 +16,6 @@
               ("L", ELevel)] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
-  let rec telescope ctor e : tele list -> exp = function
-    | []           -> e
-    | (p, a) :: xs -> ctor p a (telescope ctor e xs)
-
   let rec pLam e : ident list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
 
   type formula =
@@ -66,6 +62,8 @@
 %token W INDW SUP
 %token IM INF INDIM JOIN
 %token SUCC ADD MAX
+%token SECTION END
+%token VARIABLES
 
 %left APPFORMULA
 %left OR
@@ -81,25 +79,24 @@
 
 %%
 
-ident : IRREF { Irrefutable } | IDENT { ident $1 }
-vars : ident+ { $1 }
-lense : LPARENS vars COLON exp2 RPARENS { List.map (fun x -> (x, $4)) $2 }
-telescope : lense telescope { List.append $1 $2 } | lense { $1 }
-params : telescope { $1 } | { [] }
-path : IDENT { getPath $1 }
-face : LPARENS IDENT IDENT IDENT RPARENS { face $2 $3 $4 }
+ident  : IRREF { Irrefutable } | IDENT { ident $1 }
+vars   : ident+ { $1 }
+tele   : LPARENS vars COLON exp2 RPARENS { List.map (fun x -> (x, $4)) $2 }
+teles  : tele teles { List.append $1 $2 } | tele { $1 }
+params : teles { $1 } | { [] }
+path   : IDENT { getPath $1 }
+face   : LPARENS IDENT IDENT IDENT RPARENS { face $2 $3 $4 }
 
 part : face+ ARROW exp2 { ($1, $3) }
 file : MODULE IDENT WHERE line* EOF { ($2, $4) }
-line : IMPORT path+ { Import $2 } | PLUGIN path { Plugin $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
 repl : COLON IDENT exp2 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp2 EOF { Eval $1 } | EOF { Nope }
 exp1 : exp2 COMMA exp1 { EPair (ref None, $1, $3) } | exp2 { $1 }
 
 exp2:
-  | LAM telescope COMMA exp2 { telescope eLam $4 $2 }
-  | PI telescope COMMA exp2 { telescope ePi $4 $2 }
-  | SIGMA telescope COMMA exp2 { telescope eSig $4 $2 }
-  | W telescope COMMA exp2 { telescope eW $4 $2 }
+  | LAM teles COMMA exp2 { teles eLam $4 $2 }
+  | PI teles COMMA exp2 { teles ePi $4 $2 }
+  | SIGMA teles COMMA exp2 { teles eSig $4 $2 }
+  | W teles COMMA exp2 { teles eW $4 $2 }
   | LT vars GT exp2 { pLam $4 $2 }
   | exp3 { $1 }
 
@@ -162,7 +159,15 @@ exp6:
   | IDENT { getVar $1 }
 
 declarations:
-  | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
-  | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, telescope ePi $5 $3, $7) }
-  | DEF IDENT params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
-  | AXIOM IDENT params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }
+  | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (teles ePi $5 $3), teles eLam $7 $3) }
+  | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, teles ePi $5 $3, $7) }
+  | DEF IDENT params DEFEQ exp2 { Def ($2, None, teles eLam $5 $3) }
+  | AXIOM IDENT params COLON exp2 { Axiom ($2, teles ePi $5 $3) }
+
+line :
+  | IMPORT path+ { Import $2 }
+  | PLUGIN path { Plugin $2 }
+  | OPTION IDENT IDENT { Option ($2, $3) }
+  | declarations { Decl $1 }
+  | SECTION line+ END { Section $2 }
+  | VARIABLES teles { Variables $2 }

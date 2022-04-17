@@ -55,10 +55,12 @@ let extractDecl : decl -> string = function
   | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
 
 let extractLine : line -> string = function
-  | Import xs -> String.concat "\n" (List.map (Printf.sprintf "import %s") xs)
-  | Plugin _  -> fail "cubicaltt does not support external plugins"
-  | Option _  -> fail "cubicaltt obviously does not support Anders-specific options"
-  | Decl d    -> extractDecl d
+  | Import xs   -> String.concat "\n" (List.map (Printf.sprintf "import %s") xs)
+  | Plugin _    -> fail "cubicaltt does not support external plugins"
+  | Option _    -> fail "cubicaltt obviously does not support Anders-specific options"
+  | Section _   -> fail "cubicaltt does not support sections"
+  | Variables _ -> fail "cubicaltt does not support section variables"
+  | Decl d      -> extractDecl d
 
 let extractContent x = String.concat "\n" (List.map extractLine x)
 let extractFile : file -> string =

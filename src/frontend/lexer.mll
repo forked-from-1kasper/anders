@@ -87,30 +87,31 @@ rule main = parse
 | join          { JOIN }     | eof           { EOF }
 | ident as s    {
   match s with
-  | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
-  | "\\/"                    | "\xE2\x88\xA8"    -> OR     (* ∨ *)
-  | "forall"                 | "\xCE\xA0"        -> PI     (* Π *)
-  | "summa"                  | "\xCE\xA3"        -> SIGMA  (* Σ *)
-  | "\\"                     | "\xCE\xBB"        -> LAM    (* λ *)
-  | "ind-W"                  | "ind\xE1\xB5\x82" -> INDW   (* indᵂ *)
-  | "module"     -> MODULE   | "where"           -> WHERE
-  | "import"     -> IMPORT   | "option"          -> OPTION
-  | "PathP"      -> PATHP    | "transp"          -> TRANSP
-  | "_"          -> IRREF    | "@"               -> APPFORMULA
-  | "plugin"     -> PLUGIN   | "?"               -> HOLE
-  | "Partial"    -> PARTIAL  | "PartialP"        -> PARTIALP
-  | "inc"        -> INC      | "ouc"             -> OUC
-  | "hcomp"      -> HCOMP    | "Glue"            -> GLUE
-  | "glue"       -> GLUEELEM | "unglue"          -> UNGLUE
-  | "W"          -> W        | "sup"             -> SUP
-  | "definition"             | "def"
-  | "theorem"                | "lemma"
-  | "corollary"              | "proposition"     -> DEF
-  | "axiom"                  | "postulate"       -> AXIOM
-  | "Id"         -> ID       | "ref"             -> REF
-  | "idJ"        -> IDJ      | "isucc"           -> SUCC
-  | "iadd"       -> ADD      | "imax"            -> MAX
-  | _            -> IDENT s
+  | "/\\"                     | "\xE2\x88\xA7"    -> AND    (* ∧ *)
+  | "\\/"                     | "\xE2\x88\xA8"    -> OR     (* ∨ *)
+  | "forall"                  | "\xCE\xA0"        -> PI     (* Π *)
+  | "summa"                   | "\xCE\xA3"        -> SIGMA  (* Σ *)
+  | "\\"                      | "\xCE\xBB"        -> LAM    (* λ *)
+  | "ind-W"                   | "ind\xE1\xB5\x82" -> INDW   (* indᵂ *)
+  | "module"     -> MODULE    | "where"           -> WHERE
+  | "import"     -> IMPORT    | "option"          -> OPTION
+  | "PathP"      -> PATHP     | "transp"          -> TRANSP
+  | "_"          -> IRREF     | "@"               -> APPFORMULA
+  | "plugin"     -> PLUGIN    | "?"               -> HOLE
+  | "Partial"    -> PARTIAL   | "PartialP"        -> PARTIALP
+  | "inc"        -> INC       | "ouc"             -> OUC
+  | "hcomp"      -> HCOMP     | "Glue"            -> GLUE
+  | "glue"       -> GLUEELEM  | "unglue"          -> UNGLUE
+  | "W"          -> W         | "sup"             -> SUP
+  | "definition"              | "def"
+  | "theorem"                 | "lemma"
+  | "corollary"               | "proposition"     -> DEF
+  | "axiom"                   | "postulate"       -> AXIOM
+  | "Id"         -> ID        | "ref"             -> REF
+  | "idJ"        -> IDJ       | "isucc"           -> SUCC
+  | "iadd"       -> ADD       | "imax"            -> MAX
+  | "section"    -> SECTION   | "end"             -> END
+  | "variables"  -> VARIABLES | _                 -> IDENT s
 }
 
 and multiline = parse

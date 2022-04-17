@@ -37,3 +37,5 @@ let tokenToString : token -> string = function
   | INF        -> "INF"         | INDIM      -> "INDIM"
   | JOIN       -> "JOIN"        | SUCC       -> "SUCC"
   | ADD        -> "ADD"         | MAX        -> "MAX"
+  | SECTION    -> "SECTION"     | END        -> "END"
+  | VARIABLES  -> "VARIABLES"

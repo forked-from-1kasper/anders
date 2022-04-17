@@ -14,7 +14,8 @@
    HoTT 3.11 Contractibility
    HoTT 6.2 Induction principles and dependent paths.
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module path where
 import library/foundations/mltt/proto
@@ -41,8 +42,8 @@ def Path-η (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (<i> p @ i)
 def idp-left (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<_> p @ 0) := <_ _> x
 def idp-right (A : U) (x y : A) (p : Path A x y) : Path (Path A y y) (<_> y) (<_> p @ 1) := <_ _> y
 def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (sym A y x (sym A x y p)) := <_> p
-def section (A B : U) (f : A -> B) (g : B -> A) : U := Π (b : B), Path B (f (g b)) b
-def retract (A B : U) (f : A -> B) (g : B -> A) : U := Π (a : A), Path A (g (f a)) a
+def rinv (A B : U) (f : A → B) (g : B → A) : U := Π (b : B), Path B (f (g b)) b
+def linv (A B : U) (f : A → B) (g : B → A) : U := Π (a : A), Path A (g (f a)) a
 def hmtpy (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<i> p @ i ∧ -i) := <j i> p @ j ∧ i ∧ -i
 def plam (A : U) (f : I → A) : Path A (f 0) (f 1) := <i> f i
 def elim (A : U) (a b : A) (p : Path A a b) : I → A := λ (i : I), p @ i
@@ -58,7 +59,7 @@ def Ω : U₁ := Σ (A : U), isProp A
 
 def transport (A B : U) (p : PathP (<_> U) A B) (a : A) : B := transp p 0 a
 def trans-comp (A : U) (a : A) : Path A a (transport A A (<i> A) a) := <j> transp (<_> A) -j a
-def subst (A : U) (P : A -> U) (a b : A) (p : Path A a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
+def subst (A : U) (P : A → U) (a b : A) (p : Path A a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
 def D (A : U) : U₁ := Π (x y : A), Path A x y → U
 def J (A : U) (x : A) (C : D A) (d : C x x (idp A x)) (y : A) (p : Path A x y) : C x y p :=
 subst (singl A x) (λ (z : singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
@@ -90,15 +91,15 @@ def ∧-assoc (i j k : I) : Id I (i ∧ (j ∧ k)) ((i ∧ j) ∧ k) := ref (i �
 
 -- Strict Equality on Partial and Interval Pretypes
 
-def 1= : I -> V := Id I 1
+def 1= : I → V := Id I 1
 def 1=1 : 1= 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
 
-def Jˢ (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
-def Jˢ-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) : Id (B a a (ref a)) (Jˢ A B a a d (ref a)) d := ref d
+def Jˢ (A : V) (B : Π (a b : A), Id A a b → V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
+def Jˢ-β (A : V) (B : Π (a b : A), Id A a b → V) (a : A) (d : B a a (ref a)) : Id (B a a (ref a)) (Jˢ A B a a d (ref a)) d := ref d
 def rev (A : V) (a b : A) (p : Id A a b) : Id A b a := idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
 def comp-Id (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c := idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
-def cong-Id (A B : V) (f : A -> B) (a b : A) (p : Id A a b) : Id B (f a) (f b) := idJ A (λ (a b : A) (_ : Id A a b), Id B (f a) (f b)) a (ref (f a)) b p
+def cong-Id (A B : V) (f : A → B) (a b : A) (p : Id A a b) : Id B (f a) (f b) := idJ A (λ (a b : A) (_ : Id A a b), Id B (f a) (f b)) a (ref (f a)) b p
 
 def φ (i : I) : Partial U₁ (i ∨ -i) := [(i = 0) → U, (i = 1) → U → U]
 def φ′ (i : I) : Partial U₁ (i ∨ -i) := [(i = 1) → U → U, (i = 0) → U]
@@ -284,23 +285,23 @@ def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP
    transpFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
 -}
 
-def trans-Π (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x :=
+def trans-Π (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x :=
 λ (x : A 1), transp (<j> B j (transFill (A 1) (A 0) (<i> A -i) x @ -j)) 0 (f (transp (<i> A -i) 0 x))
 
-def trans-Π′ (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x :=
+def trans-Π′ (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x :=
 transp (<i> Π (x : A i), B i x) 0 f
 
-def trans-Π-is-correct (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) :
+def trans-Π-is-correct (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x) :
   Path (Π (x : A 1), B 1 x) (trans-Π A B f) (trans-Π′ A B f) :=
 <_> trans-Π A B f
 
-def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x :=
+def trans-Σ (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x :=
 (transp (<i> A i) 0 z.1, transp (<j> B j (transp (<i> A (i ∧ j)) -j z.1)) 0 z.2)
 
-def trans-Σ′ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x :=
+def trans-Σ′ (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x :=
 transp (<i> Σ (x : A i), B i x) 0 z
 
-def trans-Σ-is-correct (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) :
+def trans-Σ-is-correct (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x) :
   Path (Σ (x : A 1), B 1 x) (trans-Σ A B z) (trans-Σ′ A B z) :=
 <_> trans-Σ A B z
 

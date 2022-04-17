@@ -18,6 +18,8 @@ type line =
   | Plugin of string
   | Option of string * string
   | Decl of decl
+  | Section of line list
+  | Variables of tele list
 
 type content = line list
 type file = string * content
@@ -31,11 +33,17 @@ let showDecl : decl -> string = function
   | Ext (p, t, v) -> Printf.sprintf "def %s : %s :=\nbegin%send" p (showExp t) v
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
 
-let showLine : line -> string = function
+let rec showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" (String.concat " " p)
   | Plugin p -> Printf.sprintf "plugin %s" p
   | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
   | Decl d -> showDecl d
+  | Section xs -> Printf.sprintf "section\n%s\nend" (String.concat "\n" (List.map showLine xs))
+  | Variables xs -> Printf.sprintf "variables %s" (String.concat " " (List.map showTeleExp xs))
 
 let showContent x = String.concat "\n" (List.map showLine x)
 let showFile : file -> string = function | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
+
+let rec teles ctor e : tele list -> exp = function
+  | []           -> e
+  | (p, a) :: xs -> ctor p a (teles ctor e xs)

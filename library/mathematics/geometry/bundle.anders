@@ -5,7 +5,8 @@
 
    HoTT 2.3 Type families are fibrations
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module bundle where
 import library/foundations/univalent/path
@@ -32,7 +33,7 @@ def encode-decode-Pi (B : U) (F : B → U) (y : B) (x : fiber (Sigma B F) B (pr�
 <i> ((x.2 @ i, transp (<j> F (x.2 @ i ∨ -j)) i x.1.2), <j> x.2 @ i ∧ j)
 
 def Bundle=Pi (B : U) (F : B → U) (y : B) : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y) :=
-isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode-Pi B F y) (decode-Pi B F y) (decode-encode-Pi B F y) (encode-decode-Pi B F y)
+iso→path (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode-Pi B F y) (decode-Pi B F y) (decode-encode-Pi B F y) (encode-decode-Pi B F y)
 
 -- [Cherubini] 2018 Four Fiber Bundles
 

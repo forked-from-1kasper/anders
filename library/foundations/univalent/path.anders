@@ -269,100 +269,84 @@ def trans-filler-p (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP
 def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (comp-Path A x y z p q) :=
 <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i ∧ k]) (p @ i ∨ -j)
 
--- Reviewers of Prover's consistency should revise following rules of Reality Checking (Internalizing of transp and hcomp)
--- also known as Simon Huber Equations: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf
+section
+  variables (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x)
 
-{-
-   Part A:
+  def trans-Π : Π (x : A 1), B 1 x :=
+  λ (x : A 1), transp (<j> B j (transFill (A 1) (A 0) (<i> A -i) x @ -j)) 0 (f (transp (<i> A -i) 0 x))
 
-   transpⁱ N φ u₀ = u₀
-   transpⁱ U φ A = A
-   transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), where [ w = transpFill⁻ⁱ A φ v, v : A(i/1) ]
-   transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1), transpⁱ B(x/v) φ(u₀.2)), where [ v = transpFillⁱ A φ u₀.1 ]
-   transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉 compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j)
-   transpⁱ B ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : B(i/1), where B = Glue [φ ↦ (T,w)] A
-   transp⁻ⁱ A φ u = (transpⁱ A(i/1−i) φ u)(i/1−i) : A(i/0)
-   transpFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
--}
+  def trans-Π′ : Π (x : A 1), B 1 x :=
+  transp (<i> Π (x : A i), B i x) 0 f
 
-def trans-Π (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x :=
-λ (x : A 1), transp (<j> B j (transFill (A 1) (A 0) (<i> A -i) x @ -j)) 0 (f (transp (<i> A -i) 0 x))
+  def trans-Π-is-correct : Path (Π (x : A 1), B 1 x) (trans-Π A B f) (trans-Π′ A B f) :=
+  <_> trans-Π A B f
+end
 
-def trans-Π′ (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x :=
-transp (<i> Π (x : A i), B i x) 0 f
+section
+  variables (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x)
 
-def trans-Π-is-correct (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x) :
-  Path (Π (x : A 1), B 1 x) (trans-Π A B f) (trans-Π′ A B f) :=
-<_> trans-Π A B f
+  def trans-Σ : Σ (x : A 1), B 1 x :=
+  (transp (<i> A i) 0 z.1, transp (<j> B j (transp (<i> A (i ∧ j)) -j z.1)) 0 z.2)
 
-def trans-Σ (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x :=
-(transp (<i> A i) 0 z.1, transp (<j> B j (transp (<i> A (i ∧ j)) -j z.1)) 0 z.2)
+  def trans-Σ′ : Σ (x : A 1), B 1 x :=
+  transp (<i> Σ (x : A i), B i x) 0 z
 
-def trans-Σ′ (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x :=
-transp (<i> Σ (x : A i), B i x) 0 z
+  def trans-Σ-is-correct : Path (Σ (x : A 1), B 1 x) (trans-Σ A B z) (trans-Σ′ A B z) :=
+  <_> trans-Σ A B z
+end
 
-def trans-Σ-is-correct (A : I → U) (B : Π (i : I), A i → U) (z : Σ (x : A 0), B 0 x) :
-  Path (Σ (x : A 1), B 1 x) (trans-Σ A B z) (trans-Σ′ A B z) :=
-<_> trans-Σ A B z
+section
+  variables (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0)
+            (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0))
 
-def trans-Path (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0)
-  (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1) :=
-<j> comp (λ (i : I), P i @ j) (∂ j) (λ (i : I), [(j = 0) → v i, (j = 1) → w i]) (inc (P 0 @ j) (∂ j) (u₀ @ j))
+  def trans-Path : PathP (<i> P 1 @ i) (v 1) (w 1) :=
+  <j> comp (λ (i : I), P i @ j) (∂ j) (λ (i : I), [(j = 0) → v i, (j = 1) → w i]) (inc (P 0 @ j) (∂ j) (u₀ @ j))
 
-def trans-Path′ (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0)
-  (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1) :=
-transp (<i> PathP (P i) (v i) (w i)) 0 u₀
+  def trans-Path′ : PathP (<i> P 1 @ i) (v 1) (w 1) :=
+  transp (<i> PathP (P i) (v i) (w i)) 0 u₀
 
-def trans-Path-is-correct (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i))
-  (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) :
-  Path (PathP (<i> P 1 @ i) (v 1) (w 1)) (trans-Path A B P v w u₀) (trans-Path′ A B P v w u₀) :=
-<_> trans-Path A B P v w u₀
+  def trans-Path-is-correct : Path (PathP (<i> P 1 @ i) (v 1) (w 1))
+                                   (trans-Path A B P v w u₀)
+                                   (trans-Path′ A B P v w u₀) :=
+  <_> trans-Path A B P v w u₀
+end
 
-{-
-   Part B:
+section
+  variables (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0])
 
-   hcompⁱ N [φ ↦ 0] 0 = 0
-   hcompⁱ N [φ ↦ S u] (S u₀) = S (hcompⁱ N [φ ↦ u] u₀)
-   hcompⁱ U [φ ↦ E] A = Glue [φ ↦ (E(i/1), equivⁱ E(i/1−i))] A
-   hcompⁱ (Π (x : A), B) [φ ↦ u] u₀ v = hcompⁱ B(x/v) [φ ↦ u v] (u₀ v)
-   hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2), where [ v = hfillⁱ A [φ ↦ u.1] u₀.1 ]
-   hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉 hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j)
-   hcompⁱ (Glue [φ ↦ (T,w)] A) [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ : Glue [φ ↦ (T,w)] A,
-      where [ t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T ]
-   hfillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
--}
+  def hcomp-Π := λ (v : A), hcomp (B v) r (λ (k : I), [(r = 1) → u k 1=1 v]) ((ouc u₀) v)
+  def hcomp-Π′ := hcomp (Π (x : A), B x) r u (ouc u₀)
 
-def hcomp-Π (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :=
-λ (v : A), hcomp (B v) r (λ (k : I), [(r = 1) → u k 1=1 v]) ((ouc u₀) v)
+  def hcomp-Π-is-correct : Path (Π (x : A), B x) (hcomp-Π A B r u u₀) (hcomp-Π′ A B r u u₀) :=
+  <_> hcomp-Π A B r u u₀
+end
 
-def hcomp-Π′ (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :=
-hcomp (Π (x : A), B x) r u (ouc u₀)
+section
+  variables (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0])
 
-def hcomp-Π-is-correct (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :
-  Path (Π (x : A), B x) (hcomp-Π A B r u u₀) (hcomp-Π′ A B r u u₀) :=
-<_> hcomp-Π A B r u u₀
+  def hcomp-Σ : Σ (x : A), B x :=
+  (hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) 1,
+   comp (λ (i : I), B (hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) i))
+      r (λ (k : I), [(r = 1) → (u k 1=1).2]) (inc (B (ouc u₀).1) r (ouc u₀).2))
 
-def hcomp-Σ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) : Σ (x : A), B x :=
-(hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) 1,
- comp (λ (i : I), B (hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) i))
-    r (λ (k : I), [(r = 1) → (u k 1=1).2]) (inc (B (ouc u₀).1) r (ouc u₀).2))
+  def hcomp-Σ′ : Σ (x : A), B x :=
+  hcomp (Σ (x : A), B x) r u (ouc u₀)
 
-def hcomp-Σ′ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) : Σ (x : A), B x :=
-hcomp (Σ (x : A), B x) r u (ouc u₀)
+  def hcomp-Σ-is-correct : Path (Σ (x : A), B x) (hcomp-Σ A B r u u₀) (hcomp-Σ′ A B r u u₀) :=
+  <_> hcomp-Σ A B r u u₀
+end
 
-def hcomp-Σ-is-correct (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) :
-  Path (Σ (x : A), B x) (hcomp-Σ A B r u u₀) (hcomp-Σ′ A B r u u₀) :=
-<_> hcomp-Σ A B r u u₀
+section
+  variables (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0])
 
-def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) : Path A v w :=
-<j> hcomp A (r ∨ ∂ j) (λ (i : I), [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (ouc u₀ @ j)
+  def hcomp-Path : Path A v w :=
+  <j> hcomp A (r ∨ ∂ j) (λ (i : I), [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (ouc u₀ @ j)
 
-def hcomp-Path′ (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) :=
-hcomp (Path A v w) r u (ouc u₀)
+  def hcomp-Path′ := hcomp (Path A v w) r u (ouc u₀)
 
-def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) :
-  Path (Path A v w) (hcomp-Path A v w r u u₀) (hcomp-Path′ A v w r u u₀) :=
-<_> hcomp-Path A v w r u u₀
+  def hcomp-Path-is-correct : Path (Path A v w) (hcomp-Path A v w r u u₀) (hcomp-Path′ A v w r u u₀) :=
+  <_> hcomp-Path A v w r u u₀
+end
 
 def hcomp-U (r : I) (E : I → Partial U r) (A : (U)[r ↦ E 0]) := hcomp U r E (ouc A)
 

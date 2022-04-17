@@ -1,9 +1,8 @@
-{- Glivenko Theorem.
-   - Translation from implicational propositional calculus to classical logic
-
+{- Glivenko Theorem: translation from IPC to classical logic.
    https://en.wikipedia.org/wiki/Glivenko%27s_translation
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module glivenko where
 import library/foundations/mltt/proto

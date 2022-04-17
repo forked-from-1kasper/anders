@@ -1,11 +1,11 @@
-{- Path Type: https://homotopy.dev/foundations/univalent/path
-   - Path Equality;
-   - Computational properties;
-   - Interval and De Morgan laws;
-   - Generalized Transport;
-   - Strict equality on partial and interval pretypes;
-   - Cubical subtypes;
-   - Generalized Homogeneous Composition;
+{- Path Type:
+   — Path Equality.
+   — Computational properties.
+   — Interval and De Morgan laws.
+   — Generalized Transport.
+   — Strict equality on partial and interval pretypes.
+   — Cubical subtypes.
+   — Generalized Homogeneous Composition.
 
    HoTT 1.12 Identity types
    HoTT 1.12.1 Path induction
@@ -20,13 +20,10 @@
 module path where
 import library/foundations/mltt/proto
 
--- Proto
-
 def const₁ (A : U) : A → 𝟏 := const 𝟏 A ★
 def LineP (A : I → U) : V := Π (i : I), A i
 
 -- Path Equality
-
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def idp (A : U) (x : A) : Path A x x := <_> x
 def singl (A : U) (a : A) : U := Σ (x : A), Path A a x
@@ -56,7 +53,6 @@ def SET : U₁ := Σ (X : U), isSet X
 def Ω : U₁ := Σ (A : U), isProp A
 
 -- Computational Properties
-
 def transport (A B : U) (p : PathP (<_> U) A B) (a : A) : B := transp p 0 a
 def trans-comp (A : U) (a : A) : Path A a (transport A A (<i> A) a) := <j> transp (<_> A) -j a
 def subst (A : U) (P : A → U) (a b : A) (p : Path A a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
@@ -74,7 +70,6 @@ subst-comp (singl A a) (λ (z : singl A a), C a (z.1) (z.2)) (eta A a) d
 -- def K (A : U) (a : A) (p : Path A a a) : Path (Path A a a) (<_> a) p := <i j> p @ i ∧ j
 
 -- DNF solver
-
 def ∂ (i : I) := i ∨ -i
 def ∂-eq-neg-∂ (i : I) : Id I (∂ i) (∂ -i) := ref (∂ i)
 def min (i j : I) := i ∧ j
@@ -89,8 +84,7 @@ def ∧-distrib-∨ (i j k : I) : Id I ((i ∨ j) ∧ k) ((i ∧ k) ∨ (j ∧ k
 def ∨-distrib-∧ (i j k : I) : Id I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) := ref ((i ∧ j) ∨ k)
 def ∧-assoc (i j k : I) : Id I (i ∧ (j ∧ k)) ((i ∧ j) ∧ k) := ref (i ∧ (j ∧ k))
 
--- Strict Equality on Partial and Interval Pretypes
-
+-- Strict Equality
 def 1= : I → V := Id I 1
 def 1=1 : 1= 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
@@ -166,12 +160,12 @@ def ε (A : U) : Partial A 0 := []
 def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
 def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 
--- Cubical Subtypes
-
 def seg : PathP (<_> I) 0 1 := <i> i
+
+-- Cubical Subtypes
+def Partial′ (A : U) (i : I) := Partial A i
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : 1= i) : A := u p
 def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
-def Partial′ (A : U) (i : I) := Partial A i
 def sub (A : U) (i : I) (u : Partial A i) : V := A[i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
 def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
@@ -183,7 +177,6 @@ def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Pa
 def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
 
 -- Generalized Transport
-
 def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
 def trans⁻¹ (A B : U) (p : PathP (<_> U) A B) : B → A := transp (<i> p @ -i) 0

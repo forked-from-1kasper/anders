@@ -1,14 +1,16 @@
-{- Equivalence: https://homotopy.dev/foundations/univalent/equiv
-   - Fibers;
-   - Contractability of Fibers and Singletons;
-   - Equivalence.
-   - Surjective, Injective, Embedding, Hae;
-   - Theorems, Gluening;
-   - Theorem of univalence.
-   Copyright © Groupoid Infinity, 2021—2022,
-             © @siegment, 2022
+{- Equivalence:
+   — Fibers.
+   — Contractability of Fibers and Singletons.
+   — Equivalence.
+   — Surjective, Injective, Embedding
+   — Half-adjoint equivalence.
+   — Gluening.
+   — Univalence.
 
-   HoTT 4.6 Surjections and Embedding -}
+   HoTT 4.6 Surjections and Embedding
+
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module equiv where
 import library/foundations/univalent/path

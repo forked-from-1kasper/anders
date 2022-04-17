@@ -17,7 +17,6 @@ import library/mathematics/algebra/algebra
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/groupoid
-import library/mathematics/topoi/topos
 import library/mathematics/geometry/bundle
 import library/mathematics/geometry/etale
 import library/mathematics/geometry/disc

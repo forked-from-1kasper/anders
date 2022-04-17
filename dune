@@ -14,7 +14,6 @@
                 library/mathematics/categories/category.anders
                 library/mathematics/categories/functor.anders
                 library/mathematics/categories/groupoid.anders
-                library/mathematics/topoi/topos.anders
                 library/mathematics/meta/favonia.anders
                 library/mathematics/geometry/bundle.anders
                 library/mathematics/geometry/etale.anders

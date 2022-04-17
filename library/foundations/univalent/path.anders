@@ -350,7 +350,10 @@ end
 
 def hcomp-U (r : I) (E : I → Partial U r) (A : (U)[r ↦ E 0]) := hcomp U r E (ouc A)
 
--- id functions
+def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
+
+def contr-impl-prop (A : U) (H : isContr A) : isProp A :=
+λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1
 
 def idfun  (A : U) : A → A := λ (a : A), a
 def idfun′ (A : U) : A → A := transp (<_> A) 0
@@ -360,10 +363,3 @@ def idfun=idfun′  (A : U) : Path (A → A) (idfun A)  (idfun′ A) := <i> tran
 def idfun=idfun″  (A : U) : Path (A → A) (idfun A)  (idfun″ A) := <i> λ (a : A), hcomp A -i (λ (j : I), [(i = 0) → a]) a
 def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A) :=
 comp-Path (A → A) (idfun′ A) (idfun A) (idfun″ A) (<i> idfun=idfun′ A @ -i) (idfun=idfun″ A)
-
-def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
-
--- lemmas
-
-def contr-impl-prop (A : U) (H : isContr A) : isProp A :=
-λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1

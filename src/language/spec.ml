@@ -76,12 +76,12 @@ type exp =
   | EEmpty | EIndEmpty of exp                                                               (* 𝟎 *)
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
-  | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp * exp * exp                (* W *)
+  | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp                            (* W *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
 
 type extension =
-  | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp                  (* Coequalizer *)
-  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
+  | ECoeq of exp * exp | EIota of exp * exp * exp                                 (* Coequalizer *)
+  | EResp of exp * exp * exp | EIndCoeq of exp                                    (* Coequalizer *)
 
 type tele = ident * exp
 
@@ -123,6 +123,7 @@ type error =
   | Ineq             of exp * exp
   | ExpectedPi       of exp
   | ExpectedSig      of exp
+  | ExpectedW        of exp
   | ExpectedType     of exp
   | ExpectedKan      of exp
   | ExpectedPath     of exp

@@ -66,7 +66,7 @@ type value =
   | VEmpty | VIndEmpty of value
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value
-  | W of value * clos | VSup of value * value | VIndW of value * value * value
+  | W of value * clos | VSup of value * value | VIndW of value
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
 and clos = ident * (value -> value)

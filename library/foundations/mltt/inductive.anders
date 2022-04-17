@@ -37,25 +37,25 @@ def sup′ (A : U) (B : A → U) (x : A) (f : B x → W′ A B) : W′ A B := su
 def W-ind (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
   (w : W (x : A), B x) : C w :=
-indᵂ A B C g w
+indᵂ C g w
 
 def W-rec (A : U) (B : A → U) (C : U)
   (g : Π (x : A) (f : B x → (W (x : A), B x)), (B x → C) → C)
   (w : W (x : A), B x) : C :=
-indᵂ A B (λ (_ : W (x : A), B x), C) g w
+indᵂ (λ (_ : W (x : A), B x), C) g w
 
 def W-ind′ (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   (φ : Π (x : A) (f : B x → (W (x : A), B x)), C (sup A B x f)) :
   Π (w : W (x : A), B x), C w :=
-indᵂ A B C (λ (x : A) (f : B x → (W (x : A), B x)) (g : Π (b : B x), C (f b)), φ x f)
+indᵂ C (λ (x : A) (f : B x → (W (x : A), B x)) (g : Π (b : B x), C (f b)), φ x f)
 
 def W-case (A : U) (B : A → U) (C : U) (g : Π (x : A) (f : B x → (W (x : A), B x)), C) : (W (x : A), B x) → C :=
 W-ind′ A B (λ (_ : W (x : A), B x), C) g
 
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f)) (a : A) (f : B a → (W (x : A), B x)) :
-  PathP (<_> C (sup A B a f)) (indᵂ A B C g (sup A B a f)) (g a f (λ (b : B a), indᵂ A B C g (f b))) :=
-<_> g a f (λ (b : B a), indᵂ A B C g (f b))
+  PathP (<_> C (sup A B a f)) (indᵂ C g (sup A B a f)) (g a f (λ (b : B a), indᵂ C g (f b))) :=
+<_> g a f (λ (b : B a), indᵂ C g (f b))
 
 def W-proj₁ (A : U) (B : A → U) : (W (x : A), B x) → A :=
 W-case A B A (λ (x : A) (f : B x → (W (x : A), B x)), x)

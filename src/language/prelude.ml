@@ -15,7 +15,7 @@ let initLast xs =
     | y :: ys -> func (y :: xs) ys in
   let (ys, y) = func [] xs in (List.rev ys, y)
 
-  let getDigit x = Char.chr (Z.to_int x + 0x80) |> Printf.sprintf "\xE2\x82%c"
+let getDigit x = Char.chr (Z.to_int x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 
 let ten = Z.of_int 10
 

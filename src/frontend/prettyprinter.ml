@@ -76,7 +76,7 @@ let rec ppExp paren e = let x = match e with
   | EIndBool e  -> Printf.sprintf "ind₂ %s" (ppExp true e)
   | EW (a, (p, b)) -> Printf.sprintf "W %s, %s" (showTeleExp (p, a)) (showExp b)
   | ESup (a, b) -> Printf.sprintf "sup %s %s" (ppExp true a) (ppExp true b)
-  | EIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (ppExp true a) (ppExp true b) (ppExp true c)
+  | EIndW e -> Printf.sprintf "indᵂ %s" (ppExp true e)
   | EIm e -> Printf.sprintf "ℑ %s" (ppExp true e)
   | EInf e -> Printf.sprintf "ℑ-unit %s" (ppExp true e)
   | EJoin e -> Printf.sprintf "ℑ-join %s" (ppExp true e)

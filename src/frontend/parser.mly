@@ -127,7 +127,7 @@ exp4 :
   | INDUNIT exp6 { EIndUnit $2 }
   | INDBOOL exp6 { EIndBool $2 }
   | SUP exp6 exp6 { ESup ($2, $3) }
-  | INDW exp6 exp6 exp6 { EIndW ($2, $3, $4) }
+  | INDW exp6 { EIndW $2 }
   | IM exp6 { EIm $2 }
   | INF exp6 { EInf $2 }
   | INDIM exp6 exp6 { EIndIm ($2, $3) }

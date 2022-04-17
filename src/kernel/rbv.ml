@@ -66,7 +66,7 @@ let rec rbV v = match v with
   | VIndBool v           -> EIndBool (rbV v)
   | W (t, g)             -> rbVTele eW t g
   | VSup (a, b)          -> ESup (rbV a, rbV b)
-  | VIndW (a, b, c)      -> EIndW (rbV a, rbV b, rbV c)
+  | VIndW e              -> EIndW (rbV e)
   | VIm t                -> EIm (rbV t)
   | VInf v               -> EInf (rbV v)
   | VJoin v              -> EJoin (rbV v)

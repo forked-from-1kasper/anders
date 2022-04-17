@@ -20,10 +20,10 @@ transp (<i> C (sup (Maybe A) (List-ctor A) (1₂, x) (λ (x : 𝟏), ind₁ (λ 
 
 def List-ind (A : U) (C : List A → U) (z : C (nil A))
   (s : Π (x : A) (xs : List A), C xs → C (cons A x xs)) : Π (n : List A), C n :=
-indᵂ (Maybe A) (List-ctor A) C (maybe-ind A
-     (λ (x : Maybe A), Π (f : List-ctor A x → List A), (Π (b : List-ctor A x), C (f b)) → C (sup (Maybe A) (List-ctor A) x f))
-     (λ (f : 𝟎 → List A) (g : Π (x : 𝟎), C (f x)), nil-List A C f z)
-     (λ (x : A) (f : 𝟏 → List A) (g : Π (x : 𝟏), C (f x)), cons-List A C f x (s x (f ★) (g ★))))
+indᵂ C (maybe-ind A
+  (λ (x : Maybe A), Π (f : List-ctor A x → List A), (Π (b : List-ctor A x), C (f b)) → C (sup (Maybe A) (List-ctor A) x f))
+  (λ (f : 𝟎 → List A) (g : Π (x : 𝟎), C (f x)), nil-List A C f z)
+  (λ (x : A) (f : 𝟏 → List A) (g : Π (x : 𝟏), C (f x)), cons-List A C f x (s x (f ★) (g ★))))
 
 def List-rec  (A : U) (C : U) (z : C) (s : A → List A → C → C) : List A → C := List-ind A (λ (_ : List A), C) z s
 def List-iter (A : U) (C : U) (z : C) (s : A → C → C) : List A → C := List-rec A C z (λ (x : A) (_ : List A), s x)

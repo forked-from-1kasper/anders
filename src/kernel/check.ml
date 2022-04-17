@@ -63,7 +63,7 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EIndBool e           -> VIndBool (eval ctx e)
   | EW (a, (p, b))       -> let t = eval ctx a in W (t, (fresh p, closByVal ctx p t b))
   | ESup (a, b)          -> VSup (eval ctx a, eval ctx b)
-  | EIndW (a, b, c)      -> VIndW (eval ctx a, eval ctx b, eval ctx c)
+  | EIndW e              -> VIndW (eval ctx e)
   | EIm e                -> VIm (eval ctx e)
   | EInf e               -> inf (eval ctx e)
   | EJoin e              -> join (eval ctx e)
@@ -305,11 +305,12 @@ and app : value * value -> value = function
   | VApp (VApp (VIndBool _, a), _), VFalse -> a
   (* ind₂ C a b 1₂ ~> b *)
   | VApp (VApp (VIndBool _, _), b), VTrue -> b
-  (* indᵂ A B C g (sup A B x f) ~> g x f (λ (b : B x), indᵂ A B C g (f b)) *)
-  | VApp (VIndW (a, b, c), g), VApp (VApp (VSup (_, _), x), f) ->
+  (* indᵂ C g (sup A B x f) ~> g x f (λ (b : B x), indᵂ C g (f b)) *)
+  | VApp (VIndW c, g), VApp (VApp (VSup (_, _), x), f) ->
+    let b = snd (extW (fst (extPiG (inferV c)))) in
     app (app (app (g, x), f),
-      VLam (app (b, x), (freshName "b", fun y ->
-        app (VApp (VIndW (a, b, c), g), app (f, y)))))
+      VLam (snd b x, (freshName "b", fun y ->
+        app (VApp (VIndW c, g), app (f, y)))))
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
   | VApp (VIndIm _, f), VInf a -> app (f, a)
   | VApp (VIndIm (a, b), f), VHComp (_, r, u, u0) ->
@@ -384,7 +385,8 @@ and inferV v = traceInferV v; match v with
   | VIndUnit t -> recUnit t
   | VIndBool t -> recBool t
   | VSup (a, b) -> inferSup a b
-  | VIndW (a, b, c) -> inferIndW a b c
+  | VIndW c -> let (a, (p, b)) = extW (fst (extPiG (inferV c))) in
+    inferIndW a (VLam (a, (p, b))) c
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
@@ -492,7 +494,7 @@ and act rho = function
   | VIndBool v           -> VIndBool (act rho v)
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
-  | VIndW (a, b, c)      -> VIndW (act rho a, act rho b, act rho c)
+  | VIndW t              -> VIndW (act rho t)
   | VIm t                -> VIm (act rho t)
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
@@ -550,7 +552,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VTrue, VTrue -> true
     | VIndBool u, VIndBool v -> conv u v
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
-    | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> conv a1 a2 && conv b1 b2 && conv c1 c2
+    | VIndW t1, VIndW t2 -> conv t1 t2
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
@@ -697,15 +699,9 @@ and infer ctx e : value = traceInfer e; match e with
   | ESup (a, b) -> let t = eval ctx a in isType (infer ctx a);
     let (t', (p, g)) = extPiG (infer ctx b) in eqNf t t';
     isType (g (Var (p, t))); inferSup t (eval ctx b)
-  | EIndW (a, b, c) -> let t = eval ctx a in isType (infer ctx a);
-    let (t', (p, g)) = extPiG (infer ctx b) in
-    eqNf t t'; isType (g (Var (p, t)));
-
-    let (w', (q, h)) = extPiG (infer ctx c) in
-    eqNf (wtype t (eval ctx b)) w';
-    isType (h (Var (q, w')));
-
-    inferIndW t (eval ctx b) (eval ctx c)
+  | EIndW c ->
+    let (w, (x, t)) = extPiG (infer ctx c) in isType (t (Var (x, w)));
+    let (a, (p, b)) = extW w in inferIndW a (VLam (a, (p, b))) (eval ctx c)
   | EIm e -> let t = infer ctx e in isType t; t
   | EInf e -> VIm (infer ctx e)
   | EJoin e -> let t = extIm (infer ctx e) in ignore (extIm t); t

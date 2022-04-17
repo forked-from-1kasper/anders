@@ -6,11 +6,15 @@ open Rbv
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
-  | u -> raise (Internal (ExpectedPi (rbV u)))
+  | u          -> raise (Internal (ExpectedPi (rbV u)))
 
 let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
-  | u -> raise (Internal (ExpectedSig (rbV u)))
+  | u           -> raise (Internal (ExpectedSig (rbV u)))
+
+let extW : value -> value * clos = function
+  | W (t, g) -> (t, g)
+  | u        -> raise (Internal (ExpectedW (rbV u)))
 
 let extIm : value -> value = function
   | VIm v -> v
@@ -148,7 +152,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EIndBool e           -> EIndBool (salt ns e)
   | EW (a, (p, b))       -> saltTele eW ns p a b
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
-  | EIndW (a, b, c)      -> EIndW (salt ns a, salt ns b, salt ns c)
+  | EIndW e              -> EIndW (salt ns e)
   | EIm e                -> EIm (salt ns e)
   | EInf e               -> EInf (salt ns e)
   | EIndIm (a, b)        -> EIndIm (salt ns a, salt ns b)
@@ -213,7 +217,7 @@ let rec swap i j = function
   | VIndBool v           -> VIndBool (swap i j v)
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
-  | VIndW (a, b, c)      -> VIndW (swap i j a, swap i j b, swap i j c)
+  | VIndW e              -> VIndW (swap i j e)
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
@@ -232,13 +236,12 @@ let rec mem y = function
   | VType (_, Omega _) | VLevel | VHole | VI | VEmpty
   | VUnit | VStar | VBool | VFalse | VTrue -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
-  | VJ a | VOuc a | VGlue a | VIndEmpty a
-  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
+  | VJ a | VOuc a | VGlue a | VIndEmpty a | VIndUnit a
+  | VIndBool a | VIndW a | VIm a | VInf a | VJoin a -> mem y a
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VInc (a, b) | VSup (a, b)
   | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
-  | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
-  | VIndW (a, b, c) -> mem y a || mem y b || mem y c
+  | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
   | VFormula t -> memDisjunction y t
   | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts

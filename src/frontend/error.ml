@@ -19,6 +19,7 @@ let rec prettyPrintError : error -> string = function
   | Ineq (e1, e2)          -> Printf.sprintf "Type mismatch:\n  %s\nis not equal to\n  %s\n" (showExp e1) (showExp e2)
   | ExpectedPi x           -> Printf.sprintf "  %s\nexpected to be Pi-type\n" (showExp x)
   | ExpectedSig x          -> Printf.sprintf "  %s\nexpected to be Sigma-type\n" (showExp x)
+  | ExpectedW x            -> Printf.sprintf "  %s\nexpected to be W-type\n" (showExp x)
   | ExpectedType x         -> Printf.sprintf "  %s\nexpected to be universe\n" (showExp x)
   | ExpectedKan x          -> Printf.sprintf "  %s\nexpected to be fibrant universe\n" (showExp x)
   | ExpectedPath x         -> Printf.sprintf "“%s” expected to be a path.\n" (showExp x)

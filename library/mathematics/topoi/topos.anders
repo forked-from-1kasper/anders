@@ -1,16 +1,16 @@
-{- Topos Theory: https://homotopy.dev/mathematics/topoi/topos
-   - Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC;
-   - setSig, setPi, SET, Path;
-   - Topos, Set Topos.
+{- Topos:
+   — Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC.
+   — setSig, setPi, SET, Path.
+   — Topos, Set Topos.
    
    http://www.ams.org/notices/200409/what-is-illusie.pdf
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module topos where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
-import library/foundations/mltt/pi
 
 def epi (P : precategory) (X Y : P.C.ob) (f : P.C.hom X Y) : U :=
 Π (Z : P.C.ob) (g1 g2 : P.C.hom Y Z), Path (P.C.hom X Z) (P.P.∘ X Y Z f g1) (P.P.∘ X Y Z f g2) → Path (P.C.hom Y Z) g1 g2

@@ -1,14 +1,11 @@
-{- Category Theory.
-   - Categorical Groupoid.
+{- Groupoid.
 
-   HoTT 9.9 The Rezk completion
-
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module groupoid where
 import library/foundations/univalent/path
 import library/mathematics/categories/category
-option irrelevance true
 
 def PathCat (X : U) : cat := (X, λ (x y : X), PathP (<_> X) x y, star)
 

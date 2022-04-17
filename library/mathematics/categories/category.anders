@@ -1,23 +1,20 @@
-{- Category Theory: https://homotopy.dev/mathematics/categories/category/
-   - Precategories.
-   - Rezk Completion.
-   - Initial and Terminal Objects.
+{- Category Theory.
 
    HoTT 9.1 Categories and precategories
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module category where
 import library/foundations/univalent/path
-option irrelevance true
 
 def cat : U₁ := Σ (ob : U) (hom : ob → ob → U), unit
 
 def isPrecategory (C : cat) : U :=
-Σ (id : Π (x : C.ob), C.hom x x)
-  (∘ : Π (x y z : C.ob), C.hom x y → C.hom y z → C.hom x z)
-  (homSet : Π (x y : C.ob), isSet (C.hom x y))
-  (∘-left : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
+Σ (id      : Π (x : C.ob), C.hom x x)
+  (∘       : Π (x y z : C.ob), C.hom x y → C.hom y z → C.hom x z)
+  (homSet  : Π (x y : C.ob), isSet (C.hom x y))
+  (∘-left  : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
   (∘-right : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)
   (∘-assoc : Π (x y z w : C.ob) (f : C.hom x y) (g : C.hom y z) (h : C.hom z w),
     Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
@@ -25,13 +22,14 @@ def isPrecategory (C : cat) : U :=
 def precategory : U₁ := Σ (C : cat) (P : isPrecategory C), unit
 
 def catᵒᵖ (P : precategory) : precategory :=
-((P.C.ob, (λ (A B: P.C.ob), P.C.hom B A), P.C.2.2),
+((P.C.ob, (λ (A B : P.C.ob), P.C.hom B A), P.C.2.2),
  ((λ (A : P.C.ob), P.P.id A),
-  (λ (A B C: P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B), P.P.∘ C B A g f),
-  (λ (A B: P.C.ob), P.P.homSet B A),
-  (λ (A B: P.C.ob) (f: P.C.hom B A), P.P.∘-right B A f),
-  (λ (A B: P.C.ob) (f: P.C.hom B A), P.P.∘-left B A f),
-  (λ (A B C D: P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B) (h: P.C.hom D C), <i> (P.P.∘-assoc D C B A h g f) @ -i), star), star)
+  (λ (A B C : P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B), P.P.∘ C B A g f),
+  (λ (A B : P.C.ob), P.P.homSet B A),
+  (λ (A B : P.C.ob) (f : P.C.hom B A), P.P.∘-right B A f),
+  (λ (A B : P.C.ob) (f : P.C.hom B A), P.P.∘-left B A f),
+  (λ (A B C D : P.C.ob) (f : P.C.hom B A) (g : P.C.hom C B) (h : P.C.hom D C),
+    <i> (P.P.∘-assoc D C B A h g f) @ -i), P.P.2.2.2.2.2.2), P.2.2)
 
 def opPreserve (C : precategory) : PathP (<_> precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 
@@ -53,7 +51,7 @@ def homTo (P : precategory) (X : P.C.ob) : U := Σ (Y : P.C.ob), P.C.hom Y X
 def cospan (P : precategory) : U := Σ (X : P.C.ob) (_ : homTo P X), homTo P X
 
 def hasCospanCone (P : precategory) (D : cospan P) (w : P.C.ob) : U :=
-Σ (f: P.C.hom w D.2.1.1) (g: P.C.hom w D.2.2.1),
+Σ (f : P.C.hom w D.2.1.1) (g : P.C.hom w D.2.2.1),
   Path (P.C.hom w D.1) (P.P.∘ w D.2.1.1 D.1 f D.2.1.2) (P.P.∘ w D.2.2.1 D.1 g D.2.2.2)
 
 def cospanCone (P : precategory) (D : cospan P) : U := Σ (w : P.C.ob), hasCospanCone P D w

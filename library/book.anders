@@ -1,5 +1,4 @@
 module book where
-import library/foundations/mltt/pi
 import library/foundations/mltt/sigma
 import library/foundations/mltt/inductive
 import library/foundations/mltt/bool
@@ -17,12 +16,11 @@ import library/foundations/modal/infinitesimal
 import library/mathematics/algebra/algebra
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
-import library/mathematics/categories/abelian
 import library/mathematics/categories/groupoid
 import library/mathematics/topoi/topos
 import library/mathematics/geometry/bundle
 import library/mathematics/geometry/etale
-import library/mathematics/geometry/formalDisc
+import library/mathematics/geometry/disc
 import library/mathematics/homotopy/coequalizer
 import library/mathematics/homotopy/constcubes
 import library/mathematics/homotopy/pullback
@@ -33,8 +31,5 @@ import library/mathematics/homotopy/truncation
 import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/Sn
-import library/mathematics/homotopy/KGn
 
 import library/mathematics/meta/favonia
--- Impredicativity starts here
-import library/mathematics/meta/awodey

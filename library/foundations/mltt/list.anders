@@ -1,9 +1,5 @@
-{- Run-Time List Type: https://homotopy.dev/foundations/mltt/list/
-   - List;
-
-   HoTT 5.3 W-Types
-
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+{- Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module list where
 import library/foundations/mltt/maybe
@@ -39,10 +35,6 @@ List-case A (Maybe A) (nothing A) (λ (x : A), just A x)
 def tail (A : U) : List A → Maybe (List A) :=
 List-ind A (λ (_ : List A), Maybe (List A)) (nothing (List A))
            (λ (a : A) (x : List A) (_ : Maybe (List A)), just (List A) x)
-
-def z0 : List 𝟏 := nil 𝟏
-def z1 : List 𝟏 := cons 𝟏 ★ z0
-def z2 : List 𝟏 := cons 𝟏 ★ z1
 
 def append (A : U) : List A → List A → List A :=
 λ (x : List A), List-rec A (List A) x (λ (z : A) (_ : List A) (zs : List A), cons A z zs)

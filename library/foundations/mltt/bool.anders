@@ -1,10 +1,9 @@
-{- Run-time Homotopy-inductive types:
-   - Bool type (0-Sphere).
-   - Theorems are in bool_theory module.
+{- Bool (0-sphere).
 
-   HoTT 1.8 The type of booleans
+   HoTT 1.8 The type of booleans.
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
 
 module bool where
 
@@ -25,25 +24,19 @@ def 𝟐-η (c : 𝟐) : + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂) :
 ind₂ (λ (c : 𝟐), + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂))
      (0₂, <_> 0₂) (1₂, <_> 1₂) c
 
--- data 𝟐 : U := 0₂ | 1₂
-
 def not : 𝟐 → 𝟐 := rec₂ 𝟐 1₂ 0₂
 def and : 𝟐 → 𝟐 → 𝟐 := rec₂ (𝟐 → 𝟐) (const 𝟐 𝟐 0₂) (id 𝟐)
 def or  : 𝟐 → 𝟐 → 𝟐 := rec₂ (𝟐 → 𝟐) (id 𝟐) (const 𝟐 𝟐 1₂)
 def xor : 𝟐 → 𝟐 → 𝟐 := rec₂ (𝟐 → 𝟐) (id 𝟐) not
-
--- Bitlib
 
 def HA (a b : 𝟐) : 𝟐 × 𝟐 := (xor a b, and a b)
 def or² (a : 𝟐) (w : 𝟐 × 𝟐) : 𝟐 × 𝟐 := (w.1, or a w.2)
 def FA (a b cᵢₙ : 𝟐) : 𝟐 × 𝟐 := or² (HA a b).2 (HA (HA a b).1 cᵢₙ)
 def add-2bit (a b : 𝟐 × 𝟐) : 𝟐 × 𝟐 := ((FA a.1 b.1 (HA a.2 b.2).2).1, (HA a.2 b.2).1)
 
--- Church
-
 def bool′ := Π (α : U), α → α → α
 
 def true′  : bool′ := λ (α : U) (t f : α), t
 def false′ : bool′ := λ (α : U) (t f : α), f
 
-def ite (α : U) (a b : α) (f : bool′) : α := f α a b
+def ite′ (α : U) (a b : α) (f : bool′) : α := f α a b

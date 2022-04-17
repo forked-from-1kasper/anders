@@ -34,13 +34,13 @@ def isCCC (C : precategory) : U :=
   (P1 : Π (A B : C.C.ob), C.C.hom (Prod A B) A)
   (P2 : Π (A B : C.C.ob), C.C.hom (Prod A B) B), terminal C
 
-axiom Set : precategory
-axiom cartesianClosed : isCCC Set
-axiom hasSubobject : subobjectClassifier Set
+axiom 𝒮ℯ𝓉 : precategory
+axiom cartesianClosed : isCCC 𝒮ℯ𝓉
+axiom hasSubobject : subobjectClassifier 𝒮ℯ𝓉
 
 def Topos (cat : precategory) : U := Σ (cartesianClosed : isCCC cat), subobjectClassifier cat
-def internal : Topos Set := (cartesianClosed, hasSubobject)
-def presheaf (C : precategory) : U := catfunctor (catᵒᵖ C) Set
+def internal : Topos 𝒮ℯ𝓉 := (cartesianClosed, hasSubobject)
+def presheaf (C : precategory) : U := catfunctor (catᵒᵖ C) 𝒮ℯ𝓉
 def Co (C : precategory) (cod : C.C.ob) : U := Σ (dom : C.C.ob), C.C.hom dom cod
 def Delta (C : precategory) (d : C.C.ob) : U₁ := Σ (index : U), index → Co C d
 

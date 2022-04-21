@@ -103,6 +103,8 @@ rule main = parse
   | "hcomp"      -> HCOMP     | "Glue"            -> GLUE
   | "glue"       -> GLUEELEM  | "unglue"          -> UNGLUE
   | "W"          -> W         | "sup"             -> SUP
+  | "coeq"       -> COEQ      | "iota"            -> IOTA
+  | "resp"       -> RESP      | "ind-coeq"        -> INDCOEQ
   | "definition"              | "def"
   | "theorem"                 | "lemma"
   | "corollary"               | "proposition"     -> DEF

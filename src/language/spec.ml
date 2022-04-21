@@ -78,8 +78,6 @@ type exp =
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
   | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp                            (* W *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
-
-type extension =
   | ECoeq of exp * exp | EIota of exp * exp * exp                                 (* Coequalizer *)
   | EResp of exp * exp * exp | EIndCoeq of exp                                    (* Coequalizer *)
 

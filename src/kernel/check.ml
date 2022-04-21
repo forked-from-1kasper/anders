@@ -68,6 +68,10 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EInf e               -> inf (eval ctx e)
   | EJoin e              -> join (eval ctx e)
   | EIndIm (a, b)        -> VIndIm (eval ctx a, eval ctx b)
+  | ECoeq (f, g)         -> VCoeq (eval ctx f, eval ctx g)
+  | EIota (f, g, x)      -> VIota (eval ctx f, eval ctx g, eval ctx x)
+  | EResp (f, g, x)      -> VResp (eval ctx f, eval ctx g, eval ctx x)
+  | EIndCoeq e           -> VIndCoeq (eval ctx e)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)

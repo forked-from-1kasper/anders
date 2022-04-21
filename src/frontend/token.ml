@@ -35,6 +35,8 @@ let tokenToString : token -> string = function
   | INDBOOL    -> "INDBOOL"     | INDW       -> "W"
   | PLUGIN     -> "PLUGIN"      | IM         -> "IM"
   | INF        -> "INF"         | INDIM      -> "INDIM"
+  | COEQ       -> "COEQ"        | IOTA       -> "IOTA"
+  | RESP       -> "RESP"        | INDCOEQ    -> "INDCOEQ"
   | JOIN       -> "JOIN"        | SUCC       -> "SUCC"
   | ADD        -> "ADD"         | MAX        -> "MAX"
   | SECTION    -> "SECTION"     | END        -> "END"

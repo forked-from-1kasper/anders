@@ -157,6 +157,10 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EInf e               -> EInf (salt ns e)
   | EIndIm (a, b)        -> EIndIm (salt ns a, salt ns b)
   | EJoin e              -> EJoin (salt ns e)
+  | ECoeq (f, g)         -> ECoeq (salt ns f, salt ns g)
+  | EIota (f, g, x)      -> EIota (salt ns f, salt ns g, salt ns x)
+  | EResp (f, g, x)      -> EResp (salt ns f, salt ns g, salt ns x)
+  | EIndCoeq e           -> EIndCoeq (salt ns e)
 
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
@@ -222,6 +226,9 @@ let rec swap i j = function
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
   | VJoin v              -> VJoin (swap i j v)
+  | VCoeq (f, g)         -> VCoeq (swap i j f, swap i j g)
+  | VIota (f, g, x)      -> VIota (swap i j f, swap i j g, swap i j x)
+  | VIndCoeq v           -> VIndCoeq (swap i j v)
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -237,11 +244,12 @@ let rec mem y = function
   | VUnit | VStar | VBool | VFalse | VTrue -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VOuc a | VGlue a | VIndEmpty a | VIndUnit a
-  | VIndBool a | VIndW a | VIm a | VInf a | VJoin a -> mem y a
+  | VIndBool a | VIndW a | VIm a | VInf a | VJoin a | VIndCoeq a -> mem y a
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VInc (a, b) | VSup (a, b)
-  | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
-  | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c) -> mem y a || mem y b || mem y c
+  | VIndIm (a, b) | VPair (_, a, b) | VCoeq (a, b) -> mem y a || mem y b
+  | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
+  | VIota (a, b, c) | VResp (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
   | VFormula t -> memDisjunction y t
   | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts

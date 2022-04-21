@@ -26,14 +26,14 @@ import library/foundations/mltt/inductive
 
 {- Coequalizer Primitive -}
 
-axiom coequ (A B : U) (f g : A → B) : U
-axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
-axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))
-axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b)) :
-  (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
-axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
-  (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B) :
-  Path (X (ι₂ A B f g b)) (coequ-ind A B f g X i ρ (ι₂ A B f g b)) (i b)
+--axiom coequ (A B : U) (f g : A → B) : U
+--axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
+--axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))
+--axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b)) :
+--  (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
+--axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
+--  (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B) :
+--  Path (X (ι₂ A B f g b)) (coequ-ind A B f g X i ρ (ι₂ A B f g b)) (i b)
 
 -- coequ-ind-β₁ need to be definitional to write this properly (i.e. without transp)
 {-

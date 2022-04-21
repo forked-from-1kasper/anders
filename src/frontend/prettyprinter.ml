@@ -81,6 +81,10 @@ let rec ppExp paren e = let x = match e with
   | EInf e -> Printf.sprintf "ℑ-unit %s" (ppExp true e)
   | EJoin e -> Printf.sprintf "ℑ-join %s" (ppExp true e)
   | EIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppExp true a) (ppExp true b)
+  | ECoeq (f, g) -> Printf.sprintf "coeq %s %s" (ppExp true f) (ppExp true g)
+  | EIota (f, g, x) -> Printf.sprintf "iota %s %s %s" (ppExp true f) (ppExp true g) (ppExp true x)
+  | EResp (f, g, x) -> Printf.sprintf "resp %s %s %s" (ppExp true f) (ppExp true g) (ppExp true x)
+  | EIndCoeq e -> Printf.sprintf "ind-coeq %s" (ppExp true e)
   in match e with
   | ELevel | ELevelElem _ | EType (_, Omega _) | EType (_, Finite (ELevelElem _))
   | EVar _ | EFst _ | ESnd _ | EI | ESystem _ | EHole | EDir _ | EPair _

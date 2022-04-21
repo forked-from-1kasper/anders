@@ -100,6 +100,10 @@ struct
     | '\x51' -> EInf (exp ())
     | '\x52' -> let (t, f) = exp2 () in EIndIm (t, f)
     | '\x53' -> EJoin (exp ())
+    | '\x60' -> let (f, g) = exp2 () in ECoeq (f, g)
+    | '\x61' -> let (f, g, x) = exp3 () in EIota (f, g, x)
+    | '\x62' -> let (f, g, x) = exp3 () in EResp (f, g, x)
+    | '\x63' -> EIndCoeq (exp ())
     | _      -> failwith "Term?"
 
   and exp2 () = let a = exp () in let b = exp () in (a, b)

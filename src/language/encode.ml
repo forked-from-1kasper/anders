@@ -95,6 +95,10 @@ struct
     | EInf e               -> W.put '\x51'; exp e
     | EIndIm (t, f)        -> W.put '\x52'; exp2 t f
     | EJoin e              -> W.put '\x53'; exp e
+    | ECoeq (f, g)         -> W.put '\x60'; exp2 f g
+    | EIota (f, g, x)      -> W.put '\x61'; exp3 f g x
+    | EResp (f, g, x)      -> W.put '\x62'; exp3 f g x
+    | EIndCoeq e           -> W.put '\x63'; exp e
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c

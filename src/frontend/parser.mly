@@ -61,6 +61,7 @@
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
 %token IM INF INDIM JOIN
+%token COEQ IOTA RESP INDCOEQ
 %token SUCC ADD MAX
 %token SECTION END
 %token VARIABLES
@@ -131,6 +132,10 @@ exp4 :
   | IM exp6 { EIm $2 }
   | INF exp6 { EInf $2 }
   | INDIM exp6 exp6 { EIndIm ($2, $3) }
+  | COEQ exp6 exp6 { ECoeq ($2, $3) }
+  | IOTA exp6 exp6 exp6 { EIota ($2, $3, $4) }
+  | RESP exp6 exp6 exp6 { EResp ($2, $3, $4) }
+  | INDCOEQ exp6 { EIndCoeq $2 }
   | JOIN exp6 { EJoin $2 }
   | SUCC exp6 { ESucc $2 }
   | ADD exp6 exp6 { EAdd ($2, $3) }

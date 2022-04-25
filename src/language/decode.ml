@@ -159,6 +159,7 @@ struct
     | '\x15' -> InvalidOpt (string ())
     | '\x16' -> let p = string () in let x = string () in InvalidOptValue (p, x)
     | '\x17' -> ExpectedLevel (exp ())
+    | '\x18' -> let x = ident () in let e = exp () in ExpectedNonDependent (x, e)
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

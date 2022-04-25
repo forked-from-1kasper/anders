@@ -395,6 +395,7 @@ and inferV v = traceInferV v; match v with
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
+  | VCoeq (f, _) -> inferV (inferV f)
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
@@ -503,6 +504,10 @@ and act rho = function
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
   | VIndIm (a, b)        -> VIndIm (act rho a, act rho b)
+  | VCoeq (f, g)         -> VCoeq (act rho f, act rho g)
+  | VIota (f, g, x)      -> VIota (act rho f, act rho g, act rho x)
+  | VResp (f, g, x)      -> VResp (act rho f, act rho g, act rho x)
+  | VIndCoeq v           -> VIndCoeq (act rho v)
 
 and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
 
@@ -561,6 +566,10 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
     | VIndIm (a1, b1), VIndIm (a2, b2) -> conv a1 a2 && conv b1 b2
+    | VCoeq (f1, g1), VCoeq (f2, g2) -> conv f1 f2 && conv g1 g2
+    | VIota (f1, g1, x1), VIota (f2, g2, x2) -> conv f1 f2 && conv g1 g2 && conv x1 x2
+    | VResp (f1, g1, x1), VResp (f2, g2, x2) -> conv f1 f2 && conv g1 g2 && conv x1 x2
+    | VIndCoeq v1, VIndCoeq v2 -> conv v1 v2
     | _, _ -> false
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
@@ -712,6 +721,9 @@ and infer ctx e : value = traceInfer e; match e with
   | EIndIm (a, b) -> isType (infer ctx a); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     isType (g (Var (x, c))); inferIndIm t (eval ctx b)
+  | ECoeq (f, g) -> let (a, (p, h)) = extPiG (infer ctx f) in let b = h (Var (p, a)) in
+    if mem p b then raise (Internal (ExpectedNonDependent (p, rbV b)))
+    else check ctx g (implv a b); imax (inferV a) (inferV b)
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 and inferInd fibrant ctx t e f =

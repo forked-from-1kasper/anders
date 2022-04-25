@@ -117,29 +117,30 @@ type req =
   | Ping
 
 type error =
-  | Unknown          of string
-  | Ineq             of exp * exp
-  | ExpectedPi       of exp
-  | ExpectedSig      of exp
-  | ExpectedW        of exp
-  | ExpectedType     of exp
-  | ExpectedKan      of exp
-  | ExpectedPath     of exp
-  | ExpectedSubtype  of exp
-  | ExpectedSystem   of exp
-  | ExpectedFormula  of exp
-  | ExpectedIm       of exp
-  | ExpectedInf      of exp
-  | ExpectedGlue     of exp
-  | ExpectedSup      of exp
-  | DNFSolverError   of exp * dir
-  | AlreadyDeclared  of string
-  | VariableNotFound of ident
-  | InferError       of exp
-  | Traceback        of error * (exp * exp) list
-  | InvalidOpt       of string
-  | InvalidOptValue  of string * string
-  | ExpectedLevel    of exp
+  | Unknown              of string
+  | Ineq                 of exp * exp
+  | ExpectedPi           of exp
+  | ExpectedSig          of exp
+  | ExpectedW            of exp
+  | ExpectedType         of exp
+  | ExpectedKan          of exp
+  | ExpectedPath         of exp
+  | ExpectedSubtype      of exp
+  | ExpectedSystem       of exp
+  | ExpectedFormula      of exp
+  | ExpectedIm           of exp
+  | ExpectedInf          of exp
+  | ExpectedGlue         of exp
+  | ExpectedSup          of exp
+  | DNFSolverError       of exp * dir
+  | AlreadyDeclared      of string
+  | VariableNotFound     of ident
+  | InferError           of exp
+  | Traceback            of error * (exp * exp) list
+  | InvalidOpt           of string
+  | InvalidOptValue      of string * string
+  | ExpectedLevel        of exp
+  | ExpectedNonDependent of ident * exp
 
 type resp =
   | Version of int64 * int64 * int64

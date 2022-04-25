@@ -228,6 +228,7 @@ let rec swap i j = function
   | VJoin v              -> VJoin (swap i j v)
   | VCoeq (f, g)         -> VCoeq (swap i j f, swap i j g)
   | VIota (f, g, x)      -> VIota (swap i j f, swap i j g, swap i j x)
+  | VResp (f, g, x)      -> VResp (swap i j f, swap i j g, swap i j x)
   | VIndCoeq v           -> VIndCoeq (swap i j v)
 
 let memAtom y = fun (x, _) -> x = y

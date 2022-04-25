@@ -124,29 +124,30 @@ struct
     | Ping             -> W.put '\x32'
 
   let rec error = function
-    | Unknown x              -> W.put '\x01'; string x
-    | Ineq (e1, e2)          -> W.put '\x02'; exp2 e1 e2
-    | ExpectedPi e           -> W.put '\x03'; exp e
-    | ExpectedSig e          -> W.put '\x04'; exp e
-    | ExpectedW e            -> W.put '\x05'; exp e
-    | ExpectedType e         -> W.put '\x06'; exp e
-    | ExpectedKan e          -> W.put '\x07'; exp e
-    | ExpectedPath e         -> W.put '\x08'; exp e
-    | ExpectedSubtype e      -> W.put '\x09'; exp e
-    | ExpectedSystem e       -> W.put '\x0A'; exp e
-    | ExpectedFormula e      -> W.put '\x0B'; exp e
-    | ExpectedIm e           -> W.put '\x0C'; exp e
-    | ExpectedInf e          -> W.put '\x0D'; exp e
-    | ExpectedGlue e         -> W.put '\x0E'; exp e
-    | ExpectedSup e          -> W.put '\x0F'; exp e
-    | DNFSolverError (e, d)  -> W.put '\x10'; exp e; dir d
-    | AlreadyDeclared x      -> W.put '\x11'; string x
-    | VariableNotFound x     -> W.put '\x12'; ident x
-    | InferError e           -> W.put '\x13'; exp e
-    | Traceback (e, es)      -> W.put '\x14'; error e; int (List.length es); List.iter (uncurry exp2) es
-    | InvalidOpt p           -> W.put '\x15'; string p
-    | InvalidOptValue (p, x) -> W.put '\x16'; string p; string x
-    | ExpectedLevel e        -> W.put '\x17'; exp e
+    | Unknown x                   -> W.put '\x01'; string x
+    | Ineq (e1, e2)               -> W.put '\x02'; exp2 e1 e2
+    | ExpectedPi e                -> W.put '\x03'; exp e
+    | ExpectedSig e               -> W.put '\x04'; exp e
+    | ExpectedW e                 -> W.put '\x05'; exp e
+    | ExpectedType e              -> W.put '\x06'; exp e
+    | ExpectedKan e               -> W.put '\x07'; exp e
+    | ExpectedPath e              -> W.put '\x08'; exp e
+    | ExpectedSubtype e           -> W.put '\x09'; exp e
+    | ExpectedSystem e            -> W.put '\x0A'; exp e
+    | ExpectedFormula e           -> W.put '\x0B'; exp e
+    | ExpectedIm e                -> W.put '\x0C'; exp e
+    | ExpectedInf e               -> W.put '\x0D'; exp e
+    | ExpectedGlue e              -> W.put '\x0E'; exp e
+    | ExpectedSup e               -> W.put '\x0F'; exp e
+    | DNFSolverError (e, d)       -> W.put '\x10'; exp e; dir d
+    | AlreadyDeclared x           -> W.put '\x11'; string x
+    | VariableNotFound x          -> W.put '\x12'; ident x
+    | InferError e                -> W.put '\x13'; exp e
+    | Traceback (e, es)           -> W.put '\x14'; error e; int (List.length es); List.iter (uncurry exp2) es
+    | InvalidOpt p                -> W.put '\x15'; string p
+    | InvalidOptValue (p, x)      -> W.put '\x16'; string p; string x
+    | ExpectedLevel e             -> W.put '\x17'; exp e
+    | ExpectedNonDependent (x, e) -> W.put '\x18'; ident x; exp e
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

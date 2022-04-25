@@ -26,6 +26,8 @@ import library/foundations/mltt/inductive
 
 {- Coequalizer Primitive -}
 
+def coeq′ (A B : U) (f g : A → B) : U := coeq f g
+
 --axiom coequ (A B : U) (f g : A → B) : U
 --axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
 --axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))

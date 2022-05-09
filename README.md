@@ -22,26 +22,21 @@ type exp =
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
 ```
 
-Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
-CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
-HTS sctrict equality on pretypes; de Rham stack modality primitives.
-We tend not to touch general recursive higher inductive schemes yet,
-instead we will try to express as much HIT as possible through W,
-Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
+Anders is a HoTT proof assistant based on [CCHM](https://arxiv.org/pdf/1611.02108.pdf)
+in flavour of [Cubical Agda](https://agda.readthedocs.io/en/v2.6.2.1/language/cubical.html)
+plus strict equality for 2LTT and ℑ modality for synthetic differential geometry.
 
 Features
 --------
 
-* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy.
-* Pretypes hierarchy Vₙ.
-* Generalized Transport and Homogeneous Composition core Kan operations.
-* Partial Elements.
-* Cubical Subtypes.
+* 𝟎, 𝟏, 𝟐, W.
+* Pretypes & strict equality.
+* Generalized Transport and Homogeneous Composition as primitive Kan operations.
+* Cubical subtypes.
 * Glue types.
-* Strict Equality on pretypes.
 * Coequalizer.
-* Infinitesimal Shape Modality (de Rham Stack).
-* UTF-8 support including universe levels.
+* ℑ modality.
+* UTF-8 support including universe levels (i.e. `U₁₂₃`).
 * Lean syntax for ΠΣW.
 * Poor man’s records as Σ with named accessors to telescope variables.
 * 1D syntax with top-level declarations.
@@ -74,7 +69,7 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 ```
 
 ```shell
-$ anders check library/book.anders
+$ anders check library/everything.anders
 ```
 
 ## Related publications

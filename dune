@@ -1,31 +1,37 @@
 (env (dev (flags (:standard -warn-error -A))))
 
-(install (files library/foundations/mltt/proto.anders
-                library/foundations/mltt/bool.anders
-                library/foundations/mltt/inductive.anders
-                library/foundations/mltt/list.anders
-                library/foundations/mltt/sigma.anders
-                library/foundations/univalent/path.anders
-                library/foundations/univalent/prop.anders
-                library/foundations/univalent/equiv.anders
-                library/foundations/univalent/iso.anders
-                library/foundations/modal/infinitesimal.anders
+(install (files library/proto.anders
+                library/data/sigma.anders
+                library/data/W-type.anders
+                library/data/bool.anders
+                library/data/either.anders
+                library/data/maybe.anders
+                library/data/nat.anders
+                library/data/list.anders
+                library/data/fin.anders
+                library/data/vec.anders
+                library/data/path.anders
+                library/data/equiv.anders
+                library/data/iso.anders
+                library/mathematics/prop.anders
                 library/mathematics/algebra/algebra.anders
                 library/mathematics/categories/category.anders
                 library/mathematics/categories/functor.anders
                 library/mathematics/categories/groupoid.anders
-                library/mathematics/meta/favonia.anders
-                library/mathematics/geometry/bundle.anders
-                library/mathematics/geometry/etale.anders
-                library/mathematics/geometry/disc.anders
-                library/mathematics/homotopy/coequalizer.anders
-                library/mathematics/homotopy/constcubes.anders
-                library/mathematics/homotopy/pullback.anders
-                library/mathematics/homotopy/pushout.anders
-                library/mathematics/homotopy/hubSpokes.anders
-                library/mathematics/homotopy/quotient.anders
-                library/mathematics/homotopy/truncation.anders
-                library/mathematics/homotopy/suspension.anders
-                library/mathematics/homotopy/S1.anders
-                library/mathematics/homotopy/Sn.anders)
+                library/mathematics/glivenko.anders
+                library/mathematics/bundle.anders
+                library/mathematics/constcubes.anders
+                library/mathematics/pullback.anders
+                library/data/coequalizer.anders
+                library/data/pushout.anders
+                library/data/hubSpokes.anders
+                library/data/quotient.anders
+                library/data/truncation.anders
+                library/data/suspension.anders
+                library/data/S1.anders
+                library/data/Sn.anders
+                library/modal/infinitesimal.anders
+                library/modal/etale.anders
+                library/modal/disc.anders
+                library/mathematics/favonia.anders)
          (section share) (package anders))

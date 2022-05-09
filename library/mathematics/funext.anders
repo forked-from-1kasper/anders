@@ -1,0 +1,33 @@
+{- Function extensionality.
+
+   HoTT 2.9 Pi-types and the function extensionality axiom.
+
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment -}
+
+module funext where
+import library/data/path
+
+section
+  variables (A B : U) (f g : A → B)
+
+  def funext (p : Π (x : A), Path B (f x) (g x)) : Path (A → B) f g := <i> λ (a : A), p a @ i
+  def happly (p : Path (A → B) f g) (x : A) : Path B (f x) (g x) := ap (A → B) B (λ (h : A → B), h x) f g p
+
+  def funext-β (p : Π (x : A), Path B (f x) (g x)) : Π (x : A), Path B (f x) (g x) := λ (x : A), happly A B f g (funext A B f g p) x
+  def funext-η (p : Path (A → B) f g) : Path (Path (A → B) f g) (funext A B f g (happly A B f g p)) p := idp (Path (A → B) f g) p
+end
+
+def Π-ext (A : U) (B : A → U) (f g : Π (x : A), B x)
+  (p : Π (x : A), Path (B x) (f x) (g x)) : Path (Π (y : A), B y) f g :=
+<i> λ (a : A), (p a) @ i
+
+def Π-hset (A : U) (B : A → U) (h : Π (x : A), isSet (B x)) (f g : Π (x : A), B x)
+  (p q : Path (Π (x : A), B x) f g) : Path (Path (Π (x : A), B x) f g) p q :=
+<i j> λ (x : A), (h x (f x) (g x) (<i> (p @ i) x) (<i> (q @ i) x)) @ i @ j
+
+def →-hset′ (X Y : U) (p : X → isSet Y) : isSet (X → Y) := Π-hset X (λ (x : X), Y) p
+def →-hset (A B : U) (H : isSet B) : isSet (A → B) := →-hset′ A B (λ (x : A), H)
+
+def Π-contr (A : U) (B : A → U) (u : isContr A) (q : Π (x : A), isContr (B x)) : isContr (Π (x : A), B x) :=
+((λ (x : A), (q x).1), (λ (z : Π (x : A), B x), <i> λ (a : A), (q a).2 (z a) @ i))

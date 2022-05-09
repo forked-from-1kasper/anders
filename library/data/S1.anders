@@ -1,0 +1,6 @@
+module S1 where
+import library/data/coequalizer
+
+def S¹ : U := coeq (id 𝟏) (id 𝟏)
+--def base : S¹ := ι₂ 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
+--def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★ 

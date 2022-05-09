@@ -1,0 +1,33 @@
+{- Fiber Bundle:
+   — Fiber Bundle.
+   — Trivial Fiber Bundle.
+
+   HoTT 2.3 Type families are fibrations
+
+   Copyright © Groupoid Infinity, 2021—2022,
+             © @siegment, 2022 -}
+
+module bundle where
+
+import library/data/iso
+import library/data/path
+import library/data/sigma
+import library/mathematics/pullback
+import library/data/truncation
+
+def encode-Π (B : U) (F : B → U) (y : B) : fiber (Sigma B F) B (pr₁ B F) y → F y :=
+λ (x : fiber (Sigma B F) B (pr₁ B F) y), subst B F x.1.1 y (<i> x.2 @ -i) x.1.2
+
+def decode-Π (B : U) (F : B → U) (y : B) : F y → fiber (Sigma B F) B (pr₁ B F) y :=
+λ (x : F y), ((y, x), idp B y)
+
+def decode-encode-Π (B : U) (F : B → U) (y : B) (x : F y) : Path (F y) (transp (<i> F (idp B y @ i)) 0 x) x :=
+<j> transp (<i> F y) j x
+
+def encode-decode-Π (B : U) (F : B → U) (y : B) (x : fiber (Sigma B F) B (pr₁ B F) y) :
+  Path (fiber (Sigma B F) B (pr₁ B F) y) ((y, encode-Π B F y x), idp B y) x :=
+<i> ((x.2 @ i, transp (<j> F (x.2 @ i ∨ -j)) i x.1.2), <j> x.2 @ i ∧ j)
+
+theorem fiber-is-Π (B : U) (F : B → U) (y : B) : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y) :=
+iso→path (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode-Π B F y) (decode-Π B F y)
+  (decode-encode-Π B F y) (encode-decode-Π B F y)

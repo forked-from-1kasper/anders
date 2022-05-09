@@ -1,4 +1,5 @@
-module book where
+module everything where
+
 import library/data/sigma
 import library/data/W-type
 import library/data/bool

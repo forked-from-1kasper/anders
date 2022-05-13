@@ -45,3 +45,24 @@ def coeq-ind-β₂ (A B : U) (f g : A → B) (X : coeq f g → U) (i : Π (b : B
   Path (PathP (<j> X (resp f g x j)) (i (f x)) (i (g x)))
        (<j> coeq-ind′ A B f g X i ρ (resp f g x j)) (ρ x) :=
 <_> ρ x
+
+section
+  variables (A B : I → U) (f g : Π (i : I), A i → B i)
+
+  def trans-coeq-iota (x : B 0) : coeq (f 1) (g 1) :=
+  iota (f 1) (g 1) (transp (<i> B i) 0 x)
+
+  def trans-coeq-iota′ (x : B 0) : coeq (f 1) (g 1) :=
+  transp (<i> coeq (f i) (g i)) 0 (iota (f 0) (g 0) x)
+
+  def trans-coeq-resp (x : A 0) (φ : I) : coeq (f 1) (g 1) :=
+  hcomp (coeq (f 1) (g 1)) (∂ φ)
+    (λ (j : I), [(φ = 0) → iota (f 1) (g 1) (transp (<k> B (-j ∨ k)) -j
+                                (f -j (transp (<k> A (k ∧ -j)) j x))),
+                 (φ = 1) → iota (f 1) (g 1) (transp (<k> B (-j ∨ k)) -j
+                                (g -j (transp (<k> A (k ∧ -j)) j x)))])
+    (resp (f 1) (g 1) (transp (<i> A i) 0 x) φ)
+
+  def trans-coeq-resp′ (x : A 0) (φ : I) : coeq (f 1) (g 1) :=
+  transp (<i> coeq (f i) (g i)) 0 (resp (f 0) (g 0) x φ)
+end

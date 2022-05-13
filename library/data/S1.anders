@@ -1,6 +1,34 @@
 module S1 where
+
 import library/data/coequalizer
+import library/mathematics/constcubes
+
+-- https://github.com/mortberg/cubicaltt/blob/master/examples/circle.ctt
 
 def S¹ : U := coeq (id 𝟏) (id 𝟏)
 def base : S¹ := iota (id 𝟏) (id 𝟏) ★
 def loop : Path S¹ base base := <i> resp (id 𝟏) (id 𝟏) ★ i
+
+def Ω¹S¹ := Path S¹ base base
+
+section
+  variables (B : S¹ → U) (b : B base) (ℓ : PathP (<i> B (loop @ i)) b b)
+
+  def S¹-ind-lem := ind₁ (λ (x : 𝟏), B (iota (id 𝟏) (id 𝟏) x)) b
+
+  def S¹-ind : Π (x : S¹), B x :=
+  coeq-ind′ 𝟏 𝟏 (id 𝟏) (id 𝟏) B (S¹-ind-lem B b ℓ)
+    (ind₁ (λ (x : 𝟏), PathP (<i> B (resp (id 𝟏) (id 𝟏) x i))
+                            (S¹-ind-lem B b ℓ x) (S¹-ind-lem B b ℓ x)) ℓ)
+end
+
+def S¹-rec (B : U) : Π (b : B) (ℓ : Path B b b), S¹ → B := S¹-ind (λ (_ : S¹), B)
+
+def rot := S¹-ind (λ (x : S¹), Path S¹ x x) loop (cs S¹ base loop)
+def mul (x : S¹) : S¹ → S¹ := S¹-rec S¹ x (rot x)
+def square (x : S¹) := mul x x
+
+def double-loop (ℓ : Ω¹S¹) : Ω¹S¹ := <i> square (ℓ @ i)
+def triple-loop (ℓ : Ω¹S¹) : Ω¹S¹ := <i> mul (ℓ @ i) (square (ℓ @ i))
+
+def com-S¹ : Ω¹S¹ → Ω¹S¹ → Ω¹S¹ := comp-Path S¹ base base base

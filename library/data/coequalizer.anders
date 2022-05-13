@@ -27,9 +27,10 @@ import library/data/W-type
 {- Coequalizer Primitive -}
 
 def coeq′ (A B : U) (f g : A → B) : U := coeq f g
+def iota′ (A B : U) (f g : A → B) (x : B) : coeq f g := iota f g x
+def resp′ (A B : U) (f g : A → B) (x : A) : Path (coeq f g) (iota f g (f x)) (iota f g (g x)) :=
+<i> resp f g x i
 
---axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
---axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))
 --axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b)) :
 --  (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
 --axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))

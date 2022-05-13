@@ -325,6 +325,10 @@ and app : value * value -> value = function
   (* ind-ℑ A B (λ _, b) x ~> b *)
   | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
+  (* resp f g x 0 ~> iota f g (f x) *)
+  | VResp (f, g, x), VFormula ks when bot ks -> VIota (f, g, app (f, x))
+  (* resp f g x 1 ~> iota f g (g x) *)
+  | VResp (f, g, x), VFormula ks when top ks -> VIota (f, g, app (g, x))
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
@@ -396,6 +400,8 @@ and inferV v = traceInferV v; match v with
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
   | VCoeq (f, _) -> inferV (inferV f)
+  | VIota (f, g, _) -> VCoeq (f, g)
+  | VResp (f, g, _) -> implv VI (VCoeq (f, g))
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
@@ -721,10 +727,17 @@ and infer ctx e : value = traceInfer e; match e with
   | EIndIm (a, b) -> isType (infer ctx a); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     isType (g (Var (x, c))); inferIndIm t (eval ctx b)
-  | ECoeq (f, g) -> let (a, (p, h)) = extPiG (infer ctx f) in let b = h (Var (p, a)) in
-    if mem p b then raise (Internal (ExpectedNonDependent (p, rbV b)))
-    else check ctx g (implv a b); imax (inferV a) (inferV b)
+  | ECoeq (f, g) -> let (a, b) = inferCoeqType ctx f g in imax (inferV a) (inferV b)
+  | EIota (f, g, x) -> let (_, b) = inferCoeqType ctx f g in
+    check ctx x b; VCoeq (eval ctx f, eval ctx g)
+  | EResp (f, g, x) -> let (a, _) = inferCoeqType ctx f g in
+    check ctx x a; implv VI (VCoeq (eval ctx f, eval ctx g))
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
+
+and inferCoeqType ctx f g =
+  let (a, (p, h)) = extPiG (infer ctx f) in let b = h (Var (p, a)) in
+  if mem p b then raise (Internal (ExpectedNonDependent (p, rbV b)))
+  else check ctx g (implv a b); (a, b)
 
 and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in

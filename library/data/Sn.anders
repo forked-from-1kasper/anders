@@ -5,4 +5,4 @@ import library/data/suspension
 
 option girard true
 
-def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
+def sphere : ℕ → U := ℕ-iter U 𝟐 ∑

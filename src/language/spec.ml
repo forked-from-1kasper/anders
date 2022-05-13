@@ -79,7 +79,7 @@ type exp =
   | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp                            (* W *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
   | ECoeq of exp * exp | EIota of exp * exp * exp                                 (* Coequalizer *)
-  | EResp of exp * exp * exp | EIndCoeq of exp                                    (* Coequalizer *)
+  | EResp of exp * exp * exp | EIndCoeq of exp * exp * exp                        (* Coequalizer *)
 
 type tele = ident * exp
 
@@ -141,6 +141,7 @@ type error =
   | InvalidOptValue      of string * string
   | ExpectedLevel        of exp
   | ExpectedNonDependent of ident * exp
+  | ExpectedCoeq         of exp
 
 type resp =
   | Version of int64 * int64 * int64

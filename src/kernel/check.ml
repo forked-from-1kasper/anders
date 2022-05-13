@@ -71,7 +71,7 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | ECoeq (f, g)         -> VCoeq (eval ctx f, eval ctx g)
   | EIota (f, g, x)      -> VIota (eval ctx f, eval ctx g, eval ctx x)
   | EResp (f, g, x)      -> VResp (eval ctx f, eval ctx g, eval ctx x)
-  | EIndCoeq e           -> VIndCoeq (eval ctx e)
+  | EIndCoeq (e, i, r)   -> VIndCoeq (eval ctx e, eval ctx i, eval ctx r)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -329,6 +329,10 @@ and app : value * value -> value = function
   | VResp (f, g, x), VFormula ks when bot ks -> VIota (f, g, app (f, x))
   (* resp f g x 1 ~> iota f g (g x) *)
   | VResp (f, g, x), VFormula ks when top ks -> VIota (f, g, app (g, x))
+  (* coeq-ind B ι ρ (iota f g x) ~> ι x *)
+  | VIndCoeq (_, i, _), VIota (_, _, x) -> app (i, x)
+  (* coeq-ind B ι ρ (resp f g x i) ~> ρ x i *)
+  | VIndCoeq (_, _, r), VApp (VResp (_, _, x), i) -> app (app (r, x), i)
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
@@ -402,6 +406,7 @@ and inferV v = traceInferV v; match v with
   | VCoeq (f, _) -> inferV (inferV f)
   | VIota (f, g, _) -> VCoeq (f, g)
   | VResp (f, g, _) -> implv VI (VCoeq (f, g))
+  | VIndCoeq (v, _, _) -> let (f, g) = extCoeq (fst (extPiG (inferV v))) in inferIndCoeq f g v
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
@@ -428,6 +433,9 @@ and inferIndW a b c = let t = wtype a b in
 and inferIndIm a b =
   implv (VPi (a, (freshName "a", fun x -> VIm (app (b, inf x)))))
         (VPi (VIm a, (freshName "a", fun x -> VIm (app (b, x)))))
+
+and inferIndCoeq f g v =
+  VPi (VCoeq (f, g), (freshName "x", fun x -> app (v, x)))
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
@@ -513,7 +521,7 @@ and act rho = function
   | VCoeq (f, g)         -> VCoeq (act rho f, act rho g)
   | VIota (f, g, x)      -> VIota (act rho f, act rho g, act rho x)
   | VResp (f, g, x)      -> VResp (act rho f, act rho g, act rho x)
-  | VIndCoeq v           -> VIndCoeq (act rho v)
+  | VIndCoeq (v, i, r)   -> VIndCoeq (act rho v, act rho i, act rho r)
 
 and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
 
@@ -575,7 +583,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VCoeq (f1, g1), VCoeq (f2, g2) -> conv f1 f2 && conv g1 g2
     | VIota (f1, g1, x1), VIota (f2, g2, x2) -> conv f1 f2 && conv g1 g2 && conv x1 x2
     | VResp (f1, g1, x1), VResp (f2, g2, x2) -> conv f1 f2 && conv g1 g2 && conv x1 x2
-    | VIndCoeq v1, VIndCoeq v2 -> conv v1 v2
+    | VIndCoeq (v1, i1, r1), VIndCoeq (v2, i2, r2) -> conv v1 v2 && conv i1 i2 && conv r1 r2
     | _, _ -> false
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
@@ -732,6 +740,22 @@ and infer ctx e : value = traceInfer e; match e with
     check ctx x b; VCoeq (eval ctx f, eval ctx g)
   | EResp (f, g, x) -> let (a, _) = inferCoeqType ctx f g in
     check ctx x a; implv VI (VCoeq (eval ctx f, eval ctx g))
+  | EIndCoeq (e, i, r) -> let (t, (x, k)) = extPiG (infer ctx e) in
+    isKan (k (Var (x, t))); let (f, g) = extCoeq t in
+
+    let (a, (y, h)) = extPiG (inferV f) in let b = h (Var (y, a)) in
+
+    let v = eval ctx e in
+    check ctx i (VPi (b, (freshName "b", fun b -> app (v, VIota (f, g, b)))));
+    check ctx r (VPi (a, (freshName "x", fun x ->
+      VPi (VI, (freshName "ι", fun i -> app (v, VApp (VResp (f, g, x), i)))))));
+
+    let w = Var (freshName "x", a) in
+    let i' = eval ctx i in let r' = eval ctx r in
+    eqNf (app (app (r', w), vzero)) (app (i', app (f, w)));
+    eqNf (app (app (r', w), vone))  (app (i', app (g, w)));
+
+    inferIndCoeq f g v
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 and inferCoeqType ctx f g =

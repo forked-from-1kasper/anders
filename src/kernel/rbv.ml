@@ -74,6 +74,6 @@ let rec rbV v = match v with
   | VCoeq (f, g)         -> ECoeq (rbV f, rbV g)
   | VIota (f, g, x)      -> EIota (rbV f, rbV g, rbV x)
   | VResp (f, g, x)      -> EResp (rbV f, rbV g, rbV x)
-  | VIndCoeq v           -> EIndCoeq (rbV v)
+  | VIndCoeq (v, i, r)   -> EIndCoeq (rbV v, rbV i, rbV r)
 
 and rbVTele ctor t (p, g) = let x = Var (p, t) in ctor p (rbV t) (rbV (g x))

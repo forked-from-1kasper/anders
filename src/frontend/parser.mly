@@ -135,7 +135,7 @@ exp4 :
   | COEQ exp6 exp6 { ECoeq ($2, $3) }
   | IOTA exp6 exp6 exp6 { EIota ($2, $3, $4) }
   | RESP exp6 exp6 exp6 { EResp ($2, $3, $4) }
-  | INDCOEQ exp6 { EIndCoeq $2 }
+  | INDCOEQ exp6 exp6 exp6 { EIndCoeq ($2, $3, $4) }
   | JOIN exp6 { EJoin $2 }
   | SUCC exp6 { ESucc $2 }
   | ADD exp6 exp6 { EAdd ($2, $3) }

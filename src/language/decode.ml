@@ -103,7 +103,7 @@ struct
     | '\x60' -> let (f, g) = exp2 () in ECoeq (f, g)
     | '\x61' -> let (f, g, x) = exp3 () in EIota (f, g, x)
     | '\x62' -> let (f, g, x) = exp3 () in EResp (f, g, x)
-    | '\x63' -> EIndCoeq (exp ())
+    | '\x63' -> let (e, i, r) = exp3 () in EIndCoeq (e, i, r)
     | _      -> failwith "Term?"
 
   and exp2 () = let a = exp () in let b = exp () in (a, b)
@@ -160,6 +160,7 @@ struct
     | '\x16' -> let p = string () in let x = string () in InvalidOptValue (p, x)
     | '\x17' -> ExpectedLevel (exp ())
     | '\x18' -> let x = ident () in let e = exp () in ExpectedNonDependent (x, e)
+    | '\x19' -> ExpectedCoeq (exp ())
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

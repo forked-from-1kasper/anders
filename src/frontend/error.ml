@@ -27,6 +27,7 @@ let rec prettyPrintError : error -> string = function
   | ExpectedSystem x            -> Printf.sprintf "  %s\nexpected to be a system\n" (showExp x)
   | ExpectedFormula x           -> Printf.sprintf "“%s” expected to be a formula\n" (showExp x)
   | ExpectedIm x                -> Printf.sprintf "“%s” expected to be a modality" (showExp x)
+  | ExpectedCoeq x              -> Printf.sprintf "“%s” expected to be a coequalizer" (showExp x)
   | ExpectedInf x               -> Printf.sprintf "“%s” expected to be a unit of modality" (showExp x)
   | ExpectedGlue x              -> Printf.sprintf "“%s” expected to be a Glue-type" (showExp x)
   | ExpectedSup x               -> Printf.sprintf "“%s” expected to be a sup" (showExp x)

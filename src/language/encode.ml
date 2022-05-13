@@ -98,7 +98,7 @@ struct
     | ECoeq (f, g)         -> W.put '\x60'; exp2 f g
     | EIota (f, g, x)      -> W.put '\x61'; exp3 f g x
     | EResp (f, g, x)      -> W.put '\x62'; exp3 f g x
-    | EIndCoeq e           -> W.put '\x63'; exp e
+    | EIndCoeq (e, i, r)   -> W.put '\x63'; exp3 e i r
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c
@@ -148,6 +148,7 @@ struct
     | InvalidOptValue (p, x)      -> W.put '\x16'; string p; string x
     | ExpectedLevel e             -> W.put '\x17'; exp e
     | ExpectedNonDependent (x, e) -> W.put '\x18'; ident x; exp e
+    | ExpectedCoeq e              -> W.put '\x19'; exp e
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

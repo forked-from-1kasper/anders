@@ -20,6 +20,10 @@ let extIm : value -> value = function
   | VIm v -> v
   | v     -> raise (Internal (ExpectedIm (rbV v)))
 
+let extCoeq : value -> value * value = function
+  | VCoeq (f, g) -> (f, g)
+  | u            -> raise (Internal (ExpectedCoeq (rbV u)))
+
 let extInf : value -> value = function
   | VInf v -> v
   | v      -> raise (Internal (ExpectedInf (rbV v)))
@@ -160,7 +164,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | ECoeq (f, g)         -> ECoeq (salt ns f, salt ns g)
   | EIota (f, g, x)      -> EIota (salt ns f, salt ns g, salt ns x)
   | EResp (f, g, x)      -> EResp (salt ns f, salt ns g, salt ns x)
-  | EIndCoeq e           -> EIndCoeq (salt ns e)
+  | EIndCoeq (e, i, r)   -> EIndCoeq (salt ns e, salt ns i, salt ns r)
 
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
@@ -229,7 +233,7 @@ let rec swap i j = function
   | VCoeq (f, g)         -> VCoeq (swap i j f, swap i j g)
   | VIota (f, g, x)      -> VIota (swap i j f, swap i j g, swap i j x)
   | VResp (f, g, x)      -> VResp (swap i j f, swap i j g, swap i j x)
-  | VIndCoeq v           -> VIndCoeq (swap i j v)
+  | VIndCoeq (v, k, r)   -> VIndCoeq (swap i j v, swap i j k, swap i j r)
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -245,12 +249,12 @@ let rec mem y = function
   | VUnit | VStar | VBool | VFalse | VTrue -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VOuc a | VGlue a | VIndEmpty a | VIndUnit a
-  | VIndBool a | VIndW a | VIm a | VInf a | VJoin a | VIndCoeq a -> mem y a
+  | VIndBool a | VIndW a | VIm a | VInf a | VJoin a -> mem y a
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VInc (a, b) | VSup (a, b)
   | VIndIm (a, b) | VPair (_, a, b) | VCoeq (a, b) -> mem y a || mem y b
   | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
-  | VIota (a, b, c) | VResp (a, b, c) -> mem y a || mem y b || mem y c
+  | VIota (a, b, c) | VResp (a, b, c) | VIndCoeq (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
   | VFormula t -> memDisjunction y t
   | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts

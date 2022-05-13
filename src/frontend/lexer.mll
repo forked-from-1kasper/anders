@@ -104,7 +104,7 @@ rule main = parse
   | "glue"       -> GLUEELEM  | "unglue"          -> UNGLUE
   | "W"          -> W         | "sup"             -> SUP
   | "coeq"       -> COEQ      | "iota"            -> IOTA
-  | "resp"       -> RESP      | "ind-coeq"        -> INDCOEQ
+  | "resp"       -> RESP      | "coeq-ind"        -> INDCOEQ
   | "definition"              | "def"
   | "theorem"                 | "lemma"
   | "corollary"               | "proposition"     -> DEF

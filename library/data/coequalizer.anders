@@ -55,6 +55,10 @@ section
   def trans-coeq-iota′ (x : B 0) : coeq (f 1) (g 1) :=
   transp (<i> coeq (f i) (g i)) 0 (iota (f 0) (g 0) x)
 
+  def trans-coeq-iota-is-correct (x : B 0) :
+    Path (coeq (f 1) (g 1)) (trans-coeq-iota A B f g x) (trans-coeq-iota′ A B f g x) :=
+  <_> trans-coeq-iota A B f g x
+
   def trans-coeq-resp (x : A 0) (φ : I) : coeq (f 1) (g 1) :=
   hcomp (coeq (f 1) (g 1)) (∂ φ)
     (λ (j : I), [(φ = 0) → iota (f 1) (g 1) (transp (<k> B (-j ∨ k)) -j

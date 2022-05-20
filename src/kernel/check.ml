@@ -176,6 +176,11 @@ and transport i p phi u0 = match p, phi, u0 with
     let j = freshName "ι" in let k = freshName "κ" in let v1 = transFill j (swap i j t) phi a in
     let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
     VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)
+  (* transp (<i> coeq (f i) (g i)) 0 (iota (f 0) (g 0) x) ~>
+     iota (f 1) (g 1) (transp (<i> B i) 0 x) *)
+  | VCoeq (f, g), _, VIota (_, _, u) ->
+    let (a, (x, k)) = extPiG (inferV f) in let b = k (Var (x, a)) in
+    VIota (act0 i vone f, act0 i vone g, transport i b phi u)
   (* transp (<i> ℑ (A i)) 0 (ℑ-unit a) ~> ℑ-unit (transp (<i> A i) 0 a) *)
   | VIm t, _, VInf a -> inf (transport i t phi a)
   | _, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)

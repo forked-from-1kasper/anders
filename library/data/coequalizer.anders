@@ -66,3 +66,13 @@ section
   def trans-coeq-resp′ (x : A 0) (φ : I) : coeq (f 1) (g 1) :=
   transp (<i> coeq (f i) (g i)) 0 (resp (f 0) (g 0) x φ)
 end
+
+section
+  variables (A B : U) (f g : A → B) (r : I) (u : I → Partial B r) (u₀ : B[r ↦ u 0])
+
+  def hcomp-coeq-iota : coeq f g :=
+  iota f g (hcomp B r u (ouc u₀))
+
+  def hcomp-coeq-iota′ : coeq f g :=
+  hcomp (coeq f g) r (λ (i : I), [(r = 1) → iota f g (u i 1=1)]) (iota f g (ouc u₀))
+end

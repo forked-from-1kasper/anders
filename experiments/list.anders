@@ -37,8 +37,8 @@ def pure (μ : monad) : Π (α : U), α → μ.1 α ≔ μ.2.1
 def bind (μ : monad) : Π (α β : U), μ.1 α → (α → μ.1 β) → μ.1 β ≔ μ.2.2
 def map (μ : monad) (α β : U) (f : α → β) (x : μ.1 α) : μ.1 β ≔ bind μ α β x (∘ α β (μ.1 β) (pure μ β) f)
 
-def filterM (μ : monad) (α : U) (f : α → μ.1 bool′) (lst : list α) : μ.1 (list α)
- ≔ lst (μ.1 (list α)) (pure μ (list α) (nil α))
+def filterM (μ : monad) (α : U) (f : α → μ.1 bool′) (lst : list α) : μ.1 (list α) ≔
+lst (μ.1 (list α)) (pure μ (list α) (nil α))
     (λ (x : α) (xs : μ.1 (list α)), bind μ bool′ (list α) (f x)
       (λ (b : bool′), ite (μ.1 (list α))
         (map μ (list α) (list α) (∷ α x) xs) xs b))
@@ -54,5 +54,5 @@ def lst₃-powerset : list (list N) ≔
       (∷ (list N) (nil N)
         (nil (list N)))))
 
-theorem powerset-correct-at-list₃ : eq (list (list N)) (powerset N lst₃) lst₃-powerset
-     ≔ refl (list (list N)) lst₃-powerset
+theorem powerset-correct-at-list₃ : eq (list (list N)) (powerset N lst₃) lst₃-powerset ≔
+refl (list (list N)) lst₃-powerset

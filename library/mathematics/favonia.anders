@@ -10,7 +10,7 @@ def all-phenomenas (o : U) : U := Π (x y : o), PathP (<_> o) x y
 def nondual (o : U) (p : concept o) : U₁ := Π (x y : o), PathP (<_> U) (p x) (p y)
 
 def encode (o : U) : (Π (p : concept o), nondual o p) → all-phenomenas o :=
-λ (nd: Π (p : concept o), nondual o p) (a b : o),
+λ (nd : Π (p : concept o), nondual o p) (a b : o),
   coe′ (PathP (<_> o) a a) (PathP (<_> o) a b) (nd (λ (z : o), PathP (<_> o) a z) a b) (<_> a)
 
 def decode (o : U) : all-phenomenas o → (Π (p : concept o), nondual o p) :=

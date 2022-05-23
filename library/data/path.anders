@@ -354,6 +354,23 @@ end
 
 def hcomp-U (r : I) (E : I → Partial U r) (A : (U)[r ↦ E 0]) := hcomp U r E (ouc A)
 
+section
+  variables (A B : U) (f : A → B) (g : B → A)
+
+  def sec := Π (b : B), Path B (f (g b)) b
+  def ret := Π (a : A), Path A (g (f a)) a
+end
+
+section
+  variables (A B : U) (f : A → B)
+
+  def has-sec := Σ (g : B → A), sec A B f g
+  def has-ret := Σ (g : B → A), ret A B f g
+
+  def is-path-split-equiv :=
+  (has-sec A B f) × (Π (x y : A), has-sec (Path A x y) (Path B (f x) (f y)) (ap A B f x y))
+end
+
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
 
 def contr-impl-prop (A : U) (H : isContr A) : isProp A :=

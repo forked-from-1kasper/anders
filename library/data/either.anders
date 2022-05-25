@@ -1,7 +1,7 @@
 module either where
 
 def +ω (n : L) (A B : U n) : U n := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U n) A B x
-def + (A B : U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
+def + (A B : U) : U := +ω L₀ A B
 
 def inl (A B : U) (a : A) : + A B := (0₂, a)
 def inr (A B : U) (b : B) : + A B := (1₂, b)

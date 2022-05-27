@@ -119,6 +119,8 @@ def θ (A B : U) (a : A) (b : B) (φ : I) : PartialP [(φ = 0) → A, (φ = 1) �
 -- should fail
 --def φ″ (i j : I) := [(i = 0) → U, (j = 0) → U → U]
 
+def ψ′ (A B : U) (p : PathP (<_> U) A B) (i : I) := [(i = 1) → p @ i]
+
 def partial-app-test (A : U) (a : A) (φ : I) (p : 1= φ) : A := [(φ = 1) → a] p
 
 def ≤ (i j : I) := Id I (i ∧ j) i

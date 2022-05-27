@@ -52,7 +52,7 @@ def path→iso (A B : U) : PathP (<_> U) A B → iso A B :=
 λ (p : PathP (<_> U) A B), (coerce A B p, coerce B A (<i> p @ -i), trans⁻¹-trans A B p, λ (a : A), <k> trans-trans⁻¹ A B p a @ -k, star)
 
 def iso→equiv (A B : U) : iso A B → equiv A B :=
-λ (x : iso A B), univ-elim A B (iso→path A B x.f x.g x.s x.t)
+λ (x : iso A B), idtoeqv A B (iso→path A B x.f x.g x.s x.t)
 
 def equiv→iso (A B : U) : equiv A B → iso A B :=
 λ (x : equiv A B), (x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)

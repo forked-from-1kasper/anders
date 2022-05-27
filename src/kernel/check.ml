@@ -654,7 +654,7 @@ and check ctx (e0 : exp) (t0 : value) =
 and checkOverlapping ctx ts =
   System.iter (fun alpha e1 ->
     System.iter (fun beta e2 ->
-      if comparable alpha beta then
+      if compatible alpha beta then
         let ctx' = faceEnv (meet alpha beta) ctx in
         eqNf (eval ctx' e1) (eval ctx' e2)
       else ()) ts) ts

@@ -39,13 +39,17 @@ def hcomp-Glue (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
 hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
 
 def univ-formation (A B : U) := equiv A B → PathP (<_> U) A B
-def univ-intro (A B : U) : univ-formation A B := λ (e : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
-def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
-def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p :=
-<j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
-                        (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
-def ua (A B : U) (p : equiv A B) : PathP (<_> U) A B := univ-intro A B p
+def idtoeqv (A B : U) (p : PathP (<_> U) A B) : equiv A B :=
+transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+
+def ua (A B : U) (e : equiv A B) : PathP (<_> U) A B :=
+<i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
+
+def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (ua A B (idtoeqv A B p)) p :=
+<j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, idtoeqv A B p),
+                        (i = 1) → (B, transp (<_> equiv B B) (-j) (idEquiv B)),
+                        (j = 1) → (p @ i, idtoeqv (p @ i) B (<k> p @ (i ∨ k)))]
 
 def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1 :=
 <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))

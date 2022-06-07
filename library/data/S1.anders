@@ -1,5 +1,7 @@
 module S1 where
 
+import library/data/iso
+import library/data/bool
 import library/data/coequalizer
 import library/mathematics/constcubes
 
@@ -32,3 +34,14 @@ def double-loop (ℓ : Ω¹S¹) : Ω¹S¹ := <i> square (ℓ @ i)
 def triple-loop (ℓ : Ω¹S¹) : Ω¹S¹ := <i> mul (ℓ @ i) (square (ℓ @ i))
 
 def com-S¹ : Ω¹S¹ → Ω¹S¹ → Ω¹S¹ := comp-Path S¹ base base base
+
+def bool-neg-path : PathP (<_> U) 𝟐 𝟐 :=
+iso→path 𝟐 𝟐 neg neg neg-neg neg-neg
+
+option girard true
+
+def Möbius : S¹ → U :=
+S¹-ind (λ (_ : S¹), U) 𝟐 bool-neg-path
+
+def oddity (ℓ : Ω¹S¹) : 𝟐 :=
+transp (<i> Möbius (ℓ @ i)) 0 0₂

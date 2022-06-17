@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "anders"
-version: "1.3.0"
-maintainer: "Namdak Tonpa <maxim@synrc.com>"
+version: "1.4.2"
+maintainer: "Siegmentation Fault <siegmentationfault@yandex.ru>"
 authors: [
   "Namdak Tonpa @5HT"
   "Siegmentation Fault @siegment"
@@ -9,7 +9,7 @@ authors: [
 homepage: "https://homotopy.dev/"
 bug-reports: "https://github.com/groupoid/anders/issues"
 dev-repo: "git+https://github.com/groupoid/anders"
-synopsis: "Modal Homotopy Type System"
+synopsis: "Cubical Type Checker"
 license: "ISC"
 depends: [
   "dune" {>= "2.0"}

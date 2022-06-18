@@ -338,6 +338,11 @@ and app : value * value -> value = function
   | VIndCoeq (_, i, _), VIota (_, _, x) -> app (i, x)
   (* coeq-ind B ι ρ (resp f g x i) ~> ρ x i *)
   | VIndCoeq (_, _, r), VApp (VResp (_, _, x), i) -> app (app (r, x), i)
+  | VIndCoeq (b, i, ro), VHComp (t, r, u, u0) ->
+    let j = freshName "ι" in let us = app (u, dim j) in
+    comp (fun k -> app (b, hfill t r j us u0 k)) r j
+      (VSystem (walk (fun u -> app (VIndCoeq (b, i, ro), u)) r us))
+      (app (VIndCoeq (b, i, ro), u0))
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)

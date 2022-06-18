@@ -44,13 +44,22 @@ section
                                  (<j> coeq-ind′ A B f g X i ρ (resp f g x j)) (ρ x) :=
   <_> ρ x
 
-  def coeq-ind-hcomp (r : I) (u : I → Partial (coeq f g) r) (u₀ : (coeq f g)[r ↦ u 0]) :=
-  comp (λ (i : I), X (hfill (coeq f g) r u u₀ i)) r
-    (λ (j : I), [(r = 1) → coeq-ind′ A B f g X i ρ (u j 1=1)])
-    (inc (X (ouc u₀)) r (coeq-ind′ A B f g X i ρ (ouc u₀)))
+  section
+    variables (r : I) (u : I → Partial (coeq f g) r) (u₀ : (coeq f g)[r ↦ u 0])
 
-  def coeq-ind-hcomp′ (r : I) (u : I → Partial (coeq f g) r) (u₀ : (coeq f g)[r ↦ u 0]) :=
-  coeq-ind′ A B f g X i ρ (hcomp (coeq f g) r u (ouc u₀))
+    def coeq-ind-hcomp :=
+    comp (λ (i : I), X (hfill (coeq f g) r u u₀ i)) r
+      (λ (j : I), [(r = 1) → coeq-ind′ A B f g X i ρ (u j 1=1)])
+      (inc (X (ouc u₀)) r (coeq-ind′ A B f g X i ρ (ouc u₀)))
+
+    def coeq-ind-hcomp′ :=
+    coeq-ind′ A B f g X i ρ (hcomp (coeq f g) r u (ouc u₀))
+
+    def coeq-ind-β₃ : Path (X (hcomp (coeq f g) r u (ouc u₀)))
+                           (coeq-ind-hcomp A B f g X i ρ r u u₀)
+                           (coeq-ind-hcomp′ A B f g X i ρ r u u₀) :=
+    <_> coeq-ind-hcomp A B f g X i ρ r u u₀
+  end
 end
 
 section

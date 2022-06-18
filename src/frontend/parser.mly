@@ -51,7 +51,7 @@
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
 %token DEFEQ PROD ARROW DOT LAM
-%token MODULE WHERE IMPORT DEF AXIOM
+%token IMPORT DEF AXIOM
 %token SIGMA PI OPTION PLUGIN LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL PARTIALP MAP INC OUC
@@ -89,7 +89,7 @@ path   : IDENT { getPath $1 }
 face   : LPARENS IDENT IDENT IDENT RPARENS { face $2 $3 $4 }
 
 part : face+ ARROW exp2 { ($1, $3) }
-file : MODULE IDENT WHERE line* EOF { ($2, $4) }
+file : line* EOF { $1 }
 repl : COLON IDENT exp2 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp2 EOF { Eval $1 } | EOF { Nope }
 exp1 : exp2 COMMA exp1 { EPair (ref None, $1, $3) } | exp2 { $1 }
 

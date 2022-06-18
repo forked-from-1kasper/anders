@@ -6,7 +6,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module functor where
 import library/mathematics/categories/category
 
 def catfunctor (A B : precategory) : U :=

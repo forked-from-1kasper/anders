@@ -4,7 +4,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module nat where
 import library/data/W-type
 
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏

@@ -3,7 +3,6 @@
    - Polymorphic funtions.
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
-module list where
 import experiments/leibniz library/foundations/mltt/bool
 option girard true
 

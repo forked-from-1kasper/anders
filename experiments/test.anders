@@ -1,5 +1,3 @@
-module test where
-
 def id (A : U) (a : A) : A := a
 def idfun : Π (A′ : U), A′ → A′ := λ (A : U) (a : A), a
 

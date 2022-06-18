@@ -1,4 +1,3 @@
-module illtyped where
 import library/foundations/univalent/equiv
 
 def G (A B : U) (p : PathP (<_> U) A B) (r : I)

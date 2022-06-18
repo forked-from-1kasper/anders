@@ -3,7 +3,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module iso where
 import library/data/equiv
 
 -- https://github.com/mortberg/cubicaltt/blob/master/examples/equiv.ctt

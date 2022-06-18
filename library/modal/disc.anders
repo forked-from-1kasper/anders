@@ -6,8 +6,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module disc where
-
 import library/data/iso
 import library/data/path
 import library/modal/infinitesimal

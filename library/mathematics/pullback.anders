@@ -4,7 +4,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module pullback where
 import library/data/path
 import library/data/equiv
 

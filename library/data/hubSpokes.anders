@@ -1,4 +1,3 @@
-module hubSpokes where
 import library/data/path
 
 -- [Lumsdaine] 2012 Hubs and Spokes Disc

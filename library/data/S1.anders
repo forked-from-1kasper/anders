@@ -1,5 +1,3 @@
-module S1 where
-
 import library/data/iso
 import library/data/bool
 import library/data/coequalizer

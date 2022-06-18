@@ -4,8 +4,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module etale where
-
 import library/data/path
 import library/modal/infinitesimal
 import library/mathematics/pullback

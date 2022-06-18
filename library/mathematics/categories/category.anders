@@ -5,7 +5,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module category where
 import library/data/path
 
 def cat : U₁ := Σ (ob : U) (hom : ob → ob → U), unit

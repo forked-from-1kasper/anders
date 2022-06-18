@@ -1,4 +1,3 @@
-module leibniz where
 option girard true
 
 def eq (A : U) (x y : A) : U := Π (P : A -> U), P x -> P y

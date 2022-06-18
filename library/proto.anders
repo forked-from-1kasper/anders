@@ -1,5 +1,3 @@
-module proto where
-
 def ¬ (A : U) := A → 𝟎
 
 def ∘ᵀ (A B C: U) : U := (B → C) → (A → B) → (A → C)

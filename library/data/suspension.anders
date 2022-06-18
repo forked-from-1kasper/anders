@@ -1,4 +1,3 @@
-module suspension where
 import library/data/pushout
 
 -- [Caglayan] 2018

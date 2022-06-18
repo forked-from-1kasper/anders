@@ -17,7 +17,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module path where
 import library/proto
 
 def const₁ (A : U) : A → 𝟏 := const 𝟏 A ★

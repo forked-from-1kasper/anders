@@ -18,7 +18,6 @@ let tokenToString : token -> string = function
   | IRREF      -> "IRREF"       | EOF        -> "EOF"
   | DEFEQ      -> "DEFEQ"       | COMMA      -> "COMMA"
   | COLON      -> "COLON"       | ARROW      -> "ARROW"
-  | WHERE      -> "WHERE"       | MODULE     -> "MODULE"
   | LT         -> "LT"          | GT         -> "GT"
   | APPFORMULA -> "APPFORMULA"  | NEGATE     -> "NEGATE"
   | AND        -> "AND"         | OR         -> "OR"

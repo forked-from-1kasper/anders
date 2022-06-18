@@ -93,7 +93,6 @@ rule main = parse
   | "summa"                   | "\xCE\xA3"        -> SIGMA  (* Σ *)
   | "\\"                      | "\xCE\xBB"        -> LAM    (* λ *)
   | "ind-W"                   | "ind\xE1\xB5\x82" -> INDW   (* indᵂ *)
-  | "module"     -> MODULE    | "where"           -> WHERE
   | "import"     -> IMPORT    | "option"          -> OPTION
   | "PathP"      -> PATHP     | "transp"          -> TRANSP
   | "_"          -> IRREF     | "@"               -> APPFORMULA

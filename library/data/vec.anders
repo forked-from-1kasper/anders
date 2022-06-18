@@ -1,4 +1,3 @@
-module vec where
 import library/data/nat
 
 def Vec (A : U) : ℕ → U := ℕ-iterω L₁ U 𝟏 (λ (X : U), A × X)

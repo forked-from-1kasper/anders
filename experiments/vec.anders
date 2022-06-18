@@ -1,4 +1,3 @@
-module vec where
 import experiments/church
 
 def vec (α : U) (n : N) : U₁ :=

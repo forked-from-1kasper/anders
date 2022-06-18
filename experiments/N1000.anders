@@ -1,4 +1,3 @@
-module N1000 where
 import experiments/church
 
 def N1 : N := succ N0

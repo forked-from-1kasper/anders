@@ -1,5 +1,3 @@
-module Sn where
-
 import library/data/nat
 import library/data/suspension
 

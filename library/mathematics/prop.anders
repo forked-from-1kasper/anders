@@ -1,4 +1,3 @@
-module prop where
 import library/data/path
 import library/data/sigma
 

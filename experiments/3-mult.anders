@@ -1,4 +1,3 @@
-module 3-mult where
 import experiments/church
 
 definition N1 : N := succ N0

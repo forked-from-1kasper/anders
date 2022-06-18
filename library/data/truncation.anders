@@ -1,4 +1,3 @@
-module truncation where
 import library/data/Sn
 import library/data/hubSpokes
 

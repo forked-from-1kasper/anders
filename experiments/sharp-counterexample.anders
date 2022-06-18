@@ -1,4 +1,3 @@
-module sharp-counterexample where
 import library/foundations/mltt/proto
 import library/foundations/univalent/iso
 

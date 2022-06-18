@@ -1,5 +1,3 @@
-module fin where
-
 import library/data/nat
 import library/data/either
 

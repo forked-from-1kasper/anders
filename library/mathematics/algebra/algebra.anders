@@ -1,4 +1,3 @@
-module algebra where
 import library/data/path
 
 def isComm   (M : U) (op : M → M → M) : U := Π (x y : M), Path M (op x y) (op y x)

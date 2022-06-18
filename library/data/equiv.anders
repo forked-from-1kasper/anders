@@ -12,7 +12,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module equiv where
 import library/data/path
 
 def fiber (A B : U) (f : A → B) (y : B) : U := Σ (x : A), Path B y (f x)

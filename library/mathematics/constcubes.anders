@@ -1,4 +1,3 @@
-module constcubes where
 import library/data/path
 
 -- https://github.com/mortberg/cubicaltt/blob/master/examples/constcubes.ctt

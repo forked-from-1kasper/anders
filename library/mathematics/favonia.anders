@@ -1,5 +1,3 @@
-module favonia where
-
 -- [Favonia] 2017 The Theorem About Non-Duality
 
 def trans′ (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0

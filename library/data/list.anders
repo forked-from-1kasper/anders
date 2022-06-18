@@ -1,7 +1,6 @@
 {- Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module list where
 import library/data/maybe
 import library/data/nat
 

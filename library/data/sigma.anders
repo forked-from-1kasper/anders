@@ -1,4 +1,3 @@
-module sigma where
 import library/data/path
 
 def Sigma (A : U) (B : A → U) : U := summa (x: A), B x

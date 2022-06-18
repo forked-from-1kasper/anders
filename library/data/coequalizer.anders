@@ -20,7 +20,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module coequalizer where
 import library/data/equiv
 import library/data/W-type
 

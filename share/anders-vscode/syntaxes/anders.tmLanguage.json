@@ -14,7 +14,7 @@
             "name": "comment.line.double-dash.anders"
         },
         {
-            "match": "(?<=^|[\\s()\\[\\]])(option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|module|where|begin|section|end|variables)(?=$|[\\s()\\[\\]])",
+            "match": "(?<=^|[\\s()\\[\\]])(option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|begin|section|end|variables)(?=$|[\\s()\\[\\]])",
             "name": "keyword.other.anders"
         },
         {

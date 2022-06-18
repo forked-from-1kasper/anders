@@ -1,4 +1,3 @@
-module maybe where
 import library/data/either
 
 def Maybe (A : U) : U := + 𝟏 A

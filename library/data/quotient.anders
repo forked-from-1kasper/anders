@@ -1,4 +1,3 @@
-module quotient where
 import library/data/coequalizer
 
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y

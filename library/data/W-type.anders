@@ -17,8 +17,6 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022 -}
 
-module W-type where
-
 import library/data/path
 option irrelevance true
 

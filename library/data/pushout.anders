@@ -1,4 +1,3 @@
-module pushout where
 import library/data/either
 import library/data/coequalizer
 

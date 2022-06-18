@@ -22,7 +22,7 @@ type line =
   | Variables of tele list
 
 type content = line list
-type file = string * content
+type file = content
 
 let moduleSep = '/'
 let getPath = String.split_on_char moduleSep >> String.concat Filename.dir_sep
@@ -41,8 +41,7 @@ let rec showLine : line -> string = function
   | Section xs -> Printf.sprintf "section\n%s\nend" (String.concat "\n" (List.map showLine xs))
   | Variables xs -> Printf.sprintf "variables %s" (String.concat " " (List.map showTeleExp xs))
 
-let showContent x = String.concat "\n" (List.map showLine x)
-let showFile : file -> string = function | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
+let showFile : file -> string = String.concat "\n" << List.map showLine
 
 let rec teles ctor e : tele list -> exp = function
   | []           -> e

@@ -1,4 +1,3 @@
-module N3000 where
 def N := Π (A : U), (A -> A) -> A -> A
 def N0 : N := λ (A : U) (S : A -> A) (Z : A), Z
 def succ : N -> N := λ (n : N) (A : U) (S : A -> A) (Z : A), S (n A S Z)

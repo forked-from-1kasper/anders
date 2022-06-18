@@ -18,14 +18,12 @@
              © @siegment, 2022 -}
 
 import library/data/path
-option irrelevance true
 
 def 0-ind (C : 𝟎 → U) (z : 𝟎) : C z := ind₀ (C z) z
 
 def 1-rec (C : U) (x : C) (z : 𝟏) : C := ind₁ (λ (_ : 𝟏), C) x z
 def 1-ind (C : 𝟏 → U) (x : C ★) (z : 𝟏) : C z := ind₁ C x z
 def 1-β (C : U) (c : C) : Path C (1-rec C c ★) c := idp C c
-def 1-η (z : 𝟏) : Path 𝟏 ★ z := idp 𝟏 ★ -- 𝟏-irrelevance enabled
 
 def 2-ind (C : 𝟐 → U) (x : C 0₂) (y : C 1₂) (z : 𝟐) : C z := ind₂ C x y z
 def 2-rec (C : U) (x : C) (y : C) (z : 𝟐) : C := ind₂ (λ (_ : 𝟐), C) x y z

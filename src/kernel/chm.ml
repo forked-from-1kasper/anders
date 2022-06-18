@@ -50,7 +50,6 @@ let proto : req -> resp = function
     | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)
     | "pre-eval"        -> promote (fun () -> Prefs.preeval         := getBoolVal p x; OK)
     | "girard"          -> promote (fun () -> Prefs.girard          := getUnitVal p x; OK)
-    | "irrelevance"     -> promote (fun () -> Prefs.irrelevance     := getUnitVal p x; OK)
     | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
     | _                 -> Error (InvalidOpt p)
   end

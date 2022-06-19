@@ -1,4 +1,4 @@
-import library/data/Sn
+import library/data/sphere
 import library/data/hubSpokes
 
 {- Generic ℕ-indexed Truncations -}

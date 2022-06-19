@@ -24,8 +24,8 @@ import library/data/hubSpokes
 import library/data/quotient
 import library/data/truncation
 import library/data/suspension
-import library/data/S1
-import library/data/Sn
+import library/data/circle
+import library/data/sphere
 import library/modal/infinitesimal
 import library/modal/etale
 import library/modal/disc

@@ -28,8 +28,8 @@
                 library/data/quotient.anders
                 library/data/truncation.anders
                 library/data/suspension.anders
-                library/data/S1.anders
-                library/data/Sn.anders
+                library/data/circle.anders
+                library/data/sphere.anders
                 library/modal/infinitesimal.anders
                 library/modal/etale.anders
                 library/modal/disc.anders

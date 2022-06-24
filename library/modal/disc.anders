@@ -32,7 +32,8 @@ theorem diff-comp (A B C : U) (f : A → B) (g : B → C) (x : A) :
 <i> λ (ε : 𝔻 A x), (g (f ε.1), inf-prox-comp A B C g f x ε.1 ε.2 @ i)
 
 def ∞-unital-magma (X : U) := Σ (e : X) (μ : X → X → X), Π (x : X), Path X (μ e x) x × Path X (μ x e) x
-def is-left-invertible (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (λ (x : X), M.μ x a)
+
+def is-left-invertible  (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (λ (x : X), M.μ x a)
 def is-right-invertible (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (M.μ a)
 
 def H-space   := Σ (X : U), ∞-unital-magma X

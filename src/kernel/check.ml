@@ -347,17 +347,16 @@ and app : value * value -> value = function
 
 and evalSystem ctx = bimap (getDef ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
-and lookup ctx x = match Env.find_opt x ctx.local, Env.find_opt x ctx.global with
-  | Some (t, v), _ -> (t, v)
-  | _, Some (t, v) -> (t, v)
+and getType ctx x = match Env.find_opt x ctx.local, Env.find_opt x ctx.global with
+  | Some (t, _), _ -> t
+  | _, Some (t, _) -> t
   | _, _           -> raise (Internal (VariableNotFound x))
 
-and evalTerm ctx = function
-  | Exp e   -> eval ctx e
-  | Value v -> v
-
-and getType ctx x = fst (lookup ctx x)
-and getDef  ctx x = evalTerm ctx (snd (lookup ctx x))
+and getDef ctx x = match Env.find_opt x ctx.local, Env.find_opt x ctx.global with
+  | Some (_, v), _       -> v
+  | _, Some (_, Value v) -> v
+  | _, Some (_, Exp e)   -> eval ctx e
+  | _, _                 -> raise (Internal (VariableNotFound x))
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
@@ -484,8 +483,8 @@ and updTerm alpha = function
 
 and faceEnv alpha ctx =
   { ctx with local =
-    Env.map (fun (t, v) -> (upd alpha t, updTerm alpha v)) ctx.local
-    |> Env.fold (fun p d -> Env.add p (VI, Value (dir d))) alpha }
+    Env.map (fun (t, v) -> (upd alpha t, upd alpha v)) ctx.local
+    |> Env.fold (fun p d -> Env.add p (VI, dir d)) alpha }
 
 and act rho = function
   | VLam (t, (x, g))     -> VLam (act rho t, (x, g >> act rho))

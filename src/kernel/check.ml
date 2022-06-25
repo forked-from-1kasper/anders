@@ -356,7 +356,7 @@ and evalTerm ctx = function
   | Exp e   -> eval ctx e
   | Value v -> v
 
-and getType ctx x = evalTerm ctx (fst (lookup ctx x))
+and getType ctx x = fst (lookup ctx x)
 and getDef  ctx x = evalTerm ctx (snd (lookup ctx x))
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
@@ -484,8 +484,8 @@ and updTerm alpha = function
 
 and faceEnv alpha ctx =
   { ctx with local =
-    Env.map (fun (t, v) -> (updTerm alpha t, updTerm alpha v)) ctx.local
-    |> Env.fold (fun p d -> Env.add p (Value VI, Value (dir d))) alpha }
+    Env.map (fun (t, v) -> (upd alpha t, updTerm alpha v)) ctx.local
+    |> Env.fold (fun p d -> Env.add p (VI, Value (dir d))) alpha }
 
 and act rho = function
   | VLam (t, (x, g))     -> VLam (act rho t, (x, g >> act rho))

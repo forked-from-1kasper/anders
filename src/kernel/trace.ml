@@ -6,10 +6,7 @@ open Rbv
 let traceHole v ctx =
   let gma =
     Env.bindings ctx.local
-    |> List.map
-        (fun (p, x) -> match x with
-          | Value v, _ -> (p, rbV v)
-          | Exp e, _   -> (p, e)) in
+    |> List.map (fun (p, (t, _)) -> (p, rbV t)) in
   Serialize.resp (Hole (rbV v, gma)); flush_all ()
 
 let trace x xs = Serialize.resp (Trace (x, xs)); flush_all ()

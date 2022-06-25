@@ -18,7 +18,7 @@ let getBoolVal opt = function
   | "ff" | "false" -> false
   | value -> raise (Internal (InvalidOptValue (opt, value)))
 
-let getTerm e = if !Prefs.preeval then Value (eval ctx e) else Exp e
+let getTerm e = if !Prefs.normalize then Value (eval ctx e) else Exp e
 let assign x t e = upGlobal ctx (ident x) t (getTerm e)
 
 let promote fn = try fn () with exc -> Error (extErr exc)
@@ -48,7 +48,7 @@ let proto : req -> resp = function
   | Set (p, x)         ->
   begin match p with
     | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)
-    | "pre-eval"        -> promote (fun () -> Prefs.preeval         := getBoolVal p x; OK)
+    | "normalize"       -> promote (fun () -> Prefs.normalize       := getBoolVal p x; OK)
     | "girard"          -> promote (fun () -> Prefs.girard          := getUnitVal p x; OK)
     | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
     | _                 -> Error (InvalidOpt p)

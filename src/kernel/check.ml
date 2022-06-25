@@ -347,15 +347,15 @@ and app : value * value -> value = function
 
 and evalSystem ctx = bimap (getDef ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
-and getType ctx x = match Env.find_opt x ctx.local, Env.find_opt x ctx.global with
+and getType ctx x = match Env.find_opt x ctx.local, Env.find_opt x !(ctx.global) with
   | Some (t, _), _ -> t
   | _, Some (t, _) -> t
   | _, _           -> raise (Internal (VariableNotFound x))
 
-and getDef ctx x = match Env.find_opt x ctx.local, Env.find_opt x ctx.global with
+and getDef ctx x = match Env.find_opt x ctx.local, Env.find_opt x !(ctx.global) with
   | Some (_, v), _       -> v
   | _, Some (_, Value v) -> v
-  | _, Some (_, Exp e)   -> eval ctx e
+  | _, Some (t, Exp e)   -> let v = eval ctx e in upGlobal ctx x t (Value v); v
   | _, _                 -> raise (Internal (VariableNotFound x))
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))

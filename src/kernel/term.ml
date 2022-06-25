@@ -75,7 +75,7 @@ type term = Exp of exp | Value of value
 
 type ctx =
   { local  : (value * value) Env.t;
-    global : (value * term)  Env.t }
+    global : (value * term) Env.t ref }
 
 (* Implementation *)
 
@@ -99,7 +99,7 @@ let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
 let upLocal ctx p t v = { ctx with local = upVar p (t, v) ctx.local }
-let upGlobal ctx p t v = { ctx with global = upVar p (t, v) ctx.global }
+let upGlobal ctx p t v = ctx.global := upVar p (t, v) !(ctx.global)
 
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty

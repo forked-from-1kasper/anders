@@ -7,7 +7,7 @@ open Elab
 open Term
 open Rbv
 
-let ctx : ctx ref = ref { local = Env.empty; global = Env.empty }
+let ctx : ctx = { local = Env.empty; global = ref Env.empty }
 
 let getUnitVal opt = function
   | "tt" | "true" -> true
@@ -18,33 +18,33 @@ let getBoolVal opt = function
   | "ff" | "false" -> false
   | value -> raise (Internal (InvalidOptValue (opt, value)))
 
-let getTerm e = if !Prefs.preeval then Value (eval !ctx e) else Exp e
-let assign x t e = ctx := upGlobal !ctx (ident x) t (getTerm e)
+let getTerm e = if !Prefs.preeval then Value (eval ctx e) else Exp e
+let assign x t e = upGlobal ctx (ident x) t (getTerm e)
 
 let promote fn = try fn () with exc -> Error (extErr exc)
 
 let proto : req -> resp = function
   | Check (e0, t0)     -> promote (fun () -> let t = freshExp t0 in
-    isType (infer !ctx t); check !ctx (freshExp e0) (eval !ctx t); OK)
-  | Infer e            -> promote (fun () -> Term (rbV (infer !ctx (freshExp e))))
-  | Eval e             -> promote (fun () -> Term (rbV (eval !ctx (freshExp e))))
-  | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
-                                                        (eval !ctx (freshExp e2))))
+    isType (infer ctx t); check ctx (freshExp e0) (eval ctx t); OK)
+  | Infer e            -> promote (fun () -> Term (rbV (infer ctx (freshExp e))))
+  | Eval e             -> promote (fun () -> Term (rbV (eval ctx (freshExp e))))
+  | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval ctx (freshExp e1))
+                                                        (eval ctx (freshExp e2))))
   | Def (x, t0, e0)    -> promote (fun () ->
-    if Env.mem (ident x) !ctx.global then Error (AlreadyDeclared x)
+    if Env.mem (ident x) !(ctx.global) then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in
-      isType (infer !ctx t); let t' = eval !ctx t in
-      check !ctx e t'; assign x t' e; OK))
+      isType (infer ctx t); let t' = eval ctx t in
+      check ctx e t'; assign x t' e; OK))
   | Assign (x, t0, e0) -> promote (fun () ->
-    if Env.mem (ident x) !ctx.global then Error (AlreadyDeclared x)
-    else (let t = freshExp t0 in isType (infer !ctx t);
-          assign x (eval !ctx t) (freshExp e0); OK))
+    if Env.mem (ident x) !(ctx.global) then Error (AlreadyDeclared x)
+    else (let t = freshExp t0 in isType (infer ctx t);
+          assign x (eval ctx t) (freshExp e0); OK))
   | Assume (x, t0)     -> promote (fun () -> let t = freshExp t0 in
-    let y = ident x in if Env.mem y !ctx.global then Error (AlreadyDeclared x)
-    else (isType (infer !ctx t); let t' = eval !ctx t in
-          ctx := upGlobal !ctx y t' (Value (Var (y, t'))); OK))
-  | Erase x            -> ctx := { !ctx with global = Env.remove (ident x) !ctx.global }; OK
-  | Wipe               -> ctx := { global = Env.empty; local = Env.empty }; OK
+    let y = ident x in if Env.mem y !(ctx.global) then Error (AlreadyDeclared x)
+    else (isType (infer ctx t); let t' = eval ctx t in
+          upGlobal ctx y t' (Value (Var (y, t'))); OK))
+  | Erase x            -> ctx.global := Env.remove (ident x) !(ctx.global); OK
+  | Wipe               -> ctx.global := Env.empty; OK
   | Set (p, x)         ->
   begin match p with
     | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)

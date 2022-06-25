@@ -7,7 +7,7 @@ open Elab
 open Term
 open Rbv
 
-let ctx : ctx ref = ref Env.empty
+let ctx : ctx ref = ref { local = Env.empty; global = Env.empty }
 
 let getUnitVal opt = function
   | "tt" | "true" -> true
@@ -19,7 +19,7 @@ let getBoolVal opt = function
   | value -> raise (Internal (InvalidOptValue (opt, value)))
 
 let getTerm e = if !Prefs.preeval then Value (eval !ctx e) else Exp e
-let assign x t e = ctx := Env.add (ident x) (Global, Value t, getTerm e) !ctx
+let assign x t e = ctx := upGlobal !ctx (ident x) t (getTerm e)
 
 let promote fn = try fn () with exc -> Error (extErr exc)
 
@@ -31,20 +31,20 @@ let proto : req -> resp = function
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
                                                         (eval !ctx (freshExp e2))))
   | Def (x, t0, e0)    -> promote (fun () ->
-    if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
+    if Env.mem (ident x) !ctx.global then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in
       isType (infer !ctx t); let t' = eval !ctx t in
       check !ctx e t'; assign x t' e; OK))
   | Assign (x, t0, e0) -> promote (fun () ->
-    if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
+    if Env.mem (ident x) !ctx.global then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in isType (infer !ctx t);
           assign x (eval !ctx t) (freshExp e0); OK))
   | Assume (x, t0)     -> promote (fun () -> let t = freshExp t0 in
-    let y = ident x in if Env.mem y !ctx then Error (AlreadyDeclared x)
+    let y = ident x in if Env.mem y !ctx.global then Error (AlreadyDeclared x)
     else (isType (infer !ctx t); let t' = eval !ctx t in
-          ctx := Env.add y (Global, Value t', Value (Var (y, t'))) !ctx; OK))
-  | Erase x            -> ctx := Env.remove (ident x) !ctx; OK
-  | Wipe               -> ctx := Env.empty; OK
+          ctx := upGlobal !ctx y t' (Value (Var (y, t'))); OK))
+  | Erase x            -> ctx := { !ctx with global = Env.remove (ident x) !ctx.global }; OK
+  | Wipe               -> ctx := { global = Env.empty; local = Env.empty }; OK
   | Set (p, x)         ->
   begin match p with
     | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)

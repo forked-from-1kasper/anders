@@ -5,12 +5,11 @@ open Rbv
 
 let traceHole v ctx =
   let gma =
-    Env.bindings ctx
-    |> List.filter_map
+    Env.bindings ctx.local
+    |> List.map
         (fun (p, x) -> match x with
-          | Local, Value v, _ -> Some (p, rbV v)
-          | Local, Exp e, _   -> Some (p, e)
-          | _, _, _           -> None) in
+          | Value v, _ -> (p, rbV v)
+          | Exp e, _   -> (p, e)) in
   Serialize.resp (Hole (rbV v, gma)); flush_all ()
 
 let trace x xs = Serialize.resp (Trace (x, xs)); flush_all ()

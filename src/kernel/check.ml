@@ -18,7 +18,7 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | ESucc e              -> levelSucc (eval ctx e)
   | EAdd (e1, e2)        -> levelAdd (eval ctx e1) (eval ctx e2)
   | EMax (e1, e2)        -> levelMax (eval ctx e1) (eval ctx e2)
-  | EVar x               -> getRho ctx x
+  | EVar x               -> getDef ctx x
   | EHole                -> VHole
   | EPi  (a, (p, b))     -> let t = eval ctx a in VPi (t, (fresh p, closByVal ctx p t b))
   | ESig (a, (p, b))     -> let t = eval ctx a in VSig (t, (fresh p, closByVal ctx p t b))
@@ -295,7 +295,7 @@ and equivPtSingl t0 = VSig (inferV t0, (freshName "T", fun t -> prodv (equiv t t
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker, for example, while checking terms like p : Path P a b *)
   let ctx' = match v with
-  | Var (x, t) -> if Env.mem x ctx then ctx else upLocal ctx x t v
+  | Var (x, t) -> if Env.mem x ctx.local then ctx else upLocal ctx x t v
   | _          -> ctx in
   eval (upLocal ctx' p t v) e
 
@@ -345,12 +345,19 @@ and app : value * value -> value = function
       (app (VIndCoeq (b, i, ro), u0))
   | f, x -> VApp (f, x)
 
-and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
+and evalSystem ctx = bimap (getDef ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
-and getRho ctx x = match Env.find_opt x ctx with
-  | Some (_, _, Value v) -> v
-  | Some (_, _, Exp e)   -> eval ctx e
-  | None                 -> raise (Internal (VariableNotFound x))
+and lookup ctx x = match Env.find_opt x ctx.local, Env.find_opt x ctx.global with
+  | Some (t, v), _ -> (t, v)
+  | _, Some (t, v) -> (t, v)
+  | _, _           -> raise (Internal (VariableNotFound x))
+
+and evalTerm ctx = function
+  | Exp e   -> eval ctx e
+  | Value v -> v
+
+and getType ctx x = evalTerm ctx (fst (lookup ctx x))
+and getDef  ctx x = evalTerm ctx (snd (lookup ctx x))
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
@@ -476,8 +483,9 @@ and updTerm alpha = function
   | Value v -> Value (upd alpha v)
 
 and faceEnv alpha ctx =
-  Env.map (fun (p, t, v) -> if p = Local then (p, updTerm alpha t, updTerm alpha v) else (p, t, v)) ctx
-  |> Env.fold (fun p d -> Env.add p (Local, Value VI, Value (dir d))) alpha
+  { ctx with local =
+    Env.map (fun (t, v) -> (updTerm alpha t, updTerm alpha v)) ctx.local
+    |> Env.fold (fun p d -> Env.add p (Value VI, Value (dir d))) alpha }
 
 and act rho = function
   | VLam (t, (x, g))     -> VLam (act rho t, (x, g >> act rho))
@@ -613,11 +621,6 @@ and eqNf v1 v2 : unit = traceEqNF v1 v2;
   if conv v1 v2 then () else raise (Internal (Ineq (rbV v1, rbV v2)))
 
 (* Type checker itself *)
-and lookup ctx x = match Env.find_opt x ctx with
-  | Some (_, Value v, _) -> v
-  | Some (_, Exp e, _)   -> eval ctx e
-  | None                 -> raise (Internal (VariableNotFound x))
-
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; try match e0, t0 with
   | ELam (a, (p, b)), VPi (t, (_, g)) ->
@@ -663,7 +666,7 @@ and checkOverlapping ctx ts =
       else ()) ts) ts
 
 and infer ctx e : value = traceInfer e; match e with
-  | EVar x -> lookup ctx x
+  | EVar x -> getType ctx x
   | EType (c, Finite e) -> VType (c, Finite (Maximum.succ (extLevel (eval ctx e))))
   | EType (c, Omega n) -> VType (c, Omega (Z.succ n))
   | ELevel -> VType (Pretype, Omega Z.zero)

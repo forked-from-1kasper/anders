@@ -46,8 +46,6 @@ type conjunction = Conjunction.t
 module Disjunction = Set.Make(Conjunction)
 type disjunction = Disjunction.t
 
-type scope = Local | Global
-
 (* Intermediate type checker values *)
 
 type value =
@@ -75,9 +73,11 @@ and clos = ident * (value -> value)
 
 type term = Exp of exp | Value of value
 
-and record = scope * term * term
+type record = term * term
 
-and ctx = record Env.t
+type ctx =
+  { local  : record Env.t;
+    global : record Env.t }
 
 (* Implementation *)
 
@@ -100,10 +100,9 @@ let isOne i = VApp (VApp (VId VI, vone), i)
 let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
-let upLocal ctx p t v = upVar p (Local, Value t, Value v) ctx
-let upGlobal ctx p t v = upVar p (Global, Value t, Value v) ctx
+let upLocal ctx p t v = { ctx with local = upVar p (Value t, Value v) ctx.local }
+let upGlobal ctx p t v = { ctx with global = upVar p (Value t, v) ctx.global }
 
-let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
 let freshFace ns = mapFace (freshVar ns)

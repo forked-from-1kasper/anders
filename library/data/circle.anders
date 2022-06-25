@@ -1,7 +1,7 @@
 import library/data/iso
 import library/data/bool
 import library/data/coequalizer
-import library/mathematics/constcubes
+import library/mathematics/constsquares
 
 -- https://github.com/mortberg/cubicaltt/blob/master/examples/circle.ctt
 

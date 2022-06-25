@@ -20,6 +20,7 @@
                 library/mathematics/categories/groupoid.anders
                 library/mathematics/glivenko.anders
                 library/mathematics/bundle.anders
+                library/mathematics/constsquares.anders
                 library/mathematics/constcubes.anders
                 library/mathematics/pullback.anders
                 library/data/coequalizer.anders

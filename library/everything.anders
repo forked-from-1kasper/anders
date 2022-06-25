@@ -16,6 +16,7 @@ import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/groupoid
 import library/mathematics/bundle
+import library/mathematics/constsquares
 import library/mathematics/constcubes
 import library/mathematics/pullback
 import library/data/coequalizer

@@ -31,3 +31,7 @@ section
   variables (A : U)
   def idfun′ : A → A := λ (x : A), x
 end
+
+HIT S¹ : U :=
+| base
+| loop (i : I) [(i = 0) → base, (i = 1) → base]

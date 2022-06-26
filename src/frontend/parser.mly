@@ -51,7 +51,7 @@
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
 %token DEFEQ PROD ARROW DOT LAM
-%token IMPORT DEF AXIOM
+%token IMPORT DEF AXIOM BAR ADT HIT
 %token SIGMA PI OPTION PLUGIN LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL PARTIALP MAP INC OUC
@@ -148,6 +148,8 @@ exp5:
   | exp6 LSQ exp2 MAP exp2 RSQ { ESub ($1, $3, $5) }
   | exp6 { $1 }
 
+system: LSQ separated_list(COMMA, part) RSQ { System.of_seq (Seq.filter_map parsePartial (List.to_seq $2)) }
+
 exp6:
   | HOLE { EHole }
   | LEVEL { ELevelElem $1 }
@@ -159,15 +161,27 @@ exp6:
   | KANPARAM { EType (Kan, Finite (ELevelElem Z.zero)) }
   | exp6 DOT IDENT { match $3 with | "1" -> EFst $1 | "2" -> ESnd $1 | field -> EField ($1, field) }
   | NEGATE exp6 { ENeg $2 }
-  | LSQ separated_list(COMMA, part) RSQ { ESystem (System.of_seq (Seq.filter_map parsePartial (List.to_seq $2))) }
+  | system { ESystem $1 }
   | LPARENS exp1 RPARENS { $2 }
   | IDENT { getVar $1 }
+
+ctor: IDENT params { { name = $1; params = $2; boundary = System.empty } }
+pctor:
+  | ctor { $1 }
+  | IDENT params system { { name = $1; params = $2; boundary = $3 } }
+
+ctors: separated_nonempty_list(BAR, ctor) { $1 }
+pctors: separated_nonempty_list(BAR, pctor) { $1 }
 
 declarations:
   | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (teles ePi $5 $3), teles eLam $7 $3) }
   | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, teles ePi $5 $3, $7) }
   | DEF IDENT params DEFEQ exp2 { Def ($2, None, teles eLam $5 $3) }
   | AXIOM IDENT params COLON exp2 { Axiom ($2, teles ePi $5 $3) }
+  | ADT IDENT params COLON exp2 { Data ($2, { kind = $5; params = $3; ctors = [] }) }
+  | HIT IDENT params COLON exp2 { Data ($2, { kind = $5; params = $3; ctors = [] }) }
+  | ADT IDENT params COLON exp2 DEFEQ BAR? ctors { Data ($2, { kind = $5; params = $3; ctors = $8 }) }
+  | HIT IDENT params COLON exp2 DEFEQ BAR? pctors { Data ($2, { kind = $5; params = $3; ctors = $8 }) }
 
 line :
   | IMPORT path+ { Import $2 }

@@ -119,6 +119,16 @@ struct
       ts := System.add mu e !ts
     done; !ts
 
+  let many fn () = let n = int () in List.init n (fun _ -> fn ())
+
+  let tele () = let x = ident () in let e = exp () in (x, e)
+
+  let ctor () : ctor = let s = string () in let ts = many tele () in let bs = system () in
+    { name = s; params = ts; boundary = bs }
+
+  let data () : data = let k = exp () in let xs = many tele () in let ys = many ctor () in
+    { kind = k; params = xs; ctors = ys }
+
   let req () = match R.get () with
     | '\x10' -> let (e, t) = exp2 () in Check (e, t)
     | '\x11' -> Infer (exp ())
@@ -129,6 +139,7 @@ struct
     | '\x22' -> let x = string () in let t = exp () in Assume (x, t)
     | '\x23' -> Erase (string ())
     | '\x24' -> Wipe
+    | '\x25' -> let x = string () in let d = data () in Data (x, d)
     | '\x30' -> let p = string () in let x = string () in Set (p, x)
     | '\x31' -> Version
     | '\x32' -> Ping
@@ -154,8 +165,7 @@ struct
     | '\x11' -> AlreadyDeclared (string ())
     | '\x12' -> VariableNotFound (ident ())
     | '\x13' -> InferError (exp ())
-    | '\x14' -> let err = error () in let n = int () in
-      Traceback (err, List.init n (fun _ -> exp2 ()))
+    | '\x14' -> let err = error () in Traceback (err, many exp2 ())
     | '\x15' -> InvalidOpt (string ())
     | '\x16' -> let p = string () in let x = string () in InvalidOptValue (p, x)
     | '\x17' -> ExpectedLevel (exp ())
@@ -165,8 +175,7 @@ struct
 
   let resp () = match R.get () with
     | '\x10' -> let i = int64 () in let j = int64 () in let k = int64 () in Version (i, j, k)
-    | '\x11' -> let x = string () in let n = int () in
-      Trace (x, Array.to_list (Array.init n (fun _ -> exp ())))
+    | '\x11' -> let x = string () in Trace (x, many exp ())
     | '\x12' -> let e = exp () in let n = int () in
       Hole (e, List.init n (fun _ ->
         let i = ident () in let e' = exp () in (i, e')))

@@ -109,6 +109,13 @@ struct
   and system ts = int (System.cardinal ts);
     System.iter (fun mu e -> face mu; exp e) ts
 
+  let many fn xs = int (List.length xs); List.iter fn xs
+
+  let tele (i, e) = ident i; exp e
+
+  let ctor (c : ctor) = string c.name; many tele c.params; system c.boundary
+  let data (d : data) = exp d.kind; many tele d.params; many ctor d.ctors
+
   let req = function
     | Check (e, t)     -> W.put '\x10'; exp e; exp t
     | Infer e          -> W.put '\x11'; exp e
@@ -119,6 +126,7 @@ struct
     | Assume (x, t)    -> W.put '\x22'; string x; exp t
     | Erase x          -> W.put '\x23'; string x
     | Wipe             -> W.put '\x24'
+    | Data (x, d)      -> W.put '\x25'; string x; data d
     | Set (p, x)       -> W.put '\x30'; string p; string x
     | Version          -> W.put '\x31'
     | Ping             -> W.put '\x32'
@@ -143,7 +151,7 @@ struct
     | AlreadyDeclared x           -> W.put '\x11'; string x
     | VariableNotFound x          -> W.put '\x12'; ident x
     | InferError e                -> W.put '\x13'; exp e
-    | Traceback (e, es)           -> W.put '\x14'; error e; int (List.length es); List.iter (uncurry exp2) es
+    | Traceback (e, es)           -> W.put '\x14'; error e; many (uncurry exp2) es
     | InvalidOpt p                -> W.put '\x15'; string p
     | InvalidOptValue (p, x)      -> W.put '\x16'; string p; string x
     | ExpectedLevel e             -> W.put '\x17'; exp e
@@ -152,8 +160,8 @@ struct
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k
-    | Trace (x, es)     -> W.put '\x11'; string x; int (List.length es); List.iter exp es
-    | Hole (e, gma)     -> W.put '\x12'; exp e; int (List.length gma); List.iter (fun (i, e) -> ident i; exp e) gma
+    | Trace (x, es)     -> W.put '\x11'; string x; many exp es
+    | Hole (e, gma)     -> W.put '\x12'; exp e; many tele gma
     | Error err         -> W.put '\x13'; error err
     | Bool false        -> W.put '\x20'
     | Bool true         -> W.put '\x21'

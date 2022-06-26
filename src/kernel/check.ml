@@ -726,9 +726,7 @@ and infer ctx e : value = traceInfer e; match e with
     | VSub (t, _, _) -> t
     | _ -> raise (Internal (ExpectedSubtype e))
   end
-  | ESystem ts -> checkOverlapping ctx ts;
-    VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
-               eval ctx (getFormula ts))
+  | ESystem ts -> let (g, ks) = inferSystem ctx ts in VPartialP (VSystem ks, g)
   | EGlue e -> isKan (infer ctx e); inferGlue (eval ctx e)
   | EGlueElem (e, u0, a) -> check ctx e VI; let r = eval ctx e in let t = infer ctx a in
     check ctx u0 (partialv (equivPtSingl t) r); let u = eval ctx u0 in
@@ -777,6 +775,9 @@ and infer ctx e : value = traceInfer e; match e with
 
     inferIndCoeq f g v
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
+
+and inferSystem ctx ts = checkOverlapping ctx ts;
+  (eval ctx (getFormula ts), System.mapi (fun mu -> infer (faceEnv mu ctx)) ts)
 
 and inferCoeqType ctx f g =
   let (a, (p, h)) = extPiG (infer ctx f) in let b = h (Var (p, a)) in

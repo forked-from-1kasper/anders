@@ -42,3 +42,7 @@ HIT S¹ : U :=
 HIT merely (A : U) : U :=
 | elem (a : A)
 | uniq (a b : merely A) (i : I) [(i = 0) → a, (i = 1) → b]
+
+ADT boolean : U :=
+| ff
+| tt

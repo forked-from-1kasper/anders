@@ -98,6 +98,8 @@ let ePi  p a b = EPi  (a, (p, b))
 let eSig p a b = ESig (a, (p, b))
 let eW   p a b = EW   (a, (p, b))
 
+let eApp f x = EApp (f, x)
+
 let ezero = EDir Zero
 let eone  = EDir One
 
@@ -106,6 +108,10 @@ let decl x = EVar (ident x)
 
 let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
+
+let rec teles ctor e : tele list -> exp = function
+  | []           -> e
+  | (p, a) :: xs -> ctor p a (teles ctor e xs)
 
 (* Kernel Interface *)
 

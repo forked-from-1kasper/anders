@@ -106,7 +106,7 @@ let rec getField p v = function
   | t -> raise (Internal (ExpectedSig (rbV t)))
 
 let rec salt (ns : ident Env.t) : exp -> exp = function
-  | ELam (a, (p, b))     -> saltTele eLam ns p a b
+  | ELam (a, (p, b))     -> saltClos eLam ns p a b
   | EType (c, Finite e)  -> EType (c, Finite (salt ns e))
   | EType (c, Omega n)   -> EType (c, Omega n)
   | ELevel               -> ELevel
@@ -114,8 +114,8 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | ESucc e              -> ESucc (salt ns e)
   | EAdd (e1, e2)        -> EAdd (salt ns e1, salt ns e2)
   | EMax (e1, e2)        -> EMax (salt ns e1, salt ns e2)
-  | EPi (a, (p, b))      -> saltTele ePi ns p a b
-  | ESig (a, (p, b))     -> saltTele eSig ns p a b
+  | EPi (a, (p, b))      -> saltClos ePi ns p a b
+  | ESig (a, (p, b))     -> saltClos eSig ns p a b
   | EPair (r, a, b)      -> EPair (r, salt ns a, salt ns b)
   | EFst e               -> EFst (salt ns e)
   | ESnd e               -> ESnd (salt ns e)
@@ -134,7 +134,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EPartial e           -> EPartial (salt ns e)
   | EPartialP (t, r)     -> EPartialP (salt ns t, salt ns r)
   | ESub (a, i, u)       -> ESub (salt ns a, salt ns i, salt ns u)
-  | ESystem xs           -> ESystem (System.fold (fun k v -> System.add (freshFace ns k) (salt ns v)) xs System.empty)
+  | ESystem xs           -> ESystem (saltSystem ns xs)
   | EInc (t, r)          -> EInc (salt ns t, salt ns r)
   | EOuc e               -> EOuc (salt ns e)
   | EI                   -> EI
@@ -154,7 +154,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EFalse               -> EFalse
   | ETrue                -> ETrue
   | EIndBool e           -> EIndBool (salt ns e)
-  | EW (a, (p, b))       -> saltTele eW ns p a b
+  | EW (a, (p, b))       -> saltClos eW ns p a b
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
   | EIndW e              -> EIndW (salt ns e)
   | EIm e                -> EIm (salt ns e)
@@ -166,10 +166,34 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EResp (f, g, x)      -> EResp (salt ns f, salt ns g, salt ns x)
   | EIndCoeq (e, i, r)   -> EIndCoeq (salt ns e, salt ns i, salt ns r)
 
-and saltTele ctor ns p a b =
+and saltClos ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
 
-let freshExp = salt Env.empty
+and saltSystem ns xs =
+  System.fold (fun k v -> System.add (freshFace ns k) (salt ns v)) xs System.empty
+
+let saltTele ns (x, e) = let y = fresh x in (Env.add x y ns, (y, salt ns e))
+
+let saltTeles ns0 ts =
+  let ns = ref ns0 in
+  let ts' = List.map (fun t0 ->
+    let (ns', t) = saltTele !ns t0 in
+    ns := ns'; t) ts in
+  (!ns, ts')
+
+let saltCtor ns0 (c : ctor) : ctor =
+  let (ns, params) = saltTeles ns0 c.params in
+  let boundary = saltSystem ns c.boundary in
+  { name = c.name; params = params; boundary = boundary }
+
+let saltData ns0 (d : data) : data =
+  let (ns, params) = saltTeles ns0 d.params in
+  let kind = salt ns d.kind in
+  let ctors = List.map (saltCtor ns) d.ctors in
+  { kind = kind; params = params; ctors = ctors }
+
+let freshExp  = salt Env.empty
+let freshData = saltData Env.empty
 
 (* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
    >This increases efficiency as it won’t trigger computation. *)
@@ -199,7 +223,7 @@ let rec swap i j = function
   | VHole                -> VHole
   | VPathP v             -> VPathP (swap i j v)
   | VPartialP (t, r)     -> VPartialP (swap i j t, swap i j r)
-  | VSystem ts           -> VSystem (System.fold (fun k v -> System.add (mapFace (swapVar i j) k) (swap i j v)) ts System.empty)
+  | VSystem ts           -> VSystem (swapSystem i j ts)
   | VSub (t, r, u)       -> VSub (swap i j t, swap i j r, swap i j u)
   | VTransp (p, r)       -> VTransp (swap i j p, swap i j r)
   | VHComp (t, r, u, u0) -> VHComp (swap i j t, swap i j r, swap i j u, swap i j u0)
@@ -226,6 +250,8 @@ let rec swap i j = function
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW e              -> VIndW (swap i j e)
+  | VSum (x, xs)         -> VSum (x, List.map (swap i j) xs)
+  | VCon (x, xs, ys, ts) -> VCon (x, List.map (swap i j) xs, List.map (swap i j) ys, swapSystem i j ts)
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
@@ -234,6 +260,8 @@ let rec swap i j = function
   | VIota (f, g, x)      -> VIota (swap i j f, swap i j g, swap i j x)
   | VResp (f, g, x)      -> VResp (swap i j f, swap i j g, swap i j x)
   | VIndCoeq (v, k, r)   -> VIndCoeq (swap i j v, swap i j k, swap i j r)
+
+and swapSystem i j ts = System.fold (fun k v -> System.add (mapFace (swapVar i j) k) (swap i j v)) ts System.empty
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -257,10 +285,14 @@ let rec mem y = function
   | VIota (a, b, c) | VResp (a, b, c) | VIndCoeq (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
   | VFormula t -> memDisjunction y t
-  | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts
+  | VSystem ts -> memSystem y ts
   | VType (_, Finite ts) | VLevelElem ts -> memMaximum (fun x -> x = y) ts
+  | VSum (x, xs) -> ident x = y || List.exists (mem y) xs
+  | VCon (x, xs, ys, ts) -> ident x = y || List.exists (mem y) xs || List.exists (mem y) ys || memSystem y ts
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
+
+and memSystem y ts = System.exists (fun mu v -> Env.mem y mu || mem y v) ts
 
 let extErr = function
   | Internal err -> err

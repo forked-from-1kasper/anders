@@ -56,7 +56,3 @@ let rec showLine : line -> string = function
   | Variables xs -> Printf.sprintf "variables%s" (showTeles xs)
 
 let showFile : file -> string = String.concat "\n" << List.map showLine
-
-let rec teles ctor e : tele list -> exp = function
-  | []           -> e
-  | (p, a) :: xs -> ctor p a (teles ctor e xs)

@@ -19,6 +19,13 @@ let isEmpty = function
   | [] -> true
   | _  -> false
 
+(* https://github.com/ocaml/ocaml/blob/trunk/stdlib/list.ml *)
+let rec listEqual fn xs ys =
+  match xs, ys with
+  | [], [] -> true
+  | [], _ :: _ | _ :: _, [] -> false
+  | x :: xs, y :: ys -> fn x y && listEqual fn xs ys
+
 let getDigit x = Char.chr (Z.to_int x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 
 let ten = Z.of_int 10

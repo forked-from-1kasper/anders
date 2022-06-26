@@ -65,9 +65,10 @@ type value =
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value
   | W of value * clos | VSup of value * value | VIndW of value
-  | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
   | VCoeq of value * value | VIota of value * value * value
   | VResp of value * value * value | VIndCoeq of value * value * value
+  | VSum of string * value list | VCon of string * value list * value list * value System.t
+  | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
 and clos = ident * (value -> value)
 

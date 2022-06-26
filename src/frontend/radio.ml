@@ -72,6 +72,7 @@ let eval e  = Request.req (Eval e);  flush Kernel.stdin; recvTerm ()
 let infer e = Request.req (Infer e); flush Kernel.stdin; recvTerm ()
 
 let def p t e = Request.req (Def (p, t, e)); flush Kernel.stdin; over ()
+let data x d = Request.req (Data (x, d)); flush Kernel.stdin; over ()
 let assign p t e = Request.req (Assign (p, t, e)); flush Kernel.stdin; over ()
 let assume p t = Request.req (Assume (p, t)); flush Kernel.stdin; over ()
 

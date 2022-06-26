@@ -32,6 +32,13 @@ section
   def idfun′ : A → A := λ (x : A), x
 end
 
+ADT W′ (A : U) (B : A → U) : U :=
+| sup′ (x : A) (f : B x → W′ A B)
+
 HIT S¹ : U :=
 | base
 | loop (i : I) [(i = 0) → base, (i = 1) → base]
+
+HIT merely (A : U) : U :=
+| elem (a : A)
+| uniq (a b : merely A) (i : I) [(i = 0) → a, (i = 1) → b]

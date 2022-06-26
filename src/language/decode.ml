@@ -123,11 +123,11 @@ struct
 
   let tele () = let x = ident () in let e = exp () in (x, e)
 
-  let ctor () : ctor = let s = string () in let ts = many tele () in let bs = system () in
-    { name = s; params = ts; boundary = bs }
+  let ctor () : ctor = let s = string () in let ts = many tele () in
+    let bs = system () in { name = s; params = ts; boundary = bs }
 
-  let data () : data = let k = exp () in let xs = many tele () in let ys = many ctor () in
-    { kind = k; params = xs; ctors = ys }
+  let data () : data = let k = exp () in let xs = many tele () in
+    let ys = many ctor () in { kind = k; params = xs; ctors = ys }
 
   let req () = match R.get () with
     | '\x10' -> let (e, t) = exp2 () in Check (e, t)

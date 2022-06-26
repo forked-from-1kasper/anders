@@ -531,6 +531,12 @@ and act rho = function
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW t              -> VIndW (act rho t)
+  | VSum (x, xs)         -> VSum (x, List.map (act rho) xs)
+  | VCon (x, xs, ys, ts) -> let ts' = actSystem rho ts in
+    begin match System.find_opt eps ts' with
+      | Some v -> v
+      | None   -> VCon (x, List.map (act rho) xs, List.map (act rho) ys, ts')
+    end
   | VIm t                -> VIm (act rho t)
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
@@ -593,6 +599,8 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIndBool u, VIndBool v -> conv u v
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW t1, VIndW t2 -> conv t1 t2
+    | VSum (x, xs), VSum (y, ys) -> x = y && listEqual conv xs ys
+    | VCon (x, xs, ys, _), VCon (x', xs', ys', _) -> x = x' && listEqual conv xs xs' && listEqual conv ys ys'
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
@@ -811,3 +819,19 @@ and inferTransport ctx p i =
     eqNf (appFormulaE rho p ezero) (appFormulaE rho p e))
     (solve (eval ctx i) One);
   implv u0 u1
+
+let rec sum w (ctx, xs) = function
+  | []           -> VSum (w, List.rev xs)
+  | (y, e) :: ys -> let t = eval ctx e in
+    VLam (t, (y, fun x -> sum w (upLocal ctx y t x, x :: xs) ys))
+
+let rec con w ts (ctx, xs, ys) us vs = match us, vs with
+  | (p, e) :: us, _  -> let t = eval ctx e in
+    VLam (t, (p, fun x -> con w ts (upLocal ctx p t x, x :: xs, ys) us vs))
+  | [], (p, e) :: vs -> let t = eval ctx e in
+    VLam (t, (p, fun y -> con w ts (upLocal ctx p t y, xs, y :: ys) [] vs))
+  | [], []           -> let ts' = evalSystem ctx ts in
+    begin match System.find_opt eps ts' with
+      | Some v -> v
+      | None   -> VCon (w, List.rev xs, List.rev ys, ts')
+    end

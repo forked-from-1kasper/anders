@@ -23,6 +23,20 @@ let assign x t e = upGlobal ctx (ident x) t (getTerm e)
 
 let promote fn = try fn () with exc -> Error (extErr exc)
 
+let checkData x d () =
+  let e = teles ePi d.kind d.params in
+  isType (infer ctx e); let t = eval ctx e in
+  upGlobal ctx (ident x) t (Value (sum x (ctx, []) d.params));
+
+  let t0 = List.fold_left (fun e (y, _) -> EApp (e, EVar y)) (EVar (ident x)) d.params in
+
+  List.iter (fun (c : ctor) ->
+    let f = teles ePi (teles ePi t0 c.params) d.params in
+    isType (infer ctx f); let g = eval ctx f in
+    upGlobal ctx (ident c.name) g (Value (con c.name c.boundary (ctx, [], []) d.params c.params))) d.ctors;
+
+  OK
+
 let proto : req -> resp = function
   | Check (e0, t0)     -> promote (fun () -> let t = freshExp t0 in
     isType (infer ctx t); check ctx (freshExp e0) (eval ctx t); OK)
@@ -30,6 +44,7 @@ let proto : req -> resp = function
   | Eval e             -> promote (fun () -> Term (rbV (eval ctx (freshExp e))))
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval ctx (freshExp e1))
                                                         (eval ctx (freshExp e2))))
+  | Data (x, d)        -> promote (checkData x (freshData d))
   | Def (x, t0, e0)    -> promote (fun () ->
     if Env.mem (ident x) !(ctx.global) then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in

@@ -15,12 +15,14 @@ type plug = string -> exp -> string -> exp
 let plugin : (plug option) ref = ref None
 
 let getDeclName = function
-  | Def (p, _, _) | Ext (p, _, _) | Axiom (p, _) -> p
+  | Def (p, _, _) | Ext (p, _, _)
+  | Axiom (p, _)  | Data (p, _) -> p
 
 let rec checkDecl d =
   let ts = getVariables () in match d with
   | Def (p, Some t, e) -> def p (teles ePi t ts) (teles eLam e ts)
   | Def (p, None, e) -> let e' = teles eLam e ts in assign p (infer e') e'
+  | Data (x, d) -> data x d
   | Ext (p, t, v) -> begin match !plugin with
     | Some g -> checkDecl (Def (p, Some (teles ePi t ts), g p t v))
     | None -> failwith "external plugin isn’t loaded"

@@ -26,14 +26,14 @@ let promote fn = try fn () with exc -> Error (extErr exc)
 let checkData x d () =
   let e = teles ePi d.kind d.params in
   isType (infer ctx e); let t = eval ctx e in
-  upGlobal ctx (ident x) t (Value (sum x (ctx, []) d.params));
+  upGlobal ctx (ident x) t (Value (sum x d.kind (ctx, []) d.params));
 
   let t0 = List.fold_left (fun e (y, _) -> EApp (e, EVar y)) (EVar (ident x)) d.params in
 
   List.iter (fun (c : ctor) ->
     let f = teles ePi (teles ePi t0 c.params) d.params in
     isType (infer ctx f); let g = eval ctx f in
-    upGlobal ctx (ident c.name) g (Value (con c.name c.boundary (ctx, [], []) d.params c.params))) d.ctors;
+    upGlobal ctx (ident c.name) g (Value (con c.name x d.kind c.boundary (ctx, [], []) d.params c.params))) d.ctors;
 
   OK
 

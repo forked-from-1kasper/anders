@@ -56,3 +56,8 @@ ADT list (A : U) : U :=
 | cons (x : A) (xs : list A)
 
 ADT emptyω (u : L) : U u
+
+def negate : boolean → boolean
+| ff := tt | tt := ff
+
+def absurd (u v : L) (A : U u) : emptyω v → A

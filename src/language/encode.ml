@@ -116,6 +116,9 @@ struct
   let ctor (c : ctor) = string c.name; many tele c.params; system c.boundary
   let data (d : data) = exp d.kind; many tele d.params; many ctor d.ctors
 
+  let branch (x, xs, e) = string x; many ident xs; exp e
+  let split (s : split) = string s.name; many tele s.params; exp s.signature; many branch s.branches
+
   let req = function
     | Check (e, t)     -> W.put '\x10'; exp e; exp t
     | Infer e          -> W.put '\x11'; exp e
@@ -127,6 +130,7 @@ struct
     | Erase x          -> W.put '\x23'; string x
     | Wipe             -> W.put '\x24'
     | Data (x, d)      -> W.put '\x25'; string x; data d
+    | Split s          -> W.put '\x26'; split s
     | Set (p, x)       -> W.put '\x30'; string p; string x
     | Version          -> W.put '\x31'
     | Ping             -> W.put '\x32'

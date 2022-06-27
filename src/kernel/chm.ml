@@ -31,6 +31,7 @@ let proto : req -> resp = function
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval ctx (freshExp e1))
                                                         (eval ctx (freshExp e2))))
   | Data (x, d)        -> promote (fun () -> checkData ctx x (freshData d); OK)
+  | Split _            -> Error (Unknown "not implemented yet")
   | Def (x, t0, e0)    -> promote (fun () ->
     if Env.mem (ident x) !(ctx.global) then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in

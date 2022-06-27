@@ -71,14 +71,16 @@ let rec over () = match Response.resp () with
 let eval e  = Request.req (Eval e);  flush Kernel.stdin; recvTerm ()
 let infer e = Request.req (Infer e); flush Kernel.stdin; recvTerm ()
 
-let def p t e = Request.req (Def (p, t, e)); flush Kernel.stdin; over ()
-let data x d = Request.req (Data (x, d)); flush Kernel.stdin; over ()
-let assign p t e = Request.req (Assign (p, t, e)); flush Kernel.stdin; over ()
-let assume p t = Request.req (Assume (p, t)); flush Kernel.stdin; over ()
+let transmit mesg = Request.req mesg; flush Kernel.stdin; over ()
 
-let set p x = Request.req (Set (p, x)); flush Kernel.stdin; over ()
+let def p t e    = transmit (Def (p, t, e))
+let data x d     = transmit (Data (x, d))
+let split s      = transmit (Split s)
+let assign p t e = transmit (Assign (p, t, e))
+let assume p t   = transmit (Assume (p, t))
 
-let wipe () = Request.req Wipe; flush Kernel.stdin; over ()
+let set p x = transmit (Set (p, x))
+let wipe () = transmit Wipe
 
 let showResp = function
   | Version (i, j, k) -> Printf.printf "Version (%Ld, %Ld, %Ld)\n" i j k

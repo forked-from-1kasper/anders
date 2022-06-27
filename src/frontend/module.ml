@@ -11,6 +11,7 @@ type command =
 type decl =
   | Def of string * exp option * exp
   | Data of string * data
+  | Split of split
   | Ext of string * exp * string
   | Axiom of string * exp
 
@@ -28,9 +29,11 @@ type file = content
 let moduleSep = '/'
 let getPath = String.split_on_char moduleSep >> String.concat Filename.dir_sep
 
-let showTeles xs =
+let showMany fn xs =
   (if isEmpty xs then "" else " ") ^
-  String.concat " " (List.map showTeleExp xs)
+  String.concat " " (List.map fn xs)
+
+let showTeles = showMany showTeleExp
 
 let showCtor (c : ctor) =
   Printf.sprintf "%s%s [%s]" c.name (showTeles c.params) (showSystem showExp c.boundary)
@@ -40,9 +43,16 @@ let showCtors cs = if isEmpty cs then "" else ":=\n| " ^ String.concat "\n| " (L
 let showData (x : string) (d : data) =
   Printf.sprintf "HIT %s%s : %s %s" x (showTeles d.params) (showExp d.kind) (showCtors d.ctors)
 
+let showBranch (x, xs, e) = Printf.sprintf "| %s%s := %s" x (showMany showIdent xs) (showExp e)
+
+let showSplit s =
+  Printf.sprintf "def %s%s : %s\n%s" s.name (showTeles s.params) (showExp s.signature)
+    (String.concat "\n" (List.map showBranch s.branches))
+
 let showDecl : decl -> string = function
   | Def (p, Some exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
   | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
+  | Split s -> showSplit s
   | Data (x, d) -> showData x d
   | Ext (p, t, v) -> Printf.sprintf "def %s : %s :=\nbegin%send" p (showExp t) v
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)

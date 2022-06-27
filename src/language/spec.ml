@@ -115,6 +115,14 @@ let rec teles ctor e : tele list -> exp = function
 
 (* Kernel Interface *)
 
+type branch = string * ident list * exp
+
+type split =
+  { name      : string;
+    params    : tele list;
+    signature : exp;
+    branches  : branch list }
+
 type req =
   (* checker & evaluator *)
   | Check  of exp * exp
@@ -125,6 +133,7 @@ type req =
   | Def    of string * exp * exp
   | Assign of string * exp * exp
   | Data   of string * data
+  | Split  of split
   | Assume of string * exp
   | Erase  of string
   | Wipe

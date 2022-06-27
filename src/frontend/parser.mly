@@ -173,11 +173,15 @@ pctor:
 ctors: separated_nonempty_list(BAR, ctor) { $1 }
 pctors: separated_nonempty_list(BAR, pctor) { $1 }
 
+branch: IDENT ident* DEFEQ exp2 { ($1, $2, $4) }
+branches: BAR separated_nonempty_list(BAR, branch) { $2 } | { [] }
+
 declarations:
   | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (teles ePi $5 $3), teles eLam $7 $3) }
   | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, teles ePi $5 $3, $7) }
   | DEF IDENT params DEFEQ exp2 { Def ($2, None, teles eLam $5 $3) }
   | AXIOM IDENT params COLON exp2 { Axiom ($2, teles ePi $5 $3) }
+  | DEF IDENT params COLON exp2 branches { Split { name = $2; params = $3; signature = $5; branches = $6 } }
   | ADT IDENT params COLON exp2 { Data ($2, { kind = $5; params = $3; ctors = [] }) }
   | HIT IDENT params COLON exp2 { Data ($2, { kind = $5; params = $3; ctors = [] }) }
   | ADT IDENT params COLON exp2 DEFEQ BAR? ctors { Data ($2, { kind = $5; params = $3; ctors = $8 }) }

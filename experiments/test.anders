@@ -32,10 +32,10 @@ section
   def idfun′ : A → A := λ (x : A), x
 end
 
-ADT W′ (A : U) (B : A → U) : U :=
+ADT W′ (A : U) (B : A → U) : U
 | sup′ (x : A) (f : B x → W′ A B)
 
-HIT S¹ : U :=
+HIT S¹ : U
 | base
 | loop (i : I) [(i = 0) → base, (i = 1) → base]
 
@@ -43,15 +43,15 @@ def Path (A : U) (a b : A) := PathP (<_> A) a b
 
 def loop-S¹ : Path S¹ base base := <i> loop i
 
-HIT merely (A : U) : U :=
+HIT merely (A : U) : U
 | elem (a : A)
 | uniq (a b : merely A) (i : I) [(i = 0) → a, (i = 1) → b]
 
-ADT boolean : U :=
+ADT boolean : U
 | ff
 | tt
 
-ADT list (A : U) : U :=
+ADT list (A : U) : U
 | nil
 | cons (x : A) (xs : list A)
 

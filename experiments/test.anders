@@ -43,6 +43,13 @@ def Path (A : U) (a b : A) := PathP (<_> A) a b
 
 def loop-S¹ : Path S¹ base base := <i> loop i
 
+HIT T² : U
+| b
+| tp (i : I) [(i = 0) → b, (i = 1) → b]
+| tq (i : I) [(i = 0) → b, (i = 1) → b]
+| surf (i j : I) [(i = 0) → tp j, (i = 1) → tp j,
+                  (j = 0) → tq i, (j = 1) → tq i]
+
 HIT merely (A : U) : U
 | elem (a : A)
 | uniq (a b : merely A) (i : I) [(i = 0) → a, (i = 1) → b]

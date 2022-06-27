@@ -206,62 +206,68 @@ let swapDisjunction i j = Disjunction.map (swapConjunction i j)
 let swapMaximum i j = Maximum.map (fun (n, ts) -> (n, Idents.map (swapVar i j) ts))
 
 let rec swap i j = function
-  | VLam (t, (x, g))           -> VLam (swap i j t, (x, g >> swap i j))
-  | VPair (r, u, v)            -> VPair (r, swap i j u, swap i j v)
-  | VLevel                     -> VLevel
-  | VLevelElem ts              -> VLevelElem (swapMaximum i j ts)
-  | VType (c, Finite ts)       -> VType (c, Finite (swapMaximum i j ts))
-  | VType (c, Omega n)         -> VType (c, Omega n)
-  | VPi (t, (x, g))            -> VPi (swap i j t, (x, g >> swap i j))
-  | VSig (t, (x, g))           -> VSig (swap i j t, (x, g >> swap i j))
-  | VPLam f                    -> VPLam (swap i j f)
-  | Var (k, VI)                -> Var (swapVar i j k, VI)
-  | Var (x, t)                 -> Var (x, swap i j t)
-  | VApp (f, x)                -> VApp (swap i j f, swap i j x)
-  | VFst k                     -> VFst (swap i j k)
-  | VSnd k                     -> VSnd (swap i j k)
-  | VHole                      -> VHole
-  | VPathP v                   -> VPathP (swap i j v)
-  | VPartialP (t, r)           -> VPartialP (swap i j t, swap i j r)
-  | VSystem ts                 -> VSystem (swapSystem i j ts)
-  | VSub (t, r, u)             -> VSub (swap i j t, swap i j r, swap i j u)
-  | VTransp (p, r)             -> VTransp (swap i j p, swap i j r)
-  | VHComp (t, r, u, u0)       -> VHComp (swap i j t, swap i j r, swap i j u, swap i j u0)
-  | VAppFormula (f, x)         -> VAppFormula (swap i j f, swap i j x)
-  | VId v                      -> VId (swap i j v)
-  | VRef v                     -> VRef (swap i j v)
-  | VJ v                       -> VJ (swap i j v)
-  | VI                         -> VI
-  | VFormula t                 -> VFormula (swapDisjunction i j t)
-  | VInc (t, r)                -> VInc (swap i j t, swap i j r)
-  | VOuc v                     -> VOuc (swap i j v)
-  | VGlue v                    -> VGlue (swap i j v)
-  | VGlueElem (r, u, a)        -> VGlueElem (swap i j r, swap i j u, swap i j a)
-  | VUnglue (r, u, v)          -> VUnglue (swap i j r, swap i j u, swap i j v)
-  | VEmpty                     -> VEmpty
-  | VIndEmpty v                -> VIndEmpty (swap i j v)
-  | VUnit                      -> VUnit
-  | VStar                      -> VStar
-  | VIndUnit v                 -> VIndUnit (swap i j v)
-  | VBool                      -> VBool
-  | VFalse                     -> VFalse
-  | VTrue                      -> VTrue
-  | VIndBool v                 -> VIndBool (swap i j v)
-  | W (t, (x, g))              -> W (swap i j t, (x, g >> swap i j))
-  | VSup (a, b)                -> VSup (swap i j a, swap i j b)
-  | VIndW e                    -> VIndW (swap i j e)
-  | VSum (x, t, xs)            -> VSum (x, swap i j t, List.map (swap i j) xs)
-  | VCon (x, y, t, xs, ys, ts) -> VCon (x, y, swap i j t, List.map (swap i j) xs, List.map (swap i j) ys, swapSystem i j ts)
-  | VIm v                      -> VIm (swap i j v)
-  | VInf v                     -> VInf (swap i j v)
-  | VIndIm (a, b)              -> VIndIm (swap i j a, swap i j b)
-  | VJoin v                    -> VJoin (swap i j v)
-  | VCoeq (f, g)               -> VCoeq (swap i j f, swap i j g)
-  | VIota (f, g, x)            -> VIota (swap i j f, swap i j g, swap i j x)
-  | VResp (f, g, x)            -> VResp (swap i j f, swap i j g, swap i j x)
-  | VIndCoeq (v, k, r)         -> VIndCoeq (swap i j v, swap i j k, swap i j r)
+  | VLam (t, (x, g))     -> VLam (swap i j t, (x, g >> swap i j))
+  | VPair (r, u, v)      -> VPair (r, swap i j u, swap i j v)
+  | VLevel               -> VLevel
+  | VLevelElem ts        -> VLevelElem (swapMaximum i j ts)
+  | VType (c, Finite ts) -> VType (c, Finite (swapMaximum i j ts))
+  | VType (c, Omega n)   -> VType (c, Omega n)
+  | VPi (t, (x, g))      -> VPi (swap i j t, (x, g >> swap i j))
+  | VSig (t, (x, g))     -> VSig (swap i j t, (x, g >> swap i j))
+  | VPLam f              -> VPLam (swap i j f)
+  | Var (k, VI)          -> Var (swapVar i j k, VI)
+  | Var (x, t)           -> Var (x, swap i j t)
+  | VApp (f, x)          -> VApp (swap i j f, swap i j x)
+  | VFst k               -> VFst (swap i j k)
+  | VSnd k               -> VSnd (swap i j k)
+  | VHole                -> VHole
+  | VPathP v             -> VPathP (swap i j v)
+  | VPartialP (t, r)     -> VPartialP (swap i j t, swap i j r)
+  | VSystem ts           -> VSystem (swapSystem i j ts)
+  | VSub (t, r, u)       -> VSub (swap i j t, swap i j r, swap i j u)
+  | VTransp (p, r)       -> VTransp (swap i j p, swap i j r)
+  | VHComp (t, r, u, u0) -> VHComp (swap i j t, swap i j r, swap i j u, swap i j u0)
+  | VAppFormula (f, x)   -> VAppFormula (swap i j f, swap i j x)
+  | VId v                -> VId (swap i j v)
+  | VRef v               -> VRef (swap i j v)
+  | VJ v                 -> VJ (swap i j v)
+  | VI                   -> VI
+  | VFormula t           -> VFormula (swapDisjunction i j t)
+  | VInc (t, r)          -> VInc (swap i j t, swap i j r)
+  | VOuc v               -> VOuc (swap i j v)
+  | VGlue v              -> VGlue (swap i j v)
+  | VGlueElem (r, u, a)  -> VGlueElem (swap i j r, swap i j u, swap i j a)
+  | VUnglue (r, u, v)    -> VUnglue (swap i j r, swap i j u, swap i j v)
+  | VEmpty               -> VEmpty
+  | VIndEmpty v          -> VIndEmpty (swap i j v)
+  | VUnit                -> VUnit
+  | VStar                -> VStar
+  | VIndUnit v           -> VIndUnit (swap i j v)
+  | VBool                -> VBool
+  | VFalse               -> VFalse
+  | VTrue                -> VTrue
+  | VIndBool v           -> VIndBool (swap i j v)
+  | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
+  | VSup (a, b)          -> VSup (swap i j a, swap i j b)
+  | VIndW e              -> VIndW (swap i j e)
+  | VSum (x, t, xs)      -> VSum (x, swap i j t, List.map (swap i j) xs)
+  | VCon c               -> VCon (swapCon i j c)
+  | VIm v                -> VIm (swap i j v)
+  | VInf v               -> VInf (swap i j v)
+  | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
+  | VJoin v              -> VJoin (swap i j v)
+  | VCoeq (f, g)         -> VCoeq (swap i j f, swap i j g)
+  | VIota (f, g, x)      -> VIota (swap i j f, swap i j g, swap i j x)
+  | VResp (f, g, x)      -> VResp (swap i j f, swap i j g, swap i j x)
+  | VIndCoeq (v, k, r)   -> VIndCoeq (swap i j v, swap i j k, swap i j r)
 
 and swapSystem i j ts = System.fold (fun k v -> System.add (mapFace (swapVar i j) k) (swap i j v)) ts System.empty
+
+and swapCon i j (c : con) =
+  { c with kind     = swap i j c.kind;
+           params   = List.map (swap i j) c.params;
+           cparams  = List.map (swap i j) c.cparams;
+           boundary = swapSystem i j c.boundary }
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -288,7 +294,12 @@ let rec mem y = function
   | VSystem ts -> memSystem y ts
   | VType (_, Finite ts) | VLevelElem ts -> memMaximum (fun x -> x = y) ts
   | VSum (x, t, xs) -> ident x = y || mem y t || List.exists (mem y) xs
-  | VCon (x, x', t, xs, ys, ts) -> ident x = y || ident x' = y || mem y t || List.exists (mem y) xs || List.exists (mem y) ys || memSystem y ts
+  | VCon c -> ident c.name = y
+           || ident c.cname = y
+           || mem y c.kind
+           || List.exists (mem y) c.params
+           || List.exists (mem y) c.cparams
+           || memSystem y c.boundary
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 

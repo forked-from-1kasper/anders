@@ -46,3 +46,9 @@ HIT merely (A : U) : U :=
 ADT boolean : U :=
 | ff
 | tt
+
+ADT list (A : U) : U :=
+| nil
+| cons (x : A) (xs : list A)
+
+ADT emptyω (u : L) : U u

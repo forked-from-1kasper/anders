@@ -416,7 +416,7 @@ and inferV v = traceInferV v; match v with
   | VIndW c -> let (a, (p, b)) = extW (fst (extPiG (inferV c))) in
     inferIndW a (VLam (a, (p, b))) c
   | VSum (_, t, _) -> t
-  | VCon (_, y, t, xs, _, _) -> VSum (y, t, xs)
+  | VCon c -> VSum (c.name, c.kind, c.params)
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
@@ -534,11 +534,7 @@ and act rho = function
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW t              -> VIndW (act rho t)
   | VSum (x, t, xs)      -> VSum (x, act rho t, List.map (act rho) xs)
-  | VCon (x, y, t, xs, ys, ts) -> let ts' = actSystem rho ts in
-    begin match System.find_opt eps ts' with
-      | Some v -> v
-      | None   -> VCon (x, y, act rho t, List.map (act rho) xs, List.map (act rho) ys, ts')
-    end
+  | VCon c               -> actCon rho c
   | VIm t                -> VIm (act rho t)
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
@@ -547,6 +543,14 @@ and act rho = function
   | VIota (f, g, x)      -> VIota (act rho f, act rho g, act rho x)
   | VResp (f, g, x)      -> VResp (act rho f, act rho g, act rho x)
   | VIndCoeq (v, i, r)   -> VIndCoeq (act rho v, act rho i, act rho r)
+
+and actCon rho (c : con) = let ts = actSystem rho c.boundary in
+  match System.find_opt eps ts with
+  | Some v -> v
+  | None   -> VCon { c with kind     = act rho c.kind;
+                            params   = List.map (act rho) c.params;
+                            cparams  = List.map (act rho) c.cparams;
+                            boundary = ts }
 
 and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
 
@@ -602,7 +606,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW t1, VIndW t2 -> conv t1 t2
     | VSum (x, _, xs), VSum (y, _, ys) -> x = y && listEqual conv xs ys
-    | VCon (x, _, _, xs, ys, _), VCon (x', _, _, xs', ys', _) -> x = x' && listEqual conv xs xs' && listEqual conv ys ys'
+    | VCon c1, VCon c2 -> c1.name = c2.name && listEqual conv c1.params c2.params && listEqual conv c1.cparams c2.cparams
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
@@ -836,5 +840,30 @@ let rec con w1 w2 l ts (ctx, xs, ys) us vs = match us, vs with
   | [], []           -> let ts' = evalSystem ctx ts in
     begin match System.find_opt eps ts' with
       | Some v -> v
-      | None   -> VCon (w1, w2, eval ctx l, List.rev xs, List.rev ys, ts')
+      | None   -> VCon { name = w1; cname = w2; kind = eval ctx l;
+                         params = List.rev xs; cparams = List.rev ys;
+                         boundary = ts' }
     end
+
+let teleCtx = List.fold_left (fun ctx (y, e) -> let t = eval ctx e in upLocal ctx y t (Var (y, t)))
+
+let checkData (ctx : ctx) (x : string) (d : data) =
+  let e = teles ePi d.kind d.params in
+  isType (infer ctx e); let t = eval ctx e in
+  upGlobal ctx (ident x) t (Value (sum x d.kind (ctx, []) d.params));
+
+  let t0 = List.fold_left (fun e (y, _) -> EApp (e, EVar y)) (EVar (ident x)) d.params in
+
+  let (ctx1, xs1) = List.fold_left (fun (ctx, ts0) (y, e) -> let t = eval ctx e in
+    let y' = Var (y, t) in (upLocal ctx y t y', y' :: ts0)) (ctx, []) d.params in
+  let t1 = VSum (x, eval ctx1 d.kind, List.rev xs1) in
+
+  List.iter (fun (c : ctor) ->
+    let f = teles ePi (teles ePi t0 c.params) d.params in
+    isType (infer ctx f); let g = eval ctx f in
+
+    let ctx2 = teleCtx ctx1 c.params in
+    System.iter (fun _ e -> check ctx2 e t1) c.boundary;
+
+    let t = con x c.name d.kind c.boundary (ctx, [], []) d.params c.params in
+    upGlobal ctx (ident c.name) g (Value t)) d.ctors

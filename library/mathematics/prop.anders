@@ -41,5 +41,5 @@ def propIsProp (A : U) : isProp (isProp A) := λ (f g : isProp A), <i> λ (a b :
 
 def corSigProp (A : U) (B : A → U) (pB : Π (x : A), isProp (B x)) (t u : Σ (x : A), B x)
   (p : PathP (<_> A) t.1 u.1) : isProp (PathP (<i> B (p @ i)) t.2 u.2) :=
-transp (<i> isProp (pathSig0 A B t u p @ -i)) 0 (propSet (B u.1) (pB u.1)
+transp (<i> isProp (pathSig₀ A B t u p @ -i)) 0 (propSet (B u.1) (pB u.1)
   (hcomp (B u.1) 0 (λ (r : I), []) (transp (<i> B (p @ i)) 0 t.2)) u.2)

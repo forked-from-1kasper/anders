@@ -33,10 +33,14 @@ def lemProp (A : U) (h : A → isProp A) : isProp A := λ (a : A), h a a
 
 -- https://github.com/mortberg/cubicaltt/blob/master/examples/sigma.ctt
 def T (A : U) (x : A) : U := Π (y : A), Path A x y
-def lem1 (A : U) (t : isContr A) (x y : A) : Path A x y := comp-Path A x t.1 y (<i> t.2 x @ -i) (t.2 y)
-def lem2 (A : U) (t : isContr A) (x : A) : isProp (T A x) := propPi A (λ (y : A), Path A x y) (propSet A (lem1 A t) x)
 
-def propIsContr (A : U) : isProp (isContr A) := lemProp (isContr A) (λ (t : isContr A), propSig A (T A) (lem1 A t) (lem2 A t))
+section
+  variables (A : U) (t : isContr A)
+  def lem₁ (x y : A) : Path A x y := comp-Path A x t.1 y (<i> t.2 x @ -i) (t.2 y)
+  def lem₂ (x : A) : isProp (T A x) := propPi A (λ (y : A), Path A x y) (propSet A (lem₁ A t) x)
+end
+
+def propIsContr (A : U) : isProp (isContr A) := lemProp (isContr A) (λ (t : isContr A), propSig A (T A) (lem₁ A t) (lem₂ A t))
 def propIsProp (A : U) : isProp (isProp A) := λ (f g : isProp A), <i> λ (a b : A), propSet A f a b (f a b) (g a b) @ i
 
 def corSigProp (A : U) (B : A → U) (pB : Π (x : A), isProp (B x)) (t u : Σ (x : A), B x)

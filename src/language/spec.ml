@@ -93,6 +93,14 @@ type data =
     params : tele list;
     ctors  : ctor list }
 
+type branch = string * ident list * exp
+
+type split =
+  { name      : string;
+    params    : tele list;
+    signature : exp;
+    branches  : branch list }
+
 let eLam p a b = ELam (a, (p, b))
 let ePi  p a b = EPi  (a, (p, b))
 let eSig p a b = ESig (a, (p, b))
@@ -114,14 +122,6 @@ let rec teles ctor e : tele list -> exp = function
   | (p, a) :: xs -> ctor p a (teles ctor e xs)
 
 (* Kernel Interface *)
-
-type branch = string * ident list * exp
-
-type split =
-  { name      : string;
-    params    : tele list;
-    signature : exp;
-    branches  : branch list }
 
 type req =
   (* checker & evaluator *)

@@ -3,6 +3,7 @@ open Language.Decode
 open Language.Spec
 open Universe
 open Check
+open Hits
 open Elab
 open Term
 open Rbv

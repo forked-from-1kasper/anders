@@ -73,10 +73,10 @@ type value =
 and clos = ident * (value -> value)
 
 and con =
-  { name     : string;
+  { tname    : string;
     cname    : string;
     kind     : value;
-    params   : value list;
+    tparams  : value list;
     cparams  : value list;
     boundary : value System.t }
 

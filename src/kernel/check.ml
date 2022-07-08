@@ -416,7 +416,7 @@ and inferV v = traceInferV v; match v with
   | VIndW c -> let (a, (p, b)) = extW (fst (extPiG (inferV c))) in
     inferIndW a (VLam (a, (p, b))) c
   | VSum (_, t, _) -> t
-  | VCon c -> VSum (c.name, c.kind, c.params)
+  | VCon c -> VSum (c.tname, c.kind, c.tparams)
   | VSplit s -> let (t, (x, g)) = s.signature in VPi (t, (x, g))
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
@@ -552,7 +552,7 @@ and actCon rho (c : con) = let ts = actSystem rho c.boundary in
   match System.find_opt eps ts with
   | Some v -> v
   | None   -> VCon { c with kind     = act rho c.kind;
-                            params   = List.map (act rho) c.params;
+                            tparams  = List.map (act rho) c.tparams;
                             cparams  = List.map (act rho) c.cparams;
                             boundary = ts }
 
@@ -616,7 +616,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW t1, VIndW t2 -> conv t1 t2
     | VSum (x, _, xs), VSum (y, _, ys) -> x = y && listEqual conv xs ys
-    | VCon c1, VCon c2 -> c1.name = c2.name && listEqual conv c1.params c2.params && listEqual conv c1.cparams c2.cparams
+    | VCon c1, VCon c2 -> c1.cname = c2.cname && listEqual conv c1.tparams c2.tparams && listEqual conv c1.cparams c2.cparams
     | VSplit s1, VSplit s2 -> s1.fname = s2.fname && listEqual conv s1.fparams s2.fparams
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v

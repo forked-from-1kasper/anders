@@ -282,7 +282,7 @@ and swapSystem i j ts = System.fold (fun k v -> System.add (mapFace (swapVar i j
 
 and swapCon i j (c : con) =
   { c with kind     = swap i j c.kind;
-           params   = List.map (swap i j) c.params;
+           tparams  = List.map (swap i j) c.tparams;
            cparams  = List.map (swap i j) c.cparams;
            boundary = swapSystem i j c.boundary }
 
@@ -327,10 +327,10 @@ and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 and memSystem y ts = System.exists (fun mu v -> Env.mem y mu || mem y v) ts
 
 and memCon y (c : con) =
-     ident c.name = y
+     ident c.tname = y
   || ident c.cname = y
   || mem y c.kind
-  || List.exists (mem y) c.params
+  || List.exists (mem y) c.tparams
   || List.exists (mem y) c.cparams
   || memSystem y c.boundary
 

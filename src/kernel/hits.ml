@@ -17,8 +17,8 @@ let rec con w1 w2 l ts (ctx, xs, ys) us vs = match us, vs with
   | [], []           -> let ts' = evalSystem ctx ts in
     begin match System.find_opt eps ts' with
       | Some v -> v
-      | None   -> VCon { name = w1; cname = w2; kind = eval ctx l;
-                         params = List.rev xs; cparams = List.rev ys;
+      | None   -> VCon { tname = w1; cname = w2; kind = eval ctx l;
+                         tparams = List.rev xs; cparams = List.rev ys;
                          boundary = ts' }
     end
 

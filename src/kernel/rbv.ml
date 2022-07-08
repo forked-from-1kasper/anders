@@ -69,6 +69,7 @@ let rec rbV v = match v with
   | VIndW e              -> EIndW (rbV e)
   | VSum (x, _, xs)      -> List.fold_left eApp (EVar (ident x)) (List.map rbV xs)
   | VCon c               -> List.fold_left eApp (EVar (ident c.cname)) (List.map rbV (List.append c.params c.cparams))
+  | VSplit s             -> List.fold_left eApp (EVar (ident s.fname)) (List.map rbV s.fparams)
   | VIm t                -> EIm (rbV t)
   | VInf v               -> EInf (rbV v)
   | VJoin v              -> EJoin (rbV v)

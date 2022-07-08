@@ -417,6 +417,7 @@ and inferV v = traceInferV v; match v with
     inferIndW a (VLam (a, (p, b))) c
   | VSum (_, t, _) -> t
   | VCon c -> VSum (c.name, c.kind, c.params)
+  | VSplit s -> let (t, (x, g)) = s.signature in VPi (t, (x, g))
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
@@ -535,6 +536,7 @@ and act rho = function
   | VIndW t              -> VIndW (act rho t)
   | VSum (x, t, xs)      -> VSum (x, act rho t, List.map (act rho) xs)
   | VCon c               -> actCon rho c
+  | VSplit s             -> VSplit (actElim rho s)
   | VIm t                -> VIm (act rho t)
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
@@ -544,6 +546,8 @@ and act rho = function
   | VResp (f, g, x)      -> VResp (act rho f, act rho g, act rho x)
   | VIndCoeq (v, i, r)   -> VIndCoeq (act rho v, act rho i, act rho r)
 
+and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
+
 and actCon rho (c : con) = let ts = actSystem rho c.boundary in
   match System.find_opt eps ts with
   | Some v -> v
@@ -552,7 +556,14 @@ and actCon rho (c : con) = let ts = actSystem rho c.boundary in
                             cparams  = List.map (act rho) c.cparams;
                             boundary = ts }
 
-and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
+and actElim rho (s : elim) =
+  let (t, (x, g)) = s.signature in
+  { s with fparams   = List.map (act rho) s.fparams;
+           signature = (act rho t, (x, g >> act rho));
+           branches  = List.map (actBranch rho) s.branches }
+
+and actBranch rho (c, ts, fn) =
+  (c, List.map (fun (x, v) -> (x, act rho v)) ts, fn >> act rho)
 
 and act0 i j = act (Env.add i j Env.empty)
 and upd mu = act (Env.map dir mu)

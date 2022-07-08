@@ -81,10 +81,12 @@ and con =
     boundary : value System.t }
 
 and elim =
-  { name      : string;
-    params    : value list;
-    signature : value -> value;
-    branches  : (string * (value list -> value)) list }
+  { fname     : string;
+    fparams   : value list;
+    signature : value * clos;
+    branches  : branch list }
+
+and branch = string * (ident * value) list * (value list -> value)
 
 type term = Exp of exp | Value of value
 

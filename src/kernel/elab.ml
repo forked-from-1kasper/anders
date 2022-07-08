@@ -256,6 +256,7 @@ let rec swap i j = function
   | VIndW e              -> VIndW (swap i j e)
   | VSum (x, t, xs)      -> VSum (x, swap i j t, List.map (swap i j) xs)
   | VCon c               -> VCon (swapCon i j c)
+  | VSplit s             -> VSplit (swapElim i j s)
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
@@ -272,6 +273,15 @@ and swapCon i j (c : con) =
            params   = List.map (swap i j) c.params;
            cparams  = List.map (swap i j) c.cparams;
            boundary = swapSystem i j c.boundary }
+
+and swapElim i j (s : elim) =
+  let (t, (x, g)) = s.signature in
+  { s with fparams   = List.map (swap i j) s.fparams;
+           signature = (swap i j t, (x, g >> swap i j));
+           branches  = List.map (swapBranch i j) s.branches }
+
+and swapBranch i j (c, ts, fn) =
+  (c, List.map (fun (x, v) -> (x, swap i j v)) ts, fn >> swap i j)
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -298,16 +308,32 @@ let rec mem y = function
   | VSystem ts -> memSystem y ts
   | VType (_, Finite ts) | VLevelElem ts -> memMaximum (fun x -> x = y) ts
   | VSum (x, t, xs) -> ident x = y || mem y t || List.exists (mem y) xs
-  | VCon c -> ident c.name = y
-           || ident c.cname = y
-           || mem y c.kind
-           || List.exists (mem y) c.params
-           || List.exists (mem y) c.cparams
-           || memSystem y c.boundary
+  | VCon c -> memCon y c
+  | VSplit s -> memElim y s
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 
 and memSystem y ts = System.exists (fun mu v -> Env.mem y mu || mem y v) ts
+
+and memCon y (c : con) =
+     ident c.name = y
+  || ident c.cname = y
+  || mem y c.kind
+  || List.exists (mem y) c.params
+  || List.exists (mem y) c.cparams
+  || memSystem y c.boundary
+
+and memElim y (s : elim) =
+  let (t, (x, g)) = s.signature in
+     ident s.fname = y
+  || List.exists (mem y) s.fparams
+  || memClos y t x g
+  || List.exists (memBranch y) s.branches
+
+and memBranch y (c, ts, fn) =
+     ident c = y
+  || List.exists (fun (x, v) -> x = y || mem y v) ts
+  || mem y (fn (List.map (fun (x, v) -> Var (x, v)) ts))
 
 let extErr = function
   | Internal err -> err

@@ -43,11 +43,14 @@ let rec prettyPrintError : error -> string = function
     List.map (fun (e, t) -> Printf.sprintf "When trying to typecheck\n  %s\nAgainst type\n  %s\n" (showExp e) (showExp t)) es
     |> String.concat "" |> flip (^) (prettyPrintError e)
 
+let unknownOption opt = Printf.printf "Unknown option “%s”\n" opt
+let unknownOptionValue value opt = Printf.printf "Unknown value “%s” of option “%s”\n" value opt
+
 let prettyPrintExn : exn -> unit = function
   | Kernel err                         -> print_string (prettyPrintError err)
   | Parser (x, buf, filename)          -> Printf.printf "Parsing error at line %d while parsing “%s”: “%s”\n" x filename buf
-  | UnknownOption opt                  -> Printf.printf "Unknown option “%s”\n" opt
-  | UnknownOptionValue (opt, value)    -> Printf.printf "Unknown value “%s” of option “%s”\n" value opt
+  | UnknownOption opt                  -> unknownOption opt
+  | UnknownOptionValue (opt, value)    -> unknownOptionValue opt value
   | UnknownCommand s                   -> Printf.printf "Unknown command “%s”\n" s
   | ExtractionError s                  -> Printf.printf "Error occured during extraction:\n  %s\n" s
   | UnknownPrimitive x                 -> Printf.printf "Unknown primitive “%s”\n" x

@@ -71,7 +71,9 @@ let rec over () = match Response.resp () with
 let eval e  = Request.req (Eval e);  flush Kernel.stdin; recvTerm ()
 let infer e = Request.req (Infer e); flush Kernel.stdin; recvTerm ()
 
-let transmit mesg = Request.req mesg; flush Kernel.stdin; over ()
+let transmit mesg =
+  try Request.req mesg; flush Kernel.stdin; over ()
+  with ex -> prettyPrintExn ex
 
 let def p t e    = transmit (Def (p, t, e))
 let data x d     = transmit (Data (x, d))

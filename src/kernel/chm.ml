@@ -19,7 +19,6 @@ let getBoolVal opt = function
   | value -> raise (Internal (InvalidOptValue (opt, value)))
 
 let getTerm e = if !Prefs.normalize then Value (eval ctx e) else Exp e
-let assign x t e = upGlobal ctx (ident x) t (getTerm e)
 
 let promote fn = try fn () with exc -> Error (extErr exc)
 
@@ -33,18 +32,15 @@ let proto : req -> resp = function
   | Data (x, d)        -> promote (fun () -> checkData ctx x (freshData d); OK)
   | Split _            -> Error (Unknown "not implemented yet")
   | Def (x, t0, e0)    -> promote (fun () ->
-    if Env.mem (ident x) !(ctx.global) then Error (AlreadyDeclared x)
-    else (let t = freshExp t0 in let e = freshExp e0 in
-      isType (infer ctx t); let t' = eval ctx t in
-      check ctx e t'; assign x t' e; OK))
+    let t = freshExp t0 in let e = freshExp e0 in
+    isType (infer ctx t); let t' = eval ctx t in
+    check ctx e t'; assign ctx x t' (getTerm e); OK)
   | Assign (x, t0, e0) -> promote (fun () ->
-    if Env.mem (ident x) !(ctx.global) then Error (AlreadyDeclared x)
-    else (let t = freshExp t0 in isType (infer ctx t);
-          assign x (eval ctx t) (freshExp e0); OK))
+    let t = freshExp t0 in isType (infer ctx t);
+    assign ctx x (eval ctx t) (getTerm (freshExp e0)); OK)
   | Assume (x, t0)     -> promote (fun () -> let t = freshExp t0 in
-    let y = ident x in if Env.mem y !(ctx.global) then Error (AlreadyDeclared x)
-    else (isType (infer ctx t); let t' = eval ctx t in
-          upGlobal ctx y t' (Value (Var (y, t'))); OK))
+    isType (infer ctx t); let t' = eval ctx t in
+    assign ctx x t' (Value (Var (ident x, t'))); OK)
   | Erase x            -> ctx.global := Env.remove (ident x) !(ctx.global); OK
   | Wipe               -> ctx.global := Env.empty; OK
   | Set (p, x)         ->

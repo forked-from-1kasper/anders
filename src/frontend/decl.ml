@@ -27,14 +27,14 @@ let rec checkDecl d =
   | Split s -> split s
   | Ext (p, t, v) -> begin match !plugin with
     | Some g -> checkDecl (Def (p, Some (teles ePi t ts), g p t v))
-    | None -> failwith "external plugin isn’t loaded"
+    | None -> Printf.printf "external plugin isn’t loaded"
   end
   | Axiom (p, t) -> assume p (teles ePi t ts)
 
-let getBoolVal opt = function
-  | "tt" | "true"  -> true
-  | "ff" | "false" -> false
-  | value -> raise (UnknownOptionValue (opt, value))
+let setBoolVal ptr opt = function
+  | "tt" | "true"  -> ptr := true
+  | "ff" | "false" -> ptr := false
+  | value -> unknownOptionValue opt value
 
 let rec checkLine k fs : line -> Files.t = function
   | Decl d ->
@@ -46,14 +46,14 @@ let rec checkLine k fs : line -> Files.t = function
     Dynlink.loadfile (plugExt p);
     begin match !plugin with
       | Some _ -> ()
-      | None   -> failwith (Printf.sprintf "Module “%s” was not initialized." p)
+      | None   -> Printf.printf "Module “%s” was not initialized." p
     end; fs
   | Option (opt, value) ->
     begin match opt with
       | "girard"    | "irrelevance"
       | "normalize" | "impredicativity" -> set opt value
-      | "verbose" -> Prefs.verbose := getBoolVal opt value
-      | _         -> raise (UnknownOption opt)
+      | "verbose" -> setBoolVal Prefs.verbose opt value
+      | _         -> unknownOption opt
     end; fs
   | Import xs -> List.fold_left (fun fs x -> let path = ext x in
     if Files.mem path fs then fs else checkFile fs path) fs xs

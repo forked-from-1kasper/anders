@@ -850,7 +850,7 @@ let teleCtx = List.fold_left (fun ctx (y, e) -> let t = eval ctx e in upLocal ct
 let checkData (ctx : ctx) (x : string) (d : data) =
   let e = teles ePi d.kind d.params in
   isType (infer ctx e); let t = eval ctx e in
-  upGlobal ctx (ident x) t (Value (sum x d.kind (ctx, []) d.params));
+  assign ctx x t (Value (sum x d.kind (ctx, []) d.params));
 
   let t0 = List.fold_left (fun e (y, _) -> EApp (e, EVar y)) (EVar (ident x)) d.params in
 
@@ -866,4 +866,4 @@ let checkData (ctx : ctx) (x : string) (d : data) =
     System.iter (fun _ e -> check ctx2 e t1) c.boundary;
 
     let t = con x c.name d.kind c.boundary (ctx, [], []) d.params c.params in
-    upGlobal ctx (ident c.name) g (Value t)) d.ctors
+    assign ctx c.name g (Value t)) d.ctors

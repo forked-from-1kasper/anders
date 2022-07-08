@@ -106,9 +106,17 @@ let top = Disjunction.mem Conjunction.empty
 let isOne i = VApp (VApp (VId VI, vone), i)
 let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
 
+exception Internal of error
+exception IncompatibleFaces
+
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
 let upLocal ctx p t v = { ctx with local = upVar p (t, v) ctx.local }
 let upGlobal ctx p t v = ctx.global := upVar p (t, v) !(ctx.global)
+
+let assign ctx x t e =
+  if Env.mem (ident x) !(ctx.global)
+  then raise (Internal (AlreadyDeclared x))
+  else upGlobal ctx (ident x) t e
 
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
@@ -117,6 +125,3 @@ let freshFace ns = mapFace (freshVar ns)
 let actVar rho i = match Env.find_opt i rho with
   | Some v -> v
   | None   -> Var (i, VI)
-
-exception Internal of error
-exception IncompatibleFaces

@@ -161,6 +161,7 @@ struct
     | ExpectedLevel e             -> W.put '\x17'; exp e
     | ExpectedNonDependent (x, e) -> W.put '\x18'; ident x; exp e
     | ExpectedCoeq e              -> W.put '\x19'; exp e
+    | ExpectedHIT e               -> W.put '\x20'; exp e
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

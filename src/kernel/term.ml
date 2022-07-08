@@ -67,7 +67,7 @@ type value =
   | W of value * clos | VSup of value * value | VIndW of value
   | VCoeq of value * value | VIota of value * value * value
   | VResp of value * value * value | VIndCoeq of value * value * value
-  | VSum of string * value * value list | VCon of con
+  | VSum of string * value * value list | VCon of con | VSplit of elim
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
 and clos = ident * (value -> value)
@@ -79,6 +79,12 @@ and con =
     params   : value list;
     cparams  : value list;
     boundary : value System.t }
+
+and elim =
+  { name      : string;
+    params    : value list;
+    signature : value -> value;
+    branches  : (string * (value list -> value)) list }
 
 type term = Exp of exp | Value of value
 

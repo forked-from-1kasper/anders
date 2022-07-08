@@ -176,6 +176,7 @@ struct
     | '\x17' -> ExpectedLevel (exp ())
     | '\x18' -> let x = ident () in let e = exp () in ExpectedNonDependent (x, e)
     | '\x19' -> ExpectedCoeq (exp ())
+    | '\x20' -> ExpectedHIT (exp ())
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

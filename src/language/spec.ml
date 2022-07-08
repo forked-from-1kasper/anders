@@ -169,6 +169,7 @@ type error =
   | ExpectedLevel        of exp
   | ExpectedNonDependent of ident * exp
   | ExpectedCoeq         of exp
+  | ExpectedHIT          of exp
 
 type resp =
   | Version of int64 * int64 * int64

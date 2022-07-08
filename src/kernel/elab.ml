@@ -24,6 +24,10 @@ let extCoeq : value -> value * value = function
   | VCoeq (f, g) -> (f, g)
   | u            -> raise (Internal (ExpectedCoeq (rbV u)))
 
+let extSum : value -> string * value * value list = function
+  | VSum (x, t, xs) -> (x, t, xs)
+  | v               -> raise (Internal (ExpectedHIT (rbV v)))
+
 let extInf : value -> value = function
   | VInf v -> v
   | v      -> raise (Internal (ExpectedInf (rbV v)))

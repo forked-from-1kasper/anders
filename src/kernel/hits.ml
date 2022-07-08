@@ -1,6 +1,7 @@
 open Language.Spec
 open Universe
 open Check
+open Elab
 open Term
 
 let rec sum w l (ctx, xs) = function
@@ -46,4 +47,11 @@ let checkData (ctx : ctx) (x : string) (d : data) =
     ctx.data := Dict.add x d !(ctx.data)
 
 let checkSplit (ctx : ctx) (s : split) =
+  let e = teles ePi s.signature s.params in
+  isType (infer ctx e); let t = eval ctx e in
+
+  let ctx1 = teleCtx ctx s.params in
+  let (w, (p, g)) = extPiG (eval ctx1 s.signature) in
+  let (x, ts, xs) = extSum w in
+
   ()

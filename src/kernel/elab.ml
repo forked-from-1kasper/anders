@@ -188,7 +188,7 @@ let saltTeles ns0 ts =
 let saltCtor ns0 (c : ctor) : ctor =
   let (ns, params) = saltTeles ns0 c.params in
   let boundary = saltSystem ns c.boundary in
-  { name = c.name; params = params; boundary = boundary }
+  { c with params = params; boundary = boundary }
 
 let saltData ns0 (d : data) : data =
   let (ns, params) = saltTeles ns0 d.params in
@@ -196,8 +196,20 @@ let saltData ns0 (d : data) : data =
   let ctors = List.map (saltCtor ns) d.ctors in
   { kind = kind; params = params; ctors = ctors }
 
-let freshExp  = salt Env.empty
-let freshData = saltData Env.empty
+let saltBranch ns0 (x, is0, e) =
+  let is = List.map fresh is0 in let ns = ref ns0 in
+  List.iter2 (fun i0 i -> ns := Env.add i0 i !ns) is0 is;
+  (x, is, salt !ns e)
+
+let saltSplit ns0 (s : split) : split =
+  let (ns, params) = saltTeles ns0 s.params in
+  let signature    = salt ns s.signature in
+  let branches     = List.map (saltBranch ns) s.branches in
+  { s with params = params; signature = signature; branches = branches }
+
+let freshExp   = salt Env.empty
+let freshData  = saltData Env.empty
+let freshSplit = saltSplit Env.empty
 
 (* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
    >This increases efficiency as it won’t trigger computation. *)

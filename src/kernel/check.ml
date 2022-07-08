@@ -556,14 +556,13 @@ and actCon rho (c : con) = let ts = actSystem rho c.boundary in
                             cparams  = List.map (act rho) c.cparams;
                             boundary = ts }
 
+and actBranch rho (c, fn) = (c, fn >> act rho)
+
 and actElim rho (s : elim) =
   let (t, (x, g)) = s.signature in
   { s with fparams   = List.map (act rho) s.fparams;
            signature = (act rho t, (x, g >> act rho));
            branches  = List.map (actBranch rho) s.branches }
-
-and actBranch rho (c, ts, fn) =
-  (c, List.map (fun (x, v) -> (x, act rho v)) ts, fn >> act rho)
 
 and act0 i j = act (Env.add i j Env.empty)
 and upd mu = act (Env.map dir mu)
@@ -618,6 +617,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIndW t1, VIndW t2 -> conv t1 t2
     | VSum (x, _, xs), VSum (y, _, ys) -> x = y && listEqual conv xs ys
     | VCon c1, VCon c2 -> c1.name = c2.name && listEqual conv c1.params c2.params && listEqual conv c1.cparams c2.cparams
+    | VSplit s1, VSplit s2 -> s1.fname = s2.fname && listEqual conv s1.fparams s2.fparams
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v

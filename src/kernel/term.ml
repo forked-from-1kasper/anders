@@ -86,7 +86,7 @@ and elim =
     signature : value * clos;
     branches  : branch list }
 
-and branch = string * (ident * value) list * (value list -> value)
+and branch = string * (value list -> value)
 
 type term = Exp of exp | Value of value
 

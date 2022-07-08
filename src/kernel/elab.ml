@@ -286,14 +286,13 @@ and swapCon i j (c : con) =
            cparams  = List.map (swap i j) c.cparams;
            boundary = swapSystem i j c.boundary }
 
+and swapBranch i j (c, fn) = (c, fn >> swap i j)
+
 and swapElim i j (s : elim) =
   let (t, (x, g)) = s.signature in
   { s with fparams   = List.map (swap i j) s.fparams;
            signature = (swap i j t, (x, g >> swap i j));
            branches  = List.map (swapBranch i j) s.branches }
-
-and swapBranch i j (c, ts, fn) =
-  (c, List.map (fun (x, v) -> (x, swap i j v)) ts, fn >> swap i j)
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -340,12 +339,6 @@ and memElim y (s : elim) =
      ident s.fname = y
   || List.exists (mem y) s.fparams
   || memClos y t x g
-  || List.exists (memBranch y) s.branches
-
-and memBranch y (c, ts, fn) =
-     ident c = y
-  || List.exists (fun (x, v) -> x = y || mem y v) ts
-  || mem y (fn (List.map (fun (x, v) -> Var (x, v)) ts))
 
 let extErr = function
   | Internal err -> err

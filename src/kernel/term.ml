@@ -67,16 +67,19 @@ type value =
   | W of value * clos | VSup of value * value | VIndW of value
   | VCoeq of value * value | VIota of value * value * value
   | VResp of value * value * value | VIndCoeq of value * value * value
-  | VSum of string * value * value list | VCon of con | VSplit of elim
+  | VSum of sum | VCon of con | VSplit of elim
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
 and clos = ident * (value -> value)
 
+and sum =
+  { name   : string;
+    kind   : value;
+    params : value list }
+
 and con =
-  { tname    : string;
+  { parent   : sum;
     cname    : string;
-    kind     : value;
-    tparams  : value list;
     cparams  : value list;
     boundary : value System.t }
 

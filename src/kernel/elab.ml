@@ -24,9 +24,9 @@ let extCoeq : value -> value * value = function
   | VCoeq (f, g) -> (f, g)
   | u            -> raise (Internal (ExpectedCoeq (rbV u)))
 
-let extSum : value -> string * value * value list = function
-  | VSum (x, t, xs) -> (x, t, xs)
-  | v               -> raise (Internal (ExpectedHIT (rbV v)))
+let extSum : value -> sum = function
+  | VSum s -> s
+  | v      -> raise (Internal (ExpectedHIT (rbV v)))
 
 let extInf : value -> value = function
   | VInf v -> v
@@ -266,7 +266,7 @@ let rec swap i j = function
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW e              -> VIndW (swap i j e)
-  | VSum (x, t, xs)      -> VSum (x, swap i j t, List.map (swap i j) xs)
+  | VSum s               -> VSum (swapSum i j s)
   | VCon c               -> VCon (swapCon i j c)
   | VSplit s             -> VSplit (swapElim i j s)
   | VIm v                -> VIm (swap i j v)
@@ -280,9 +280,12 @@ let rec swap i j = function
 
 and swapSystem i j ts = System.fold (fun k v -> System.add (mapFace (swapVar i j) k) (swap i j v)) ts System.empty
 
+and swapSum i j (s : sum) =
+  { s with kind = swap i j s.kind;
+           params = List.map (swap i j) s.params }
+
 and swapCon i j (c : con) =
-  { c with kind     = swap i j c.kind;
-           tparams  = List.map (swap i j) c.tparams;
+  { c with parent   = swapSum i j c.parent;
            cparams  = List.map (swap i j) c.cparams;
            boundary = swapSystem i j c.boundary }
 
@@ -318,7 +321,7 @@ let rec mem y = function
   | VFormula t -> memDisjunction y t
   | VSystem ts -> memSystem y ts
   | VType (_, Finite ts) | VLevelElem ts -> memMaximum (fun x -> x = y) ts
-  | VSum (x, t, xs) -> ident x = y || mem y t || List.exists (mem y) xs
+  | VSum s -> memSum y s
   | VCon c -> memCon y c
   | VSplit s -> memElim y s
 
@@ -326,11 +329,14 @@ and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 
 and memSystem y ts = System.exists (fun mu v -> Env.mem y mu || mem y v) ts
 
+and memSum y (s : sum) =
+     ident s.name = y
+  || mem y s.kind
+  || List.exists (mem y) s.params
+
 and memCon y (c : con) =
-     ident c.tname = y
-  || ident c.cname = y
-  || mem y c.kind
-  || List.exists (mem y) c.tparams
+     ident c.cname = y
+  || memSum y c.parent
   || List.exists (mem y) c.cparams
   || memSystem y c.boundary
 

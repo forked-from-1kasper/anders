@@ -42,4 +42,8 @@ let checkData (ctx : ctx) (x : string) (d : data) =
     System.iter (fun _ e -> check ctx2 e t1) c.boundary;
 
     let t = con x c.name d.kind c.boundary (ctx, [], []) d.params c.params in
-    assign ctx c.name g (Value t)) d.ctors
+    assign ctx c.name g (Value t)) d.ctors;
+    ctx.data := Dict.add x d !(ctx.data)
+
+let checkSplit (ctx : ctx) (s : split) =
+  ()

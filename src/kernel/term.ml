@@ -84,7 +84,8 @@ type term = Exp of exp | Value of value
 
 type ctx =
   { local  : (value * value) Env.t;
-    global : (value * term) Env.t ref }
+    global : (value * term) Env.t ref;
+    data   : data Dict.t ref }
 
 (* Implementation *)
 

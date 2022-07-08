@@ -8,7 +8,7 @@ open Elab
 open Term
 open Rbv
 
-let ctx : ctx = { local = Env.empty; global = ref Env.empty }
+let ctx : ctx = { local = Env.empty; global = ref Env.empty; data = ref Dict.empty }
 
 let getUnitVal opt = function
   | "tt" | "true" -> true
@@ -31,7 +31,7 @@ let proto : req -> resp = function
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval ctx (freshExp e1))
                                                         (eval ctx (freshExp e2))))
   | Data (x, d)        -> promote (fun () -> checkData ctx x (freshData d); OK)
-  | Split _            -> Error (Unknown "not implemented yet")
+  | Split s            -> promote (fun () -> checkSplit ctx s; OK)
   | Def (x, t0, e0)    -> promote (fun () ->
     let t = freshExp t0 in let e = freshExp e0 in
     isType (infer ctx t); let t' = eval ctx t in

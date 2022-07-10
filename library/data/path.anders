@@ -269,14 +269,18 @@ hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u (i ∧ j) 1=1, (j = 0) → ouc u�
 def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀)) :=
 <j> hfill A r u u₀ j
 
-def trans-filler (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A x (q @ i)) p (comp-Path A x y z p q) :=
-<j i> hfill A (∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ k]) (inc A (∂ i) (p @ i)) j
+section
+  variables (A : U) (x y z : A) (p : Path A x y) (q : Path A y z)
 
-def trans-filler-p (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A x (q @ i)) p (comp-Path A x y z p q) :=
-<j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ (k ∧ j), (j = 0) → p @ i]) (p @ i)
+  def trans-filler : PathP (<i> Path A x (q @ i)) p (comp-Path A x y z p q) :=
+  <j i> hfill A (∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ k]) (inc A (∂ i) (p @ i)) j
 
-def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (comp-Path A x y z p q) :=
-<j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i ∧ k]) (p @ i ∨ -j)
+  def trans-filler-p : PathP (<i> Path A x (q @ i)) p (comp-Path A x y z p q) :=
+  <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ (k ∧ j), (j = 0) → p @ i]) (p @ i)
+
+  def trans-filler-q : PathP (<i> Path A (p @ -i) z) q (comp-Path A x y z p q) :=
+  <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i ∧ k]) (p @ i ∨ -j)
+end
 
 section
   variables (A : I → U) (B : Π (i : I), A i → U) (f : Π (x : A 0), B 0 x)

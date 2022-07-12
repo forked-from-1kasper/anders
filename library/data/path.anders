@@ -42,8 +42,12 @@ def idp-left (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<_>
 def idp-right (A : U) (x y : A) (p : Path A x y) : Path (Path A y y) (<_> y) (<_> p @ 1) := <_ _> y
 def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (sym A y x (sym A x y p)) := <_> p
 
-def rinv (A B : U) (f : A → B) (g : B → A) : U := Π (b : B), Path B (f (g b)) b
-def linv (A B : U) (f : A → B) (g : B → A) : U := Π (a : A), Path A (g (f a)) a
+section
+  variables (A B : U) (f : A → B) (g : B → A)
+
+  def rinv := Π (b : B), Path B (f (g b)) b
+  def linv := Π (a : A), Path A (g (f a)) a
+end
 
 -- https://github.com/mortberg/cubicaltt/blob/master/examples/circle.ctt#L62-L65
 def hmtpy (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<i> p @ i ∧ -i) := <j i> p @ j ∧ i ∧ -i
@@ -263,11 +267,15 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 
 def ghcomp-ε (A : U) (a : A) : Path A (ghcomp A 0 (λ (i : I), []) (inc A 0 a)) a := <_> a
 
-def hfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) (j : I) :=
-hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u (i ∧ j) 1=1, (j = 0) → ouc u₀]) (ouc u₀)
+section
+  variables (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0])
 
-def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀)) :=
-<j> hfill A r u u₀ j
+  def hfill (j : I) :=
+  hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u (i ∧ j) 1=1, (j = 0) → ouc u₀]) (ouc u₀)
+
+  def hfill′ : Path A (ouc u₀) (hcomp A r u (ouc u₀)) :=
+  <j> hfill A r u u₀ j
+end
 
 section
   variables (A : U) (x y z : A) (p : Path A x y) (q : Path A y z)

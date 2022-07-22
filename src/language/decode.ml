@@ -123,16 +123,6 @@ struct
 
   let tele () = let x = ident () in let e = exp () in (x, e)
 
-  let ctor () : ctor = let s = string () in let ts = many tele () in
-    let bs = system () in { name = s; params = ts; boundary = bs }
-
-  let data () : data = let k = exp () in let xs = many tele () in
-    let ys = many ctor () in { kind = k; params = xs; ctors = ys }
-
-  let branch () = let x = string () in let xs = many ident () in let e = exp () in (x, xs, e)
-  let split () : split = let x = string () in let xs = many tele () in let e = exp () in let bs = many branch () in
-    { name = x; params = xs; signature = e; branches = bs }
-
   let req () = match R.get () with
     | '\x10' -> let (e, t) = exp2 () in Check (e, t)
     | '\x11' -> Infer (exp ())
@@ -143,8 +133,6 @@ struct
     | '\x22' -> let x = string () in let t = exp () in Assume (x, t)
     | '\x23' -> Erase (string ())
     | '\x24' -> Wipe
-    | '\x25' -> let x = string () in let d = data () in Data (x, d)
-    | '\x26' -> Split (split ())
     | '\x30' -> let p = string () in let x = string () in Set (p, x)
     | '\x31' -> Version
     | '\x32' -> Ping
@@ -176,7 +164,6 @@ struct
     | '\x17' -> ExpectedLevel (exp ())
     | '\x18' -> let x = ident () in let e = exp () in ExpectedNonDependent (x, e)
     | '\x19' -> ExpectedCoeq (exp ())
-    | '\x20' -> ExpectedHIT (exp ())
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

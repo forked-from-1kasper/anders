@@ -24,10 +24,6 @@ let extCoeq : value -> value * value = function
   | VCoeq (f, g) -> (f, g)
   | u            -> raise (Internal (ExpectedCoeq (rbV u)))
 
-let extSum : value -> sum = function
-  | VSum s -> s
-  | v      -> raise (Internal (ExpectedHIT (rbV v)))
-
 let extInf : value -> value = function
   | VInf v -> v
   | v      -> raise (Internal (ExpectedInf (rbV v)))
@@ -176,40 +172,7 @@ and saltClos ctor ns p a b =
 and saltSystem ns xs =
   System.fold (fun k v -> System.add (freshFace ns k) (salt ns v)) xs System.empty
 
-let saltTele ns (x, e) = let y = fresh x in (Env.add x y ns, (y, salt ns e))
-
-let saltTeles ns0 ts =
-  let ns = ref ns0 in
-  let ts' = List.map (fun t0 ->
-    let (ns', t) = saltTele !ns t0 in
-    ns := ns'; t) ts in
-  (!ns, ts')
-
-let saltCtor ns0 (c : ctor) : ctor =
-  let (ns, params) = saltTeles ns0 c.params in
-  let boundary = saltSystem ns c.boundary in
-  { c with params = params; boundary = boundary }
-
-let saltData ns0 (d : data) : data =
-  let (ns, params) = saltTeles ns0 d.params in
-  let kind = salt ns d.kind in
-  let ctors = List.map (saltCtor ns) d.ctors in
-  { kind = kind; params = params; ctors = ctors }
-
-let saltBranch ns0 (x, is0, e) =
-  let is = List.map fresh is0 in let ns = ref ns0 in
-  List.iter2 (fun i0 i -> ns := Env.add i0 i !ns) is0 is;
-  (x, is, salt !ns e)
-
-let saltSplit ns0 (s : split) : split =
-  let (ns, params) = saltTeles ns0 s.params in
-  let signature    = salt ns s.signature in
-  let branches     = List.map (saltBranch ns) s.branches in
-  { s with params = params; signature = signature; branches = branches }
-
 let freshExp   = salt Env.empty
-let freshData  = saltData Env.empty
-let freshSplit = saltSplit Env.empty
 
 (* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
    >This increases efficiency as it won’t trigger computation. *)
@@ -266,9 +229,6 @@ let rec swap i j = function
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW e              -> VIndW (swap i j e)
-  | VSum s               -> VSum (swapSum i j s)
-  | VCon c               -> VCon (swapCon i j c)
-  | VSplit s             -> VSplit (swapElim i j s)
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
@@ -279,23 +239,6 @@ let rec swap i j = function
   | VIndCoeq (v, k, r)   -> VIndCoeq (swap i j v, swap i j k, swap i j r)
 
 and swapSystem i j ts = System.fold (fun k v -> System.add (mapFace (swapVar i j) k) (swap i j v)) ts System.empty
-
-and swapSum i j (s : sum) =
-  { s with kind = swap i j s.kind;
-           params = List.map (swap i j) s.params }
-
-and swapCon i j (c : con) =
-  { c with parent   = swapSum i j c.parent;
-           cparams  = List.map (swap i j) c.cparams;
-           boundary = swapSystem i j c.boundary }
-
-and swapBranch i j (c, fn) = (c, fn >> swap i j)
-
-and swapElim i j (s : elim) =
-  let (t, (x, g)) = s.signature in
-  { s with fparams   = List.map (swap i j) s.fparams;
-           signature = (swap i j t, (x, g >> swap i j));
-           branches  = List.map (swapBranch i j) s.branches }
 
 let memAtom y = fun (x, _) -> x = y
 let memConjunction y = Conjunction.exists (memAtom y)
@@ -321,30 +264,10 @@ let rec mem y = function
   | VFormula t -> memDisjunction y t
   | VSystem ts -> memSystem y ts
   | VType (_, Finite ts) | VLevelElem ts -> memMaximum (fun x -> x = y) ts
-  | VSum s -> memSum y s
-  | VCon c -> memCon y c
-  | VSplit s -> memElim y s
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 
 and memSystem y ts = System.exists (fun mu v -> Env.mem y mu || mem y v) ts
-
-and memSum y (s : sum) =
-     ident s.name = y
-  || mem y s.kind
-  || List.exists (mem y) s.params
-
-and memCon y (c : con) =
-     ident c.cname = y
-  || memSum y c.parent
-  || List.exists (mem y) c.cparams
-  || memSystem y c.boundary
-
-and memElim y (s : elim) =
-  let (t, (x, g)) = s.signature in
-     ident s.fname = y
-  || List.exists (mem y) s.fparams
-  || memClos y t x g
 
 let extErr = function
   | Internal err -> err

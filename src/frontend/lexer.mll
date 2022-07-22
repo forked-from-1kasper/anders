@@ -108,13 +108,11 @@ rule main = parse
   | "theorem"                 | "lemma"
   | "corollary"               | "proposition"     -> DEF
   | "axiom"                   | "postulate"       -> AXIOM
-  | "ADT"        -> ADT       | "HIT"             -> HIT
   | "Id"         -> ID        | "ref"             -> REF
   | "idJ"        -> IDJ       | "isucc"           -> SUCC
   | "iadd"       -> ADD       | "imax"            -> MAX
   | "section"    -> SECTION   | "end"             -> END
-  | "variables"  -> VARIABLES | "|"               -> BAR
-  | _            -> IDENT s
+  | "variables"  -> VARIABLES | _                 -> IDENT s
 }
 
 and multiline = parse

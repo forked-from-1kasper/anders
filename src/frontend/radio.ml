@@ -76,8 +76,6 @@ let transmit mesg =
   with ex -> prettyPrintExn ex
 
 let def p t e    = transmit (Def (p, t, e))
-let data x d     = transmit (Data (x, d))
-let split s      = transmit (Split s)
 let assign p t e = transmit (Assign (p, t, e))
 let assume p t   = transmit (Assume (p, t))
 

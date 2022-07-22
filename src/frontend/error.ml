@@ -31,7 +31,6 @@ let rec prettyPrintError : error -> string = function
   | ExpectedInf x               -> Printf.sprintf "“%s” expected to be a unit of modality.\n" (showExp x)
   | ExpectedGlue x              -> Printf.sprintf "“%s” expected to be a Glue-type.\n" (showExp x)
   | ExpectedSup x               -> Printf.sprintf "“%s” expected to be a sup.\n" (showExp x)
-  | ExpectedHIT x               -> Printf.sprintf "“%s” expected to be a higher inductive type.\n" (showExp x)
   | DNFSolverError (e, d)       -> Printf.sprintf "Cannot solve: %s = %s" (showExp e) (showDir d)
   | AlreadyDeclared p           -> Printf.sprintf "“%s” is already declared.\n" p
   | VariableNotFound p          -> Printf.sprintf "Variable %s was not found\n" (showIdent p)

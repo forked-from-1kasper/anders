@@ -51,7 +51,7 @@
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
 %token DEFEQ PROD ARROW DOT LAM
-%token IMPORT DEF AXIOM BAR ADT HIT
+%token IMPORT DEF AXIOM
 %token SIGMA PI OPTION PLUGIN LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL PARTIALP MAP INC OUC
@@ -165,25 +165,11 @@ exp6:
   | LPARENS exp1 RPARENS { $2 }
   | IDENT { getVar $1 }
 
-ctor: IDENT params { { name = $1; params = $2; boundary = System.empty } }
-pctor:
-  | ctor { $1 }
-  | IDENT params system { { name = $1; params = $2; boundary = $3 } }
-
-ctors: BAR separated_nonempty_list(BAR, ctor) { $2 } | { [] }
-pctors: BAR separated_nonempty_list(BAR, pctor) { $2 } | { [] }
-
-branch: IDENT ident* DEFEQ exp2 { ($1, $2, $4) }
-branches: BAR separated_nonempty_list(BAR, branch) { $2 } | { [] }
-
 declarations:
   | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (teles ePi $5 $3), teles eLam $7 $3) }
   | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, teles ePi $5 $3, $7) }
   | DEF IDENT params DEFEQ exp2 { Def ($2, None, teles eLam $5 $3) }
   | AXIOM IDENT params COLON exp2 { Axiom ($2, teles ePi $5 $3) }
-  | DEF IDENT params COLON exp2 branches { Split { name = $2; params = $3; signature = $5; branches = $6 } }
-  | ADT IDENT params COLON exp2 ctors { Data ($2, { kind = $5; params = $3; ctors = $6 }) }
-  | HIT IDENT params COLON exp2 pctors { Data ($2, { kind = $5; params = $3; ctors = $6 }) }
 
 line :
   | IMPORT path+ { Import $2 }

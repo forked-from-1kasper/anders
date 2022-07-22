@@ -84,24 +84,6 @@ type exp =
 
 type tele = ident * exp
 
-type ctor =
-  { name     : string;
-    params   : tele list;
-    boundary : exp System.t }
-
-type data =
-  { kind   : exp;
-    params : tele list;
-    ctors  : ctor list }
-
-type branch = string * ident list * exp
-
-type split =
-  { name      : string;
-    params    : tele list;
-    signature : exp;
-    branches  : branch list }
-
 let eLam p a b = ELam (a, (p, b))
 let ePi  p a b = EPi  (a, (p, b))
 let eSig p a b = ESig (a, (p, b))
@@ -133,8 +115,6 @@ type req =
   (* context *)
   | Def    of string * exp * exp
   | Assign of string * exp * exp
-  | Data   of string * data
-  | Split  of split
   | Assume of string * exp
   | Erase  of string
   | Wipe
@@ -169,7 +149,6 @@ type error =
   | ExpectedLevel        of exp
   | ExpectedNonDependent of ident * exp
   | ExpectedCoeq         of exp
-  | ExpectedHIT          of exp
 
 type resp =
   | Version of int64 * int64 * int64

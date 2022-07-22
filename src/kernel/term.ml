@@ -67,36 +67,15 @@ type value =
   | W of value * clos | VSup of value * value | VIndW of value
   | VCoeq of value * value | VIota of value * value * value
   | VResp of value * value * value | VIndCoeq of value * value * value
-  | VSum of sum | VCon of con | VSplit of elim
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
 and clos = ident * (value -> value)
-
-and sum =
-  { name   : string;
-    kind   : value;
-    params : value list }
-
-and con =
-  { parent   : sum;
-    cname    : string;
-    cparams  : value list;
-    boundary : value System.t }
-
-and elim =
-  { fname     : string;
-    fparams   : value list;
-    signature : value * clos;
-    branches  : branch list }
-
-and branch = string * (value list -> value)
 
 type term = Exp of exp | Value of value
 
 type ctx =
   { local  : (value * value) Env.t;
-    global : (value * term) Env.t ref;
-    data   : data Dict.t ref }
+    global : (value * term) Env.t ref }
 
 (* Implementation *)
 

@@ -415,9 +415,6 @@ and inferV v = traceInferV v; match v with
   | VSup (a, b) -> inferSup a b
   | VIndW c -> let (a, (p, b)) = extW (fst (extPiG (inferV c))) in
     inferIndW a (VLam (a, (p, b))) c
-  | VSum s -> s.kind
-  | VCon c -> VSum c.parent
-  | VSplit s -> let (t, (x, g)) = s.signature in VPi (t, (x, g))
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
@@ -534,9 +531,6 @@ and act rho = function
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW t              -> VIndW (act rho t)
-  | VSum s               -> VSum (actSum rho s)
-  | VCon c               -> actCon rho c
-  | VSplit s             -> VSplit (actElim rho s)
   | VIm t                -> VIm (act rho t)
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
@@ -547,25 +541,6 @@ and act rho = function
   | VIndCoeq (v, i, r)   -> VIndCoeq (act rho v, act rho i, act rho r)
 
 and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
-
-and actSum rho (s : sum) =
-  { s with kind   = act rho s.kind;
-           params = List.map (act rho) s.params }
-
-and actCon rho (c : con) = let ts = actSystem rho c.boundary in
-  match System.find_opt eps ts with
-  | Some v -> v
-  | None   -> VCon { c with parent   = actSum rho c.parent;
-                            cparams  = List.map (act rho) c.cparams;
-                            boundary = ts }
-
-and actBranch rho (c, fn) = (c, fn >> act rho)
-
-and actElim rho (s : elim) =
-  let (t, (x, g)) = s.signature in
-  { s with fparams   = List.map (act rho) s.fparams;
-           signature = (act rho t, (x, g >> act rho));
-           branches  = List.map (actBranch rho) s.branches }
 
 and act0 i j = act (Env.add i j Env.empty)
 and upd mu = act (Env.map dir mu)
@@ -618,9 +593,6 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIndBool u, VIndBool v -> conv u v
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW t1, VIndW t2 -> conv t1 t2
-    | VSum s1, VSum s2 -> s1.name = s2.name && listEqual conv s1.params s2.params
-    | VCon c1, VCon c2 -> c1.cname = c2.cname && listEqual conv c1.parent.params c2.parent.params && listEqual conv c1.cparams c2.cparams
-    | VSplit s1, VSplit s2 -> s1.fname = s2.fname && listEqual conv s1.fparams s2.fparams
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v

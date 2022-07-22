@@ -3,12 +3,11 @@ open Language.Decode
 open Language.Spec
 open Universe
 open Check
-open Hits
 open Elab
 open Term
 open Rbv
 
-let ctx : ctx = { local = Env.empty; global = ref Env.empty; data = ref Dict.empty }
+let ctx : ctx = { local = Env.empty; global = ref Env.empty }
 
 let getUnitVal opt = function
   | "tt" | "true" -> true
@@ -30,8 +29,6 @@ let proto : req -> resp = function
   | Eval e             -> promote (fun () -> Term (rbV (eval ctx (freshExp e))))
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval ctx (freshExp e1))
                                                         (eval ctx (freshExp e2))))
-  | Data (x, d)        -> promote (fun () -> checkData ctx x (freshData d); OK)
-  | Split s            -> promote (fun () -> checkSplit ctx (freshSplit s); OK)
   | Def (x, t0, e0)    -> promote (fun () ->
     let t = freshExp t0 in let e = freshExp e0 in
     isType (infer ctx t); let t' = eval ctx t in

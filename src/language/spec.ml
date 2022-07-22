@@ -62,7 +62,7 @@ type 'a level =
 
 type exp =
   | EType of cosmos * exp level                                                        (* cosmos *)
-  | ELevel | ELevelElem of Z.t | ESucc of exp | EAdd of exp * exp | EMax of exp * exp  (* levels *)
+  | ELevel | ELevelElem of Z.t | ELSucc of exp | EAdd of exp * exp | EMax of exp * exp (* levels *)
   | EVar of ident | EHole                                                           (* variables *)
   | EPi of exp * (ident * exp) | ELam of exp * (ident * exp) | EApp of exp * exp           (* pi *)
   | ESig of exp * (ident * exp) | EPair of tag * exp * exp                              (* sigma *)
@@ -77,6 +77,7 @@ type exp =
   | EEmpty | EIndEmpty of exp                                                               (* 𝟎 *)
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
+  | EN | EZero | ESucc | ENInd of exp                                                       (* ℕ *)
   | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp                            (* W *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
   | ECoeq of exp * exp | EIota of exp * exp * exp                                 (* Coequalizer *)

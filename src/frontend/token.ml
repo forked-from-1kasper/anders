@@ -39,4 +39,4 @@ let tokenToString : token -> string = function
   | JOIN       -> "JOIN"        | SUCC       -> "SUCC"
   | ADD        -> "ADD"         | MAX        -> "MAX"
   | SECTION    -> "SECTION"     | END        -> "END"
-  | VARIABLES  -> "VARIABLES"
+  | VARIABLES  -> "VARIABLES"   | NIND       -> "NIND"

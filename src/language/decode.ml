@@ -49,7 +49,7 @@ struct
     | '\x03' -> let c = cosmos () in let n = integer () in EType (c, Omega n)
     | '\x04' -> ELevel
     | '\x05' -> ELevelElem (integer ())
-    | '\x06' -> ESucc (exp ())
+    | '\x06' -> ELSucc (exp ())
     | '\x07' -> let (l1, l2) = exp2 () in EAdd (l1, l2)
     | '\x08' -> let (l1, l2) = exp2 () in EMax (l1, l2)
     | '\x09' -> EVar (ident ())
@@ -96,6 +96,10 @@ struct
     | '\x49' -> let (a, p, b) = clos () in EW (a, (p, b))
     | '\x4A' -> let (a, b) = exp2 () in ESup (a, b)
     | '\x4B' -> EIndW (exp ())
+    | '\x4C' -> EN
+    | '\x4D' -> EZero
+    | '\x4E' -> ESucc
+    | '\x4F' -> ENInd (exp ())
     | '\x50' -> EIm (exp ())
     | '\x51' -> EInf (exp ())
     | '\x52' -> let (t, f) = exp2 () in EIndIm (t, f)

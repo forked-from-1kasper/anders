@@ -13,7 +13,8 @@
               ("★", EStar);      ("star", EStar);
               ("false", EFalse); ("0₂", EFalse);
               ("true", ETrue);   ("1₂", ETrue);
-              ("L", ELevel)] in
+              ("ℕ", EN);         ("zero", EZero);
+              ("succ", ESucc);   ("L", ELevel)] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
   let rec pLam e : ident list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
@@ -58,7 +59,7 @@
 %token AND OR NEGATE
 %token ID REF IDJ
 %token GLUE GLUEELEM UNGLUE
-%token INDEMPTY INDUNIT INDBOOL
+%token INDEMPTY INDUNIT INDBOOL NIND
 %token W INDW SUP
 %token IM INF INDIM JOIN
 %token COEQ IOTA RESP INDCOEQ
@@ -127,6 +128,7 @@ exp4 :
   | INDEMPTY exp6 { EIndEmpty $2 }
   | INDUNIT exp6 { EIndUnit $2 }
   | INDBOOL exp6 { EIndBool $2 }
+  | NIND exp6 { ENInd $2 }
   | SUP exp6 exp6 { ESup ($2, $3) }
   | INDW exp6 { EIndW $2 }
   | IM exp6 { EIm $2 }
@@ -137,7 +139,7 @@ exp4 :
   | RESP exp6 exp6 exp6 { EResp ($2, $3, $4) }
   | INDCOEQ exp6 exp6 exp6 { EIndCoeq ($2, $3, $4) }
   | JOIN exp6 { EJoin $2 }
-  | SUCC exp6 { ESucc $2 }
+  | SUCC exp6 { ELSucc $2 }
   | ADD exp6 exp6 { EAdd ($2, $3) }
   | MAX exp6 exp6 { EMax ($2, $3) }
   | PREPARAM exp6 { EType (Pretype, Finite $2) }

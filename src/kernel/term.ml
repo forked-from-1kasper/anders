@@ -64,6 +64,7 @@ type value =
   | VEmpty | VIndEmpty of value
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value
+  | VN | VZero | VSucc | VNInd of value
   | W of value * clos | VSup of value * value | VIndW of value
   | VCoeq of value * value | VIota of value * value * value
   | VResp of value * value * value | VIndCoeq of value * value * value

@@ -64,6 +64,10 @@ let rec rbV v = match v with
   | VFalse               -> EFalse
   | VTrue                -> ETrue
   | VIndBool v           -> EIndBool (rbV v)
+  | VN                   -> EN
+  | VZero                -> EZero
+  | VSucc                -> ESucc
+  | VNInd v              -> ENInd (rbV v)
   | W (t, g)             -> rbVTele eW t g
   | VSup (a, b)          -> ESup (rbV a, rbV b)
   | VIndW e              -> EIndW (rbV e)

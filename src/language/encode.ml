@@ -44,7 +44,7 @@ struct
     | EType (c, Omega n)   -> W.put '\x03'; cosmos c; integer n
     | ELevel               -> W.put '\x04'
     | ELevelElem n         -> W.put '\x05'; integer n
-    | ESucc l              -> W.put '\x06'; exp l
+    | ELSucc l             -> W.put '\x06'; exp l
     | EAdd (l1, l2)        -> W.put '\x07'; exp l1; exp l2
     | EMax (l1, l2)        -> W.put '\x08'; exp l1; exp l2
     | EVar x               -> W.put '\x09'; ident x
@@ -91,6 +91,10 @@ struct
     | EW (a, (p, b))       -> clos '\x49' a p b
     | ESup (a, b)          -> W.put '\x4A'; exp2 a b
     | EIndW e              -> W.put '\x4B'; exp e
+    | EN                   -> W.put '\x4C'
+    | EZero                -> W.put '\x4D'
+    | ESucc                -> W.put '\x4E'
+    | ENInd t              -> W.put '\x4F'; exp t
     | EIm t                -> W.put '\x50'; exp t
     | EInf e               -> W.put '\x51'; exp e
     | EIndIm (t, f)        -> W.put '\x52'; exp2 t f

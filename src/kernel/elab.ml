@@ -72,6 +72,7 @@ let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 let prodv a b = VSig (a, (Irrefutable, fun _ -> b))
 let pairv a b = VPair (ref None, a, b)
+let succv n   = VApp (VSucc, n)
 
 let idp v = VPLam (VLam (VI, (Irrefutable, fun _ -> v)))
 let idfun t = VLam (t, (freshName "x", fun x -> x))
@@ -111,7 +112,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EType (c, Omega n)   -> EType (c, Omega n)
   | ELevel               -> ELevel
   | ELevelElem n         -> ELevelElem n
-  | ESucc e              -> ESucc (salt ns e)
+  | ELSucc e             -> ELSucc (salt ns e)
   | EAdd (e1, e2)        -> EAdd (salt ns e1, salt ns e2)
   | EMax (e1, e2)        -> EMax (salt ns e1, salt ns e2)
   | EPi (a, (p, b))      -> saltClos ePi ns p a b
@@ -154,6 +155,10 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EFalse               -> EFalse
   | ETrue                -> ETrue
   | EIndBool e           -> EIndBool (salt ns e)
+  | EN                   -> EN
+  | EZero                -> EZero
+  | ESucc                -> ESucc
+  | ENInd e              -> ENInd (salt ns e)
   | EW (a, (p, b))       -> saltClos eW ns p a b
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
   | EIndW e              -> EIndW (salt ns e)
@@ -226,6 +231,10 @@ let rec swap i j = function
   | VFalse               -> VFalse
   | VTrue                -> VTrue
   | VIndBool v           -> VIndBool (swap i j v)
+  | VN                   -> VN
+  | VZero                -> VZero
+  | VSucc                -> VSucc
+  | VNInd v              -> VNInd v
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW e              -> VIndW (swap i j e)
@@ -251,10 +260,11 @@ let rec mem y = function
   | VLam (t, (x, g)) | VPi (t, (x, g))
   | VSig (t, (x, g)) | W (t, (x, g)) -> memClos y t x g
   | VType (_, Omega _) | VLevel | VHole | VI | VEmpty
-  | VUnit | VStar | VBool | VFalse | VTrue -> false
+  | VUnit | VStar | VBool | VFalse | VTrue
+  | VN | VZero | VSucc -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VOuc a | VGlue a | VIndEmpty a | VIndUnit a
-  | VIndBool a | VIndW a | VIm a | VInf a | VJoin a -> mem y a
+  | VIndBool a | VNInd a | VIndW a | VIm a | VInf a | VJoin a -> mem y a
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VInc (a, b) | VSup (a, b)
   | VIndIm (a, b) | VPair (_, a, b) | VCoeq (a, b) -> mem y a || mem y b

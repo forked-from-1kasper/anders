@@ -112,7 +112,8 @@ rule main = parse
   | "idJ"        -> IDJ       | "isucc"           -> SUCC
   | "iadd"       -> ADD       | "imax"            -> MAX
   | "section"    -> SECTION   | "end"             -> END
-  | "variables"  -> VARIABLES | _                 -> IDENT s
+  | "variables"  -> VARIABLES | "ℕ-ind"           -> NIND
+  | _            -> IDENT s
 }
 
 and multiline = parse

@@ -34,7 +34,7 @@ let rec ppExp paren e = let x = match e with
   | EType (c, Omega n) -> ppCosmos c ^ "ω" ^ showSubscript n
   | ELevel -> "L"
   | ELevelElem n -> "L" ^ showSubscript n
-  | ESucc e -> Printf.sprintf "isucc %s" (ppExp true e)
+  | ELSucc e -> Printf.sprintf "isucc %s" (ppExp true e)
   | EAdd (e1, e2) -> Printf.sprintf "iadd %s %s" (ppExp true e1) (ppExp true e2)
   | EMax (e1, e2) -> Printf.sprintf "imax %s %s" (ppExp true e1) (ppExp true e2)
   | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTeleExp (p, a)) (showExp b)
@@ -71,9 +71,11 @@ let rec ppExp paren e = let x = match e with
   | EUnglue (r, u, e) -> Printf.sprintf "unglue %s %s %s" (ppExp true r) (ppExp true u) (ppExp true e)
   | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
   | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
+  | EN -> "ℕ" | EZero -> "zero" | ESucc -> "succ"
   | EIndEmpty e -> Printf.sprintf "ind₀ %s" (ppExp true e)
   | EIndUnit e  -> Printf.sprintf "ind₁ %s" (ppExp true e)
   | EIndBool e  -> Printf.sprintf "ind₂ %s" (ppExp true e)
+  | ENInd e -> Printf.sprintf "ℕ-ind %s" (ppExp true e)
   | EW (a, (p, b)) -> Printf.sprintf "W %s, %s" (showTeleExp (p, a)) (showExp b)
   | ESup (a, b) -> Printf.sprintf "sup %s %s" (ppExp true a) (ppExp true b)
   | EIndW e -> Printf.sprintf "indᵂ %s" (ppExp true e)
@@ -88,7 +90,8 @@ let rec ppExp paren e = let x = match e with
   in match e with
   | ELevel | ELevelElem _ | EType (_, Omega _) | EType (_, Finite (ELevelElem _))
   | EVar _ | EFst _ | ESnd _ | EI | ESystem _ | EHole | EDir _ | EPair _
-  | ENeg _ | EEmpty | EUnit | EBool | EStar | EFalse | ETrue -> x
+  | ENeg _ | EEmpty | EUnit | EBool | EStar | EFalse | ETrue
+  | EN     | EZero  | ESucc -> x
   | _ -> parens paren x
 
 and showExp e = ppExp false e

@@ -15,7 +15,7 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EType (c, Omega n)   -> VType (c, Omega n)
   | ELevel               -> VLevel
   | ELevelElem n         -> VLevelElem (Maximum.singleton (n, Idents.empty))
-  | ESucc e              -> levelSucc (eval ctx e)
+  | ELSucc e             -> levelSucc (eval ctx e)
   | EAdd (e1, e2)        -> levelAdd (eval ctx e1) (eval ctx e2)
   | EMax (e1, e2)        -> levelMax (eval ctx e1) (eval ctx e2)
   | EVar x               -> getDef ctx x
@@ -61,6 +61,10 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EFalse               -> VFalse
   | ETrue                -> VTrue
   | EIndBool e           -> VIndBool (eval ctx e)
+  | EN                   -> VN
+  | EZero                -> VZero
+  | ESucc                -> VSucc
+  | ENInd e              -> VNInd (eval ctx e)
   | EW (a, (p, b))       -> let t = eval ctx a in W (t, (fresh p, closByVal ctx p t b))
   | ESup (a, b)          -> VSup (eval ctx a, eval ctx b)
   | EIndW e              -> VIndW (eval ctx e)
@@ -299,7 +303,7 @@ and closByVal ctx p t e v = traceClos e p v;
   | _          -> ctx in
   eval (upLocal ctx' p t v) e
 
-and app : value * value -> value = function
+and app (f, x) = match f, x with
   (* J A C a φ a (ref a) ~> φ *)
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
   (* Glue A 1 u ~> (u 1=1).1 *)
@@ -314,6 +318,10 @@ and app : value * value -> value = function
   | VApp (VApp (VIndBool _, a), _), VFalse -> a
   (* ind₂ C a b 1₂ ~> b *)
   | VApp (VApp (VIndBool _, _), b), VTrue -> b
+  (* N-ind A z s zero ~> z *)
+  | VApp (VApp (VNInd _, z), _), VZero -> z
+  (* N-ind A z s (succ n) ~> s (N-ind A z s n) *)
+  | VApp (VApp (VNInd _, _), s), VApp (VSucc, n) -> app (app (s, n), app (f, n))
   (* indᵂ C g (sup A B x f) ~> g x f (λ (b : B x), indᵂ C g (f b)) *)
   | VApp (VIndW c, g), VApp (VApp (VSup (_, _), x), f) ->
     let b = snd (extW (fst (extPiG (inferV c)))) in
@@ -407,11 +415,13 @@ and inferV v = traceInferV v; match v with
   | VGlue t -> inferGlue t
   | VGlueElem (r, u, a) -> inferGlueElem r u (inferV a)
   | VUnglue (_, _, b) -> let (t, _, _) = extGlue (inferV b) in t
-  | VEmpty | VUnit | VBool -> kan Z.zero
+  | VEmpty | VUnit | VBool | VN -> kan Z.zero
   | VStar -> VUnit | VFalse | VTrue -> VBool
+  | VZero -> VN | VSucc -> implv VN VN
   | VIndEmpty t -> implv VEmpty t
   | VIndUnit t -> recUnit t
   | VIndBool t -> recBool t
+  | VNInd t -> recN t
   | VSup (a, b) -> inferSup a b
   | VIndW c -> let (a, (p, b)) = extW (fst (extPiG (inferV c))) in
     inferIndW a (VLam (a, (p, b))) c
@@ -433,6 +443,10 @@ and recUnit t = let x = freshName "x" in
 and recBool t = let x = freshName "x" in
   implv (app (t, VFalse)) (implv (app (t, VTrue))
     (VPi (VBool, (x, fun x -> app (t, x)))))
+
+and recN t = let e = fun x -> app (t, x) in
+  implv (e VZero) (implv (VPi (VN, (freshName "n", fun n -> implv (e n) (e (succv n)))))
+                         (VPi (VN, (freshName "n", e))))
 
 and wtype a b = W (a, (freshName "x", fun x -> app (b, x)))
 
@@ -528,6 +542,10 @@ and act rho = function
   | VFalse               -> VFalse
   | VTrue                -> VTrue
   | VIndBool v           -> VIndBool (act rho v)
+  | VN                   -> VN
+  | VZero                -> VZero
+  | VSucc                -> VSucc
+  | VNInd v              -> VNInd (act rho v)
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW t              -> VIndW (act rho t)
@@ -591,6 +609,10 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VFalse, VFalse -> true
     | VTrue, VTrue -> true
     | VIndBool u, VIndBool v -> conv u v
+    | VN, VN -> true
+    | VZero, VZero -> true
+    | VSucc, VSucc -> true
+    | VNInd u, VNInd v -> conv u v
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW t1, VIndW t2 -> conv t1 t2
     | VIm u, VIm v -> conv u v
@@ -669,7 +691,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EType (c, Finite e) -> VType (c, Finite (Maximum.succ (extLevel (eval ctx e))))
   | EType (c, Omega n) -> VType (c, Omega (Z.succ n))
   | ELevel -> VType (Pretype, Omega Z.zero)
-  | ELevelElem _ -> VLevel | ESucc e -> check ctx e VLevel; VLevel
+  | ELevelElem _ -> VLevel | ELSucc e -> check ctx e VLevel; VLevel
   | EAdd (e1, e2) | EMax (e1, e2) -> check ctx e1 VLevel; check ctx e2 VLevel; VLevel
   | EPi (a, (p, b)) -> inferTele ctx (if !Prefs.impredicativity then impred else imax) p a b
   | ESig (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx imax p a b
@@ -726,11 +748,13 @@ and infer ctx e : value = traceInfer e; match e with
     inferGlueElem r u t
   | EUnglue (r, u, e) -> let (t, r', u') = extGlue (infer ctx e) in
     eqNf (eval ctx r) r'; eqNf (eval ctx u) u'; t
-  | EEmpty | EUnit | EBool -> kan Z.zero
+  | EEmpty | EUnit | EBool | EN -> kan Z.zero
   | EStar -> VUnit | EFalse | ETrue -> VBool
+  | EZero -> VN | ESucc -> implv VN VN
   | EIndEmpty e -> isType (infer ctx e); implv VEmpty (eval ctx e)
   | EIndUnit e -> inferInd false ctx VUnit e recUnit
   | EIndBool e -> inferInd false ctx VBool e recBool
+  | ENInd e -> inferInd false ctx VN e recN
   | ESup (a, b) -> let t = eval ctx a in isType (infer ctx a);
     let (t', (p, g)) = extPiG (infer ctx b) in eqNf t t';
     isType (g (Var (p, t))); inferSup t (eval ctx b)

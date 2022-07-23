@@ -58,7 +58,7 @@ let extType = function
 
 let actIdents rho k =
   Idents.elements k
-  |> List.map (extLevel << actVar rho)
+  |> List.map (extLevel % actVar rho)
   |> Maximum.adds
 
 let actMaximum rho ks =

@@ -24,11 +24,11 @@ let unions t1 t2 =
 let unionss = List.fold_left unions (Disjunction.singleton Conjunction.empty)
 
 let negConjunction : conjunction -> disjunction =
-     Conjunction.elements
-  >> List.map (negAtom >> Conjunction.singleton)
-  >> Disjunction.of_list
+    Disjunction.of_list
+  % List.map (Conjunction.singleton % negAtom)
+  % Conjunction.elements
 
-let negDisjunction = Disjunction.elements >> List.map negConjunction >> unionss >> simplify
+let negDisjunction = simplify % unionss % List.map negConjunction % Disjunction.elements
 
 let orFormula v1 v2 = match v1, v2 with
   | Var (x, _), Var (y, _) -> VFormula (Disjunction.of_list [Conjunction.singleton (x, One); Conjunction.singleton (y, One)])

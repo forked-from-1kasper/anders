@@ -5,8 +5,7 @@ let flip f a b = f b a
 let curry f x y = f (x, y)
 let uncurry f (x, y) = f x y
 
-let (<<) f g x = f (g x)
-let (>>) g f x = f (g x)
+let (%) f g x = f (g x)
 
 let initLast xs =
   let rec func xs = function

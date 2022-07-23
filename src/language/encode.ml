@@ -19,9 +19,9 @@ struct
       |> W.put
     done
 
-  let int = Int64.of_int >> int64
+  let int = int64 % Int64.of_int
   let string xs = int (String.length xs); W.puts xs
-  let integer = Z.to_bits >> string
+  let integer = string % Z.to_bits
 
   let ident = function
     | Irrefutable -> W.put '\x00'

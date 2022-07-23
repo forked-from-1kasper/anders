@@ -179,7 +179,7 @@ and transport i p phi u0 = match p, phi, u0 with
     (* if conv (act0 i vone p) p then u0 else ??? *)
     let j = freshName "ι" in let k = freshName "κ" in let v1 = transFill j (swap i j t) phi a in
     let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
-    VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)
+    VApp (VApp (VSup (t', VLam (t', (fresh x, act0 i vone % b))), v1 vone), v2)
   (* transp (<i> coeq (f i) (g i)) 0 (iota (f 0) (g 0) x) ~>
      iota (f 1) (g 1) (transp (<i> B i) 0 x) *)
   | VCoeq (f, g), _, VIota (_, _, u) ->
@@ -212,7 +212,7 @@ and idtoeqv i e = let a = act0 i vzero e in
   transport i (equiv a e) vzero (idEquiv a)
 
 and walk f r = function
-  | VSystem ts -> System.mapi (fun mu -> f >> upd mu) ts
+  | VSystem ts -> System.mapi (fun mu -> upd mu % f) ts
   | t          -> mkSystem (List.map (fun mu ->
     (mu, upd mu (f (app (upd mu t, VRef vone))))) (solve r One))
 
@@ -227,9 +227,8 @@ and homcom t r i u u0 = match t, r, u, u0 with
       comp (λ i, B (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 i)) φ
         (λ (k : I), [(r = 1) → (u k 1=1).2]) u₀.2) *)
   | VSig (t, (_, b)), _, _, _ -> let k = freshName "κ" in
-    (* TODO: swap *)
-    let v1 = hfill t r k (VSystem (walk (vfst >> act0 i (dim k)) r u)) (vfst u0) in
-    let v2 = comp (v1 >> b) r i (VSystem (walk vsnd r u)) (vsnd u0) in
+    let v1 = hfill t r k (VSystem (walk (swap i k % vfst) r u)) (vfst u0) in
+    let v2 = comp (b % v1) r i (VSystem (walk vsnd r u)) (vsnd u0) in
     VPair (ref None, v1 vone, v2)
   (* hcomp (PathP A v w) φ u u₀ ~> <j> hcomp (A @ j) (λ (i : I),
       [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (u₀ @ j) *)
@@ -291,7 +290,7 @@ and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (
 and isContr t = let x = freshName "x" in let y = freshName "y" in
   VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
 
-and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr << fiber t1 t2 f))
+and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr % fiber t1 t2 f))
 and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
 and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
 and equivPtSingl t0 = VSig (inferV t0, (freshName "T", fun t -> prodv (equiv t t0) t))
@@ -373,7 +372,7 @@ and inferV v = traceInferV v; match v with
   | VPi (t, (x, f)) -> inferVTele (if !Prefs.impredicativity then impred else imax) t x f
   | VSig (t, (x, f)) | W (t, (x, f)) -> inferVTele imax t x f
   | VLam (t, (x, f)) -> VPi (t, (x, fun x -> inferV (f x)))
-  | VPLam (VLam (VI, (_, g))) -> let t = VLam (VI, (freshName "ι", g >> inferV)) in
+  | VPLam (VLam (VI, (_, g))) -> let t = VLam (VI, (freshName "ι", inferV % g)) in
     VApp (VApp (VPathP (VPLam t), g vzero), g vone)
   | Var (_, t)               -> t
   | VFst e                   -> fst (extSigG (inferV e))
@@ -501,14 +500,14 @@ and faceEnv alpha ctx =
     |> Env.fold (fun p d -> Env.add p (VI, dir d)) alpha }
 
 and act rho = function
-  | VLam (t, (x, g))     -> VLam (act rho t, (x, g >> act rho))
+  | VLam (t, (x, g))     -> VLam (act rho t, (x, act rho % g))
   | VPair (r, u, v)      -> VPair (r, act rho u, act rho v)
   | VType (c, Finite ts) -> VType (c, Finite (actMaximum rho ts))
   | VType (c, Omega n)   -> VType (c, Omega n)
   | VLevel               -> VLevel
   | VLevelElem ts        -> VLevelElem (actMaximum rho ts)
-  | VPi (t, (x, g))      -> VPi (act rho t, (x, g >> act rho))
-  | VSig (t, (x, g))     -> VSig (act rho t, (x, g >> act rho))
+  | VPi (t, (x, g))      -> VPi (act rho t, (x, act rho % g))
+  | VSig (t, (x, g))     -> VSig (act rho t, (x, act rho % g))
   | VPLam f              -> VPLam (act rho f)
   | Var (i, VI)          -> actVar rho i
   | Var (x, t)           -> Var (x, act rho t)
@@ -546,7 +545,7 @@ and act rho = function
   | VZero                -> VZero
   | VSucc                -> VSucc
   | VNInd v              -> VNInd (act rho v)
-  | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
+  | W (t, (x, g))        -> W (act rho t, (x, act rho % g))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW t              -> VIndW (act rho t)
   | VIm t                -> VIm (act rho t)
@@ -558,7 +557,7 @@ and act rho = function
   | VResp (f, g, x)      -> VResp (act rho f, act rho g, act rho x)
   | VIndCoeq (v, i, r)   -> VIndCoeq (act rho v, act rho i, act rho r)
 
-and actSystem rho = bimap (actVar rho) (fun mu -> upd mu >> act rho)
+and actSystem rho = bimap (actVar rho) (fun mu -> act rho % upd mu)
 
 and act0 i j = act (Env.add i j Env.empty)
 and upd mu = act (Env.map dir mu)
@@ -699,7 +698,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EPLam (ELam (EI, (i, e))) ->
     let ctx' = upLocal ctx i VI (Var (i, VI)) in ignore (infer ctx' e);
     let g = fun j -> eval (upLocal ctx i VI j) e in
-    let t = VLam (VI, (freshName "ι", g >> inferV)) in
+    let t = VLam (VI, (freshName "ι", inferV % g)) in
     VApp (VApp (VPathP (VPLam t), g vzero), g vone)
   | EApp (f, x) -> begin match infer ctx f with
     | VPartialP (t, i) -> check ctx x (isOne i); app (t, eval ctx x)

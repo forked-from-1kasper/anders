@@ -190,14 +190,14 @@ let swapDisjunction i j = Disjunction.map (swapConjunction i j)
 let swapMaximum i j = Maximum.map (fun (n, ts) -> (n, Idents.map (swapVar i j) ts))
 
 let rec swap i j = function
-  | VLam (t, (x, g))     -> VLam (swap i j t, (x, g >> swap i j))
+  | VLam (t, (x, g))     -> VLam (swap i j t, (x, swap i j % g))
   | VPair (r, u, v)      -> VPair (r, swap i j u, swap i j v)
   | VLevel               -> VLevel
   | VLevelElem ts        -> VLevelElem (swapMaximum i j ts)
   | VType (c, Finite ts) -> VType (c, Finite (swapMaximum i j ts))
   | VType (c, Omega n)   -> VType (c, Omega n)
-  | VPi (t, (x, g))      -> VPi (swap i j t, (x, g >> swap i j))
-  | VSig (t, (x, g))     -> VSig (swap i j t, (x, g >> swap i j))
+  | VPi (t, (x, g))      -> VPi (swap i j t, (x, swap i j % g))
+  | VSig (t, (x, g))     -> VSig (swap i j t, (x, swap i j % g))
   | VPLam f              -> VPLam (swap i j f)
   | Var (k, VI)          -> Var (swapVar i j k, VI)
   | Var (x, t)           -> Var (x, swap i j t)
@@ -235,7 +235,7 @@ let rec swap i j = function
   | VZero                -> VZero
   | VSucc                -> VSucc
   | VNInd v              -> VNInd v
-  | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
+  | W (t, (x, g))        -> W (swap i j t, (x, swap i j % g))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW e              -> VIndW (swap i j e)
   | VIm v                -> VIm (swap i j v)

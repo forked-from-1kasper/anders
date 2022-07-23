@@ -25,7 +25,7 @@ type content = line list
 type file = content
 
 let moduleSep = '/'
-let getPath = String.split_on_char moduleSep >> String.concat Filename.dir_sep
+let getPath = String.concat Filename.dir_sep % String.split_on_char moduleSep
 
 let showMany fn xs =
   (if isEmpty xs then "" else " ") ^
@@ -47,4 +47,4 @@ let rec showLine : line -> string = function
   | Section xs -> Printf.sprintf "\nsection\n%s\nend\n" (String.concat "\n" (List.map showLine xs))
   | Variables xs -> Printf.sprintf "variables%s" (showTeles xs)
 
-let showFile : file -> string = String.concat "\n" << List.map showLine
+let showFile : file -> string = String.concat "\n" % List.map showLine

@@ -3,9 +3,9 @@ import library/data/sigma
 
 -- https://github.com/mortberg/cubicaltt/blob/master/examples/prelude.ctt
 def lemPropF (A : U) (P : A → U) (pP : Π (x : A), isProp (P x))
-  (a0 a1 : A) (p : PathP (<_> A) a0 a1) (b0 : P a0) (b1 : P a1) : PathP (<i> P (p @ i)) b0 b1 :=
-<i> pP (p @ i) (comp (λ (j : I), P (p @ (i ∧ j))) -i (λ (k : I), [(i = 0) → b0]) (inc (P (p @ 0)) -i b0))
-               (comp (λ (j : I), P (p @ (i ∨ -j))) i (λ (k : I), [(i = 1) → b1]) (inc (P (p @ 1)) i b1)) @ i
+  (a₀ a₁ : A) (p : PathP (<_> A) a₀ a₁) (b₀ : P a₀) (b₁ : P a₁) : PathP (<i> P (p @ i)) b₀ b₁ :=
+<i> pP (p @ i) (comp (λ (j : I), P (p @ (i ∧  j))) -i (λ (k : I), [(i = 0) → b₀]) (inc (P (p @ 0)) -i b₀))
+               (comp (λ (j : I), P (p @ (i ∨ -j)))  i (λ (k : I), [(i = 1) → b₁]) (inc (P (p @ 1))  i b₁)) @ i
 
 def lemSig (A : U) (B : A → U) (pB : Π (x : A), isProp (B x))
   (u v : Σ (x : A), B x) (p : Path A u.1 v.1) : Path (Σ (x : A), B x) u v :=

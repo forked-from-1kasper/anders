@@ -1,4 +1,4 @@
-import library/leibniz
+import experiments/leibniz
 
 axiom T : U
 axiom t₁ : T

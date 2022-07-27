@@ -1,13 +1,17 @@
 def id (A : U) (a : A) : A := a
 def idfun : Π (A′ : U), A′ → A′ := λ (A : U) (a : A), a
 
-def sigma/intro (A : U) (B : A -> U) (x : A) (u : B (id A x)) : Σ (x : A), B x := (x, u)
-def sigma/proj₂ : Π (A : U) (B : A -> U) (z : Σ (x : A), B x), B z.1 := λ (A : U) (B : A -> U) (z : Σ (x : A), B x), z.2
+def sigma/intro (A : U) (B : A → U) (x : A) (u : B (id A x)) : Σ (x : A), B x := (x, u)
+def sigma/proj₂ : Π (A : U) (B : A → U) (z : Σ (x : A), B x), B z.1 := λ (A : U) (B : A → U) (z : Σ (x : A), B x), z.2
 def const (A : U) (B : U) (a : A) (b : B) : A := a
-def test : Π (A : U) (B : U), (A -> B) -> A -> B := λ (A : U) (B : U) (f : A -> B) (x : A), f x
+def test : Π (A : U) (B : U), (A → B) → A → B := λ (A : U) (B : U) (f : A → B) (x : A), f x
 def trio : U₂ := Σ (fst : U₁) (snd : U₁), U₁
 def lower : U₁₁₂₁₂ := U₁₁₂₁₁
-def instance : trio := (U, U -> U, U -> U -> U)
+def instance : trio := (U, U → U, U → U → U)
+
+def hole (A B C X Y Z : U) (a : A) (b : B) (x : X) : Y := ?
+
+def anus : Π (A : U), A → A → Σ (B : U), B := ?
 
 def pair (A B : U) := Σ (first : A) (second : B), U
 def pair-first  (A B : U) (X : pair A B) : A := X.first
@@ -18,8 +22,6 @@ def and : 𝟐 → 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (const
 def or : 𝟐 → 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (idfun 𝟐) (const 𝟐 𝟐 true)
 
 def zarith : U₈₈₈₈₈₈₈₈₈₈₈₈₈₈₁₈₄₄₆₇₄₄₀₇₃₇₀₉₅₅₁₆₁₅ := U₈₈₈₈₈₈₈₈₈₈₈₈₈₈₁₈₄₄₆₇₄₄₀₇₃₇₀₉₅₅₁₆₁₄
-
-def hole (A B C X Y Z : U) (a : A) (b : B) (x : X) : Y := ?
 
 section
   section

@@ -11,7 +11,7 @@ def instance : trio := (U, U → U, U → U → U)
 
 def hole (A B C X Y Z : U) (a : A) (b : B) (x : X) : Y := ?
 
-def anus : Π (A : U), A → A → Σ (B : U), B := ?
+def hole′ : Π (A : U), A → A → Σ (B : U), B := ?
 
 def pair (A B : U) := Σ (first : A) (second : B), U
 def pair-first  (A B : U) (X : pair A B) : A := X.first

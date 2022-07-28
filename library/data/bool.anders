@@ -33,10 +33,3 @@ def HA (a b : 𝟐) : 𝟐 × 𝟐 := (xor a b, and a b)
 def or² (a : 𝟐) (w : 𝟐 × 𝟐) : 𝟐 × 𝟐 := (w.1, or a w.2)
 def FA (a b cᵢₙ : 𝟐) : 𝟐 × 𝟐 := or² (HA a b).2 (HA (HA a b).1 cᵢₙ)
 def add-2bit (a b : 𝟐 × 𝟐) : 𝟐 × 𝟐 := ((FA a.1 b.1 (HA a.2 b.2).2).1, (HA a.2 b.2).1)
-
-def bool′ := Π (α : U), α → α → α
-
-def true′  : bool′ := λ (α : U) (t f : α), t
-def false′ : bool′ := λ (α : U) (t f : α), f
-
-def ite′ (α : U) (a b : α) (f : bool′) : α := f α a b

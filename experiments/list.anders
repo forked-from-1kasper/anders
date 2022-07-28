@@ -3,7 +3,7 @@
    - Polymorphic funtions.
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
-import experiments/leibniz library/foundations/mltt/bool
+import experiments/leibniz
 option girard true
 
 def ∘ (α β γ : U) (f : β → γ) (g : α → β) : α → γ ≔ λ (x : α), f (g x)
@@ -16,7 +16,7 @@ def list-pure (α : U) : α → list α ≔ λ (a : α), ∷ α a (nil α)
 def lst₁ : list N ≔ ∷ N N0 (∷ N N1 (∷ N N2 (∷ N N3 (nil N))))
 def lst₂ : list N ≔ ∷ N N1 (∷ N N2 (∷ N N3 (∷ N N4 (nil N))))
 
-theorem map-succ-lst₁-eq-lst₂ : eq (list N) (list-map N N succ lst₁) lst₂ ≔ refl (list N) lst₂
+theorem map-succ-lst₁-eq-lst₂ : eq (list N) (list-map N N succ′ lst₁) lst₂ ≔ refl (list N) lst₂
 
 def append (α : U) (xs : list α) (ys : list α) : list α ≔ λ (μ : U) (n : μ) (c : α → μ → μ), xs μ (ys μ n c) c
 
@@ -39,7 +39,7 @@ def map (μ : monad) (α β : U) (f : α → β) (x : μ.1 α) : μ.1 β ≔ bin
 def filterM (μ : monad) (α : U) (f : α → μ.1 bool′) (lst : list α) : μ.1 (list α) ≔
 lst (μ.1 (list α)) (pure μ (list α) (nil α))
     (λ (x : α) (xs : μ.1 (list α)), bind μ bool′ (list α) (f x)
-      (λ (b : bool′), ite (μ.1 (list α))
+      (λ (b : bool′), ite′ (μ.1 (list α))
         (map μ (list α) (list α) (∷ α x) xs) xs b))
 
 def List : monad ≔ (list, list-pure, list-bind)

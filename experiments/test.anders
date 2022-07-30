@@ -34,3 +34,4 @@ section
   def idfun′ : A → A := λ (x : A), x
 end
 
+def test′ := U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U

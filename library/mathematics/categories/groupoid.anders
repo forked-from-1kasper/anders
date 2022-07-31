@@ -6,7 +6,7 @@
 import library/data/path
 import library/mathematics/categories/category
 
-def PathCat (X : U) : cat := (X, λ (x y : X), PathP (<_> X) x y, star)
+def PathCat (X : U) : cat := (X, (λ (x y : X), PathP (<_> X) x y), star)
 
 def isCatGroupoid (C : cat) : U :=
 Σ (id : Π (x : C.ob), C.hom x x)

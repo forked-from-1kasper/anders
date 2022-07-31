@@ -21,5 +21,5 @@ import library/mathematics/pullback
 def isÉtaleMap (A B : U) (f : A → B) : U :=
 isPullbackSq A (ℑ A) B (ℑ B) (ℑ-app A B f) (ι B) (ι A) f (λ (a : A), <_> ℑ-unit (f a))
 
-def ÉtaleMap (A B: U) : U := Σ (f : A → B), isÉtaleMap A B f
+def ÉtaleMap (A B : U) : U := Σ (f : A → B), isÉtaleMap A B f
 def isÉtale (A : U) := isÉtaleMap A 𝟏 (λ (_ : A), ★)

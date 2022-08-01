@@ -49,8 +49,10 @@ macro →⁷ A := A → (→⁶ A)
 
 #eval →⁷ U
 
+macrovariables X Y
+
 infix 25 =
-macro A = B := PathP (<_> typeof A) A B
+macro X = Y := PathP (<_> typeof X) X Y
 
 def refl (A : U) (a : A) : a = a :=
 <_> a

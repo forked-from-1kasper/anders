@@ -8,7 +8,8 @@ Changelog
 * Deprecated useless (and inconsistent) `irrelevance` option.
 * Rename `pre-eval` option to `normalize`.
 * Several major optimisations.
-* Built-in natural numbers.
+* Built-in natural numbers ℕ.
+* `typeof`.
 
 27 MAY 2022 **Version 1.4.1:**
 

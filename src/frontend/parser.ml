@@ -321,8 +321,6 @@ let quantifierExpander fn = function
   | Node ('(', [Node ('(', Atom "W" :: bs); Atom ","; e]) -> Some (expandQuantifier fn eW   bs e)
   | _                                                     -> None
 
-let isProj = String.starts_with ~prefix:"."
-
 let lowExpander fn = function
   | Node ('(', [e1; Atom ","; e2])                  -> Some (EPair (ref None, fn e1, fn e2))
   | Node ('(', [e; Atom "."; Atom "1"])             -> Some (EFst (fn e))

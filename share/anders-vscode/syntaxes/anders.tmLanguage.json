@@ -14,11 +14,11 @@
             "name": "comment.line.double-dash.anders"
         },
         {
-            "match": "(?<=^|[\\s()\\[\\]])(macro|macrovariables|infix|infixr|infixl|#eval|#infer|#macroexpand|option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|begin|section|end|variables)(?=$|[\\s()\\[\\]])",
+            "match": "(?<=^|[\\s()\\[\\]])(unsafe|macro|macrovariables|infix|infixr|infixl|#eval|#infer|#macroexpand|option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|begin|section|end|variables)(?=$|[\\s()\\[\\]])",
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s(),\\[\\]])(λ|coeq|resp|iota|coeq-ind|Σ|Π|Id|W|ℑ|ℑ-unit|ind-ℑ|ℑ-join|indᵂ|ind₀|ind₁|ind₂|sup|ref|idJ|forall|summa|Partial|PartialP|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s(),\\[\\]])",
+            "match": "(?<=^|[\\s(),\\[\\]])(λ|coeq|resp|iota|coeq-ind|Σ|Π|Id|W|ℑ|ℑ-unit|ind-ℑ|ℑ-join|indᵂ|ind₀|ind₁|ind₂|sup|ref|idJ|forall|summa|Partial|PartialP|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue|typeof)(?=$|[\\s(),\\[\\]])",
             "name": "keyword.control.anders"
         },
         {

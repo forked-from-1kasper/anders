@@ -76,6 +76,7 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EIota (f, g, x)      -> VIota (eval ctx f, eval ctx g, eval ctx x)
   | EResp (f, g, x)      -> VResp (eval ctx f, eval ctx g, eval ctx x)
   | EIndCoeq (e, i, r)   -> VIndCoeq (eval ctx e, eval ctx i, eval ctx r)
+  | ETypeof e            -> inferV (eval ctx e)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -787,6 +788,7 @@ and infer ctx e : value = traceInfer e; match e with
     eqNf (app (app (r', w), vone))  (app (i', app (g, w)));
 
     inferIndCoeq f g v
+  | ETypeof e -> inferV (infer ctx e)
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 and inferSystem ctx ts = checkOverlapping ctx ts;

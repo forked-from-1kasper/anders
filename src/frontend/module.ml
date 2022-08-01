@@ -27,7 +27,7 @@ type line =
   | Option of string * string
   | Variables of tele list
   | Macrovariables of string list
-  | Macro of syntax * syntax
+  | Macro of bool * syntax * syntax
   | Macroexpand of syntax
   | Decl of decl
   | Infer of exp
@@ -77,6 +77,8 @@ let showOperator = function
   | Prefix        -> "prefix"
   | Postfix       -> "postfix"
 
+let showUnsafeAttr b = if b then "unsafe " else ""
+
 let showLine = function
   | Operator (op, prec, is) -> Printf.sprintf "%s %f %s" (showOperator op) prec (String.concat " " is)
   | Import p -> Printf.sprintf "import %s" (String.concat " " p)
@@ -86,7 +88,7 @@ let showLine = function
   | Section -> "section" | End -> "end"
   | Variables xs -> Printf.sprintf "variables%s" (showTeles xs)
   | Macrovariables is -> Printf.sprintf "macrovariables %s" (String.concat " " is)
-  | Macro (e1, e2) -> Printf.sprintf "macro %s :=\n%s" (showStx e1) (showStx e2)
+  | Macro (b, e1, e2) -> Printf.sprintf "%smacro %s :=\n%s" (showUnsafeAttr b) (showStx e1) (showStx e2)
   | Macroexpand stx -> Printf.sprintf "#macroexpand %s" (showStx stx)
   | Infer e -> Printf.sprintf "#infer %s" (showExp e)
   | Eval e -> Printf.sprintf "#eval %s" (showExp e)

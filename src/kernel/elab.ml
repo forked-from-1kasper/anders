@@ -170,6 +170,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EIota (f, g, x)      -> EIota (salt ns f, salt ns g, salt ns x)
   | EResp (f, g, x)      -> EResp (salt ns f, salt ns g, salt ns x)
   | EIndCoeq (e, i, r)   -> EIndCoeq (salt ns e, salt ns i, salt ns r)
+  | ETypeof e            -> ETypeof (salt ns e)
 
 and saltClos ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)

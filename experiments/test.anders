@@ -48,3 +48,15 @@ macro →⁶ A := A → (→⁵ A)
 macro →⁷ A := A → (→⁶ A)
 
 #eval →⁷ U
+
+infix 25 =
+macro A = B := PathP (<_> typeof A) A B
+
+def refl (A : U) (a : A) : a = a :=
+<_> a
+
+def symm (A : U) (a b : A) (p : a = b) : b = a :=
+<i> p @ -i
+
+def trans (A : U) (a b c : A) (p : a = b) (q : b = c) : a = c :=
+<i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)

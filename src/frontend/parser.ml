@@ -215,6 +215,7 @@ let unary e = function
   | "-"       -> Some (ENeg e)
   | "U"       -> Some (EType (Kan, Finite e))
   | "V"       -> Some (EType (Pretype, Finite e))
+  | "typeof"  -> Some (ETypeof e)
   | _         -> None
 
 let binary e1 e2 = function
@@ -395,13 +396,18 @@ let expandExterior e0 =
 
 let rec macroexpand e =
   match expandExterior e with
-  | Node (c, es) -> Node (c, List.map macroexpand es)
-  | t            -> t
+  | Node ('[', ts) -> Node ('[', List.map macroexpandClause ts)
+  | Node (c, es)   -> Node (c, List.map macroexpand es)
+  | t              -> t
 
-let upMacro e1 e2 =
+and macroexpandClause = function
+  | Node ('(', [f; e]) -> paren [f; macroexpand e]
+  | e                  -> e
+
+let upMacro isUnsafe e1 e2 =
   let vbs   = collectVariables Set.empty e1 in
-  let value = macroexpand e2 in
-  macros := { variables = vbs; pattern = e1; value = value } :: !macros
+  let value = if isUnsafe then e2 else unpack e2 in
+  macros := { variables = vbs; pattern = e1; value = macroexpand value } :: !macros
 
 let upMacrovars = List.iter (fun i -> variables := Set.add i !variables)
 
@@ -416,7 +422,7 @@ let ws       = str isWhitespace >> eps
 let nl       = str (fun c -> c = '\n' || c = '\r') >> eps
 let keywords = ["def"; "definition"; "theorem"; "lemma"; "proposition"; "macro"; "import";
                 "infixl"; "infixr"; "infix"; "postulate"; "axiom"; "macrovariables"; "option";
-                "variables"; "section"; "end"; "#macroexpand"; "#infer"; "#eval";
+                "unsafe"; "variables"; "section"; "end"; "#macroexpand"; "#infer"; "#eval";
                 "--"; "{-"; "-}"]
 let reserved = ['('; ')'; '['; ']'; '<'; '>'; '\n'; '\t'; '\r'; ' '; '.'; ',']
 
@@ -475,9 +481,10 @@ let axm = tele truth (token "axiom" <|> token "postulate") >>=
   fun (i, bs, e) -> let t = teles ePi (elab e) bs in pure (Decl (Axiom (i, t)))
 
 let macro =
-  token "macro" >> ws >> toplevel isntDefTok >>= fun e1 ->
-    defTok >> optional ws >> toplevel truth >>= fun e2 ->
-      pure (Macro (e1, e2))
+  optional1 (token "unsafe" >> ws) >>= fun flag ->
+    token "macro" >> ws >> toplevel isntDefTok >>= fun e1 ->
+      defTok >> optional ws >> toplevel truth >>= fun e2 ->
+        pure (Macro (Option.is_some flag, e1, e2))
 
 let mkOperator assoc tok = token tok >> ws >> ident << ws >>= fun e ->
   sepBy1 ws ident >>= fun is -> pure (Operator (assoc, float_of_string e, is))

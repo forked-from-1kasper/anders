@@ -82,6 +82,7 @@ type exp =
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
   | ECoeq of exp * exp | EIota of exp * exp * exp                                 (* Coequalizer *)
   | EResp of exp * exp * exp | EIndCoeq of exp * exp * exp                        (* Coequalizer *)
+  | ETypeof of exp                                                                     (* Macros *)
 
 type tele = ident * exp
 

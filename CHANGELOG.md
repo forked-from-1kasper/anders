@@ -1,6 +1,15 @@
 Changelog
 =========
 
+?? AUG 2022 **Version 1.8.0:**
+
+* Abandoned Menhir in favour of new extensible parser.
+* Abandoned useless “module … where” syntax.
+* Deprecated useless (and inconsistent) `irrelevance` option.
+* Rename `pre-eval` option to `normalize`.
+* Several major optimisations.
+* Built-in natural numbers.
+
 27 MAY 2022 **Version 1.4.1:**
 
 * Fix of major bug leading to inconstistency.

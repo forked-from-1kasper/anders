@@ -1,6 +1,8 @@
 open Language.Prelude
 open Language.Spec
 open Prettyprinter
+open Parser
+open Module
 open Prefs
 
 exception Kernel             of error
@@ -58,6 +60,8 @@ let prettyPrintExn : exn -> unit = function
   | ExpectedDir s                      -> Printf.printf "“%s” expected to be “%s” or “%s”" s !zeroPrim !onePrim
   | Sys_error s                        -> print_endline s
   | ProtocolViolation                  -> Printf.printf "Protocol violation\n"
+  | InvalidSyntax e                    -> Printf.printf "Invalid syntax:\n  %s\n" (showStx e)
+  | ExpectedNode e                     -> Printf.printf "“%s” expected to be a node.\n" (showStx e)
   | Restart                            -> raise Restart
   | ex                                 -> Printf.printf "Uncaught exception: %s\n" (Printexc.to_string ex)
 

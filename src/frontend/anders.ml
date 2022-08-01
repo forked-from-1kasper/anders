@@ -1,10 +1,8 @@
 open Error
 
 type cmdline =
-  | Check     of string
-  | Lex       of string
-  | Parse     of string
-  | Prim      of string * string
+  | Check of string
+  | Prim  of string * string
   | Repl | Help | Trace | Receive
   | Indices | Girard | Silent | Irrelevance
 
@@ -15,8 +13,7 @@ let help =
         list = [] | command list
    primitive = zero | one | interval
 
-     command = check <filename>      | lex <filename>
-             | parse <filename>      | prim primitive <name>
+     command = check <filename>      | prim primitive <name>
              | girard                | trace
              | receive               | indices
              | silent                | repl
@@ -24,9 +21,7 @@ let help =
 
 let repl = ref false
 let cmd : cmdline -> unit = function
-  | Check     filename -> Repl.check filename
-  | Lex       filename -> Reader.lex filename
-  | Parse     filename -> Reader.parse filename
+  | Check     filename -> Decl.checkFile filename
   | Prim (prim, value) -> begin match prim with
     | "zero"     -> Prefs.zeroPrim     := value
     | "one"      -> Prefs.onePrim      := value
@@ -46,8 +41,6 @@ let rec parseArgs : string list -> cmdline list = function
   | [] -> []
   | "prim" :: prim :: value :: rest -> Prim (prim, value) :: parseArgs rest
   | "check"       :: filename :: rest -> Check     filename :: parseArgs rest
-  | "lex"         :: filename :: rest -> Lex       filename :: parseArgs rest
-  | "parse"       :: filename :: rest -> Parse     filename :: parseArgs rest
   | "help"        :: rest             -> Help        :: parseArgs rest
   | "trace"       :: rest             -> Trace       :: parseArgs rest
   | "receive"     :: rest             -> Receive     :: parseArgs rest

@@ -17,6 +17,8 @@ def pair (A B : U) := Σ (first : A) (second : B), U
 def pair-first  (A B : U) (X : pair A B) : A := X.first
 def pair-second (A B : U) (X : pair A B) : B := X.second
 
+def fst-snd (A B C : U) (w : Σ (_ : A), Σ (_ : B), C) : B := w.2.1
+
 def not : 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐) 1₂ 0₂
 def and : 𝟐 → 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (const 𝟐 𝟐 false) (idfun 𝟐)
 def or : 𝟐 → 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (idfun 𝟐) (const 𝟐 𝟐 true)
@@ -35,3 +37,14 @@ section
 end
 
 def test′ := U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U → U
+
+macrovariables A B C D
+
+macro →² A := A → A
+macro →³ A := A → (→² A)
+macro →⁴ A := A → (→³ A)
+macro →⁵ A := A → (→⁴ A)
+macro →⁶ A := A → (→⁵ A)
+macro →⁷ A := A → (→⁶ A)
+
+#eval →⁷ U

@@ -22,7 +22,7 @@ This software is licensed under the ISC License. For more information, see LICEN
 let loaded : Files.t ref = ref Files.empty
 
 let main : command -> unit = function
-  | Eval e -> let (t, v) = (infer e, eval e) in
+  | Expr e -> let (t, v) = (infer e, eval e) in
     Printf.printf "TYPE: %s\nEVAL: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> loaded := Files.empty; raise Restart
@@ -30,12 +30,12 @@ let main : command -> unit = function
   | Command (s, _) | Action s -> raise (UnknownCommand s)
   | Nope -> ()
 
-let check filename = loaded := handleErrors (checkFile !loaded) filename !loaded
-
 let repl () =
   print_endline ("\n" ^ banner ^ "\n\nFor help type ‘:h’.\n");
   try while true do
     print_string "> "; let line = read_line () in
-    handleErrors (fun x -> main (Reader.parseErr Parser.repl
-      (Lexing.from_string x) "<stdin>")) line ()
+    handleErrors (fun s ->
+      match Combinators.runParser Parser.repl (Combinators.ofString s) 0 with
+      | Error err -> Printf.printf "Parse error:\n%s\n" err
+      | Ok (_, c) -> main c) line ()
   done with End_of_file -> ()

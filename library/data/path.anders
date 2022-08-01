@@ -197,7 +197,7 @@ def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Pa
 def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
 
 -- Generalized Transport
-def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → (λ (_ : I), A)]]) := transp (<i> (ouc p) i) j
+def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
 def trans⁻¹ (A B : U) (p : PathP (<_> U) A B) : B → A := transp (<i> p @ -i) 0
 def subst′ (A : U) (P : A → U) (a b : A) (p : Path A a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e

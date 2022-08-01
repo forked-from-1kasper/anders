@@ -16,7 +16,7 @@ struct
 end
 
 module Dict = Map.Make(String)
-module Env = Map.Make(Ident)
+module Env  = Map.Make(Ident)
 
 type dir = Zero | One
 

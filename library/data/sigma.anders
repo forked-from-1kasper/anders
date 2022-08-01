@@ -1,6 +1,6 @@
 import library/data/path
 
-def Sigma (A : U) (B : A → U) : U := Σ (x: A), B x
+def Sigma (A : U) (B : A → U) : U := Σ (x : A), B x
 def prod (A B : U) : U := Σ (_ : A), B
 def pair (A : U) (B : A → U) (a : A) (b : B a) : Sigma A B := (a, b)
 def pr₁ (A : U) (B : A → U) (x : Sigma A B) : A := x.1
@@ -18,7 +18,7 @@ def ac (A B : U) (R : A → B → U) (g : Π (x : A), Σ (y : B), R x y) :
   Σ (f : A → B), Π (x : A), R x (f x) :=
 (λ (i : A), (g i).1, λ (j : A), (g j).2)
 
-def total (A :U) (B C : A → U) (f : Π (x : A), B x → C x)
+def total (A : U) (B C : A → U) (f : Π (x : A), B x → C x)
   (w : Σ (x : A), B x) : Σ (x : A), C x :=
 (w.1, f w.1 w.2)
 

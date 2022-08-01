@@ -21,7 +21,7 @@ def isPrecategory (C : cat) : U :=
 def precategory : U₁ := Σ (C : cat) (P : isPrecategory C), unit
 
 def catᵒᵖ (P : precategory) : precategory :=
-((P.C.ob, (λ (A B : P.C.ob), P.C.hom B A), P.C.2.2),
+((P.C.ob, λ (A B : P.C.ob), P.C.hom B A, P.C.2.2),
  ((λ (A : P.C.ob), P.P.id A),
   (λ (A B C : P.C.ob) (f : P.C.hom B A) (g : P.C.hom C B), P.P.∘ C B A g f),
   (λ (A B : P.C.ob), P.P.homSet B A),

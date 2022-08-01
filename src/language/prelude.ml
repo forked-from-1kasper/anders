@@ -14,6 +14,19 @@ let initLast xs =
     | y :: ys -> func (y :: xs) ys in
   let (ys, y) = func [] xs in (List.rev ys, y)
 
+let splitWhile p =
+  let rec go xs = function
+    | y :: ys when p y -> go (y :: xs) ys
+    | ys               -> List.rev xs, ys
+  in go []
+
+let splitBy sep =
+  let rec go xs ys = function
+    | z :: zs when z = sep -> go [] (List.rev xs :: ys) zs
+    | z :: zs              -> go (z :: xs) ys zs
+    | []                   -> List.rev (List.rev xs :: ys)
+  in function [] -> [] | zs -> go [] [] zs
+
 let isEmpty = function
   | [] -> true
   | _  -> false

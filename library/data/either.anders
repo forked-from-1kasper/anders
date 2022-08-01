@@ -14,11 +14,11 @@ def +-recω (n m : L) (A B : U n) (C : U m) (f : A → C) (g : B → C) : (+ω n
 def +-ind := +-indω L₀ L₀
 def +-rec := +-recω L₀ L₀
 
-def +-β₁ (A B : U) (C : + A B → U) (a: A) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) :
+def +-β₁ (A B : U) (C : + A B → U) (a : A) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) :
   PathP (<_>C (inl A B a)) (f a) (+-ind A B C f g (inl A B a)) :=
 <_> f a
 
-def +-β₂ (A B : U) (C : + A B → U) (b: B) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) :
+def +-β₂ (A B : U) (C : + A B → U) (b : B) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) :
   PathP (<_>C (inr A B b)) (g b) (+-ind A B C f g (inr A B b)) :=
 <_> g b
 

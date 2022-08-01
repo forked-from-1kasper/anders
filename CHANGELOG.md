@@ -20,37 +20,57 @@ Changelog
 
 27 JAN 2022 **Version 1.1.1 Univalence:**
 
-* Glue Type.
-* 0, 1, 2, W Types.
-* Infinitesimal Shape Modality.
+* `Glue`, `glue` and `unglue` primitives.
+* 𝟎, 𝟏, 𝟐, and W-types.
+* Infinitesimal Shape Modality ℑ.
+* `ZArith` for universe levels to avoid inconstistency (see https://github.com/agda/agda/issues/5706).
+* Eliminate a lot of “Variable … was not found” bugs.
 
-11 DEC 2021 **Version 0.12.1 Categorical Library:**
+11 DEC 2021 **Version 0.12.1:**
 
-* Sigma with auto projections.
-* Modules: algebra, cat, fun, topos, ab, kraus.
-* Improved Huber’s rules (see https://simhu.github.io/misc/hcomp.pdf).
-* Support for PartialP primitive.
+*Technical release.*
+
+11 DEC 2021 **Version 0.12.0:**
+
+* Some of Huber’s rules (see https://simhu.github.io/misc/hcomp.pdf).
+* Support for `PartialP` primitive.
 * Improved reduction rules for hypercubes.
+* `infer` is now able to handle cubical systems.
+* Rewritten DNF solver.
+* Accessors for Σ’s.
+* Some optimisations.
 
 15 JUL 2021 **Version 0.7.2 Kan Operations:**
 
-* Strict Equality (`Id`, `ref`, `idJ`).
 * Cubical Subtypes (`Sub`, `inc`, `ouc`).
-* Partials, Cubical Systems (Partial, [φ ↦ u]).
-* Kan Operations (hcomp, transp).
+* Homogeneous Kan composition (`hcomp`).
 * Eliminate neutral elements (they were derived from Mini-TT).
 * Initial Base Library (OPAM share folder).
-* New options `silent` and `indices`.
+* New options: `silent` and `indices`.
 
 6 JUL 2021 **Version 0.7.1 Binary Distribution:**
 
+* `infer` is now able to handle lambdas.
+* Partials, Cubical Systems (Partial, [φ ↦ u]).
+* Strict Equality (`Id`, `ref`, `idJ`).
 * Minor optimizations.
 * OPAM package.
 * ISC license.
 
 5 JUL 2021 **Version 0.7 MLTT Internalization:**
 
+* Universes hierarchy Uₙ.
+* `PathP`, path lambdas (`<i> f`), path application `@`.
+* CHM interval and de Morgan algebra over it (`∧`, `∨` and `-`).
+* Pretypes hierarchy Vₙ.
+* Generalized Transport (`transp`).
+* `infer` allowing to write definition without type ascription.
+* `girard` option.
+* (Wide) UTF-8 support.
+* Debug traces.
+* REPL.
+
+14 APR 2020 **Development starts here:**
+* Type checker based on my (unpublished) port Mini-TT to F#.
+* Parser & Lexer (Menhir + ocamllex).
 * MLTT ΠΣ primitives.
-* CHM interval, pretypes hierarchy Vₙ.
-* Generalized Transport.
-* Parser & Lexer in 80 LOC each (Menhir + ocamllex).

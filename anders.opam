@@ -6,8 +6,8 @@ authors: [
   "Namdak Tonpa @5HT"
   "Siegmentation Fault @siegment"
 ]
-bug-reports: "https://github.com/groupoid/anders/issues"
-dev-repo: "git+https://github.com/groupoid/anders"
+bug-reports: "https://github.com/forked-from-1kasper/anders/issues"
+dev-repo: "git+https://github.com/forked-from-1kasper/anders"
 synopsis: "Cubical Type Checker"
 license: "ISC"
 depends: [

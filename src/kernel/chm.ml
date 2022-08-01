@@ -49,7 +49,7 @@ let proto : req -> resp = function
     | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
     | _                 -> Error (InvalidOpt p)
   end
-  | Version            -> Version (1L, 4L, 2L)
+  | Version            -> Version (1L, 8L, 0L)
   | Ping               -> Pong
 
 let () = try while true do

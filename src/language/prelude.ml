@@ -46,3 +46,40 @@ let rec showSubscript x =
   if Z.lt x Z.zero then failwith "showSubscript: expected positive integer"
   else if Z.equal x Z.zero then "" else let (y, d) = Z.div_rem x ten in
     showSubscript y ^ getDigit d
+
+module ListRef =
+struct
+  exception Failure
+  type 'a t = 'a list ref
+
+  let ofList xs : 'a t = ref xs
+
+  let peek ptr =
+    match !ptr with
+    |   []   -> None
+    | x :: _ -> Some x
+
+  let next ptr =
+    match !ptr with
+    |   []    -> raise Failure
+    | x :: xs -> (ptr := xs; x)
+
+  let drop ptr =
+    match !ptr with
+    |   []    -> ()
+    | _ :: xs -> ptr := xs
+
+  let junk ptr = drop ptr; ptr
+
+  let isEmpty ptr =
+    match !ptr with
+    |   []   -> true
+    | _ :: _ -> false
+
+  let takeWhile pred stream =
+    let rec loop buf =
+      match peek stream with
+      | Some t when pred t -> (drop stream; loop (t :: buf))
+      | _                  -> List.rev buf
+    in loop []
+end

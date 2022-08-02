@@ -50,20 +50,9 @@ let next = function
   |   []    -> raise TooFewArguments
   | x :: xs -> (x, xs)
 
-let takeWhile pred stream =
-  let rec loop buf =
-    match Stream.peek stream with
-    | Some t when pred t -> (Stream.junk stream; loop (t :: buf))
-    | _                  -> List.rev buf
-  in loop []
-
 let getPrecedence = function
   | Atom t -> Dict.find_opt t !operators
   | Node _ -> None
-
-let isEmpty = Option.is_none % Stream.peek
-let junk stream = Stream.junk stream; stream
-let drop stream = if isEmpty stream then stream else junk stream
 
 let mapsto = Atom "↦"
 
@@ -75,10 +64,10 @@ let rec nud stream = function
   | Node ('[', es)                         -> prattSystem es
   | Node (_,   es)                         -> prattSigma es
   | Atom x when isQuantifier x             ->
-    let xs = List.map prattBinder (takeWhile ((<>) (Atom ",")) stream) in
-    paren [paren (Atom x :: xs); Atom ","; pratter (junk stream)]
+    let xs = List.map prattBinder (ListRef.takeWhile ((<>) (Atom ",")) stream) in
+    paren [paren (Atom x :: xs); Atom ","; pratter (ListRef.junk stream)]
   | Atom x -> match Dict.find_opt x !operators with
-    | Some (Prefix, _)  -> paren [Atom x; nud stream (Stream.next stream)]
+    | Some (Prefix, _)  -> paren [Atom x; nud stream (ListRef.next stream)]
     | Some (Infix _, _) -> raise (UnexpectedInfix x)
     | Some (Postfix, _) -> raise (UnexpectedPostfix x)
     | _                 -> Atom x
@@ -88,12 +77,12 @@ and prattBinder e = let (is, es) = unpackBinder e in
 
 and prattSystem es =
   let rec loop stream buf =
-    if isEmpty stream then List.rev buf
+    if ListRef.isEmpty stream then List.rev buf
     else
-      let xs = takeWhile ((<>) (Atom "→")) stream in
-      let e  = pratter (junk stream) in
-      loop (drop stream) (paren [paren xs; e] :: buf)
-  in Node ('[', loop (Stream.of_list es) [])
+      let xs = ListRef.takeWhile ((<>) (Atom "→")) stream in
+      let e  = pratter (ListRef.junk stream) in
+      loop (ListRef.junk stream) (paren [paren xs; e] :: buf)
+  in Node ('[', loop (ListRef.ofList es) [])
 
 and led assoc bp stream left t =
   let rbp = match assoc with
@@ -103,43 +92,43 @@ and led assoc bp stream left t =
 
 and expression rbp rassoc stream =
   let rec loop left =
-    match Stream.peek stream with
+    match ListRef.peek stream with
     | None | Some (Atom ",") -> left
     | Some t ->
     begin
       match getPrecedence t with
       | Some (Infix lassoc, lbp) ->
         if lbp > rbp || (lbp = rbp && lassoc = Right && rassoc = Right)
-        then loop (led lassoc lbp (junk stream) left t)
+        then loop (led lassoc lbp (ListRef.junk stream) left t)
         else if lbp < rbp || (lbp = rbp && lassoc = Left && rassoc = Left)
         then left else raise (OpConflict (left, t))
       | Some (Postfix, lbp) ->
-        if lbp > rbp then begin Stream.junk stream; loop (paren [left; t]) end
+        if lbp > rbp then begin ListRef.drop stream; loop (paren [left; t]) end
         else if lbp = rbp then raise (OpConflict (left, t))
         else left
       | Some (Prefix, _) | None ->
-        let next = nud stream (Stream.next stream) in
+        let next = nud stream (ListRef.next stream) in
         loop (mkApp left (prattProj stream next))
     end in
-  try loop (paren [prattProj stream (nud stream (Stream.next stream))])
-  with Stream.Failure -> raise TooFewArguments
+  try loop (paren [prattProj stream (nud stream (ListRef.next stream))])
+  with ListRef.Failure -> raise TooFewArguments
 
 and pratter stream = expression neg_infinity Neither stream
 
 and prattProj stream stx =
-  match Stream.peek stream with
-  | Some (Atom ".") -> let next = Stream.next (junk stream) in
+  match ListRef.peek stream with
+  | Some (Atom ".") -> let next = ListRef.next (ListRef.junk stream) in
                        prattProj stream (paren [stx; Atom "."; nud stream next])
   | _               -> stx
 
 and prattSigma xs =
   let rec loop stream =
     let stx = pratter stream in
-    match Stream.peek stream with
-    | Some (Atom ",") -> paren [stx; Atom ","; loop (junk stream)]
+    match ListRef.peek stream with
+    | Some (Atom ",") -> paren [stx; Atom ","; loop (ListRef.junk stream)]
     | Some e          -> raise (InvalidSyntax e)
     | None            -> stx in
-  loop (Stream.of_list xs)
+  loop (ListRef.ofList xs)
 
 and unpack = function
   | Node ('(', xs) -> prattSigma xs

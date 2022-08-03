@@ -39,6 +39,7 @@ let setBoolVal ptr opt = function
 
 let rec checkLine conf = function
   | Macrovariables is -> Parser.upMacrovars is; conf
+  | Token is -> Parser.upTokens is; conf
   | Macro (b, e1, e2) -> Parser.upMacro b e1 e2; conf
   | Macroexpand e -> Printf.printf "MACROEXPAND: %s\n" (showStx (Parser.macroelab e)); flush_all (); conf
   | Infer e -> Printf.printf "INFER: %s\n" (Prettyprinter.showExp (infer e)); flush_all (); conf

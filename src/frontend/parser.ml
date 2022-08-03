@@ -417,7 +417,7 @@ let nl       = str (fun c -> c = '\n' || c = '\r') >> eps
 let keywords = ["def"; "definition"; "theorem"; "lemma"; "proposition"; "macro"; "import";
                 "prefix"; "postfix"; "infixl"; "infixr"; "infix"; "postulate"; "axiom";
                 "macrovariables"; "option"; "unsafe"; "variables"; "section"; "end";
-                "#macroexpand"; "#infer"; "#eval"; "--"; "{-"; "-}"]
+                "token"; "#macroexpand"; "#infer"; "#eval"; "--"; "{-"; "-}"]
 let reserved = ['('; ')'; '['; ']'; '<'; '>'; '\n'; '\t'; '\r'; ' '; '.'; ',']
 
 let isValidChar  c = not (List.mem c reserved)
@@ -431,14 +431,38 @@ let inlineComment    = token "--" >> str0 (fun c -> c <> '\r' && c <> '\n') >> n
 let multilineComment = token "{-" >> optional ws >> sepBy ws (guard ((<>) "-}") (str (negate isWhitespace))) >> optional ws >> token "-}"
 let comment          = (inlineComment <|> multilineComment) >> pure Skip
 
-let syntax = fix (fun p ->
-  let chars = character '.' <|> character '-' <|> character ',' in
-  let atom  = atom <$> ident in
-  let paren = sat isBracket << optional ws >>= fun c -> many p << ch (enclosing c) >>= fun es -> pure (Node (c, es)) in
-  many comment >> (chars <|> atom <|> paren) << many comment << optional ws)
+let toTokenize = ref ["-"]
+let upTokens is = toTokenize := !toTokenize @ is
 
-let toplevel c = guard c syntax >>= fun x -> many (guard c syntax) >>=
-  fun xs -> pure (match xs with [] -> x | _ -> paren (x :: xs))
+let tokenize s =
+  let rec loopLeft buf s0 =
+    match findMap (cutAtBegin s0) !toTokenize with
+    | Some (prefix, s) -> loopLeft (prefix :: buf) s
+    | None             -> (buf, s0) in
+  let rec loopRight buf s0 =
+    match findMap (cutAtEnd s0) !toTokenize with
+    | Some (postfix, s) -> loopRight (postfix :: buf) s
+    | None              -> (buf, s0) in
+
+  let (left, s1) = loopLeft [] s in
+  if String.length s1 = 0 then List.rev left
+  else let (right, s2) = loopRight [] s1 in
+  if String.length s2 = 0 then List.rev_append left right
+  else List.rev_append left (s2 :: right)
+
+let syntax = fix (fun p ->
+  let special = singleton <$> (character '.' <|> character ',') in
+  let atom    = (List.map atom % tokenize) <$> ident in
+  let paren   = sat isBracket << optional ws >>= fun c -> many p << ch (enclosing c) >>=
+                  fun es -> pure [Node (c, List.concat es)] in
+  many comment >> (special <|> atom <|> paren) << many comment << optional ws)
+
+let toplevel c = guard (List.for_all c) syntax >>=
+  fun x -> many (guard (List.for_all c) syntax) >>=
+    fun xs -> match x @ List.concat xs with
+      | []  -> failwith "unreachable code was reached"
+      | [y] -> pure y
+      | ys  -> pure (paren ys)
 
 let isDefTok t = t = ":=" || t = "≔" || t = "≜" || t = "≝"
 let defTok = guard isDefTok ident
@@ -497,12 +521,13 @@ let macroexpand    = debug "#macroexpand" (fun e -> Macroexpand e)
 let infer          = debug "#infer"       (fun e -> Infer (elab e))
 let eval           = debug "#eval"        (fun e -> Eval (elab e))
 let macrovariables = token "macrovariables" >> ws >> sepBy1 ws ident >>= fun is -> pure (Macrovariables is)
+let tokens         = token "token" >> ws >> sepBy1 ws ident >>= fun is -> pure (Token is)
 let variables      = token "variables" >> ws >> binders >>= fun bs -> pure (Variables bs)
 let import         = token "import" >> ws >> sepBy1 ws ident >>= fun fs -> pure (Import fs)
 let options        = token "option" >> ws >> ident >>= fun i -> ws >> ident >>= fun v -> pure (Option (i, v))
 let section        = (token "section" >> pure Section) <|> (token "end" >> pure End)
 
-let commands = import <|> variables <|> options <|> operator <|> macroexpand <|> infer <|> eval <|> macrovariables
+let commands = import <|> variables <|> options <|> operator <|> macroexpand <|> infer <|> eval <|> macrovariables <|> tokens
 let cmdeof   = eof >> pure Eof
 let cmdline  = def <|> axm <|> macro <|> commands <|> section <|> comment <|> cmdeof
 let cmd      = optional ws >> cmdline

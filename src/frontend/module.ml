@@ -27,6 +27,7 @@ type line =
   | Option of string * string
   | Variables of tele list
   | Macrovariables of string list
+  | Token of string list
   | Macro of bool * syntax * syntax
   | Macroexpand of syntax
   | Decl of decl
@@ -88,6 +89,7 @@ let showLine = function
   | Section -> "section" | End -> "end"
   | Variables xs -> Printf.sprintf "variables%s" (showTeles xs)
   | Macrovariables is -> Printf.sprintf "macrovariables %s" (String.concat " " is)
+  | Token is -> Printf.sprintf "token %s" (String.concat " " is)
   | Macro (b, e1, e2) -> Printf.sprintf "%smacro %s :=\n%s" (showUnsafeAttr b) (showStx e1) (showStx e2)
   | Macroexpand stx -> Printf.sprintf "#macroexpand %s" (showStx stx)
   | Infer e -> Printf.sprintf "#infer %s" (showExp e)

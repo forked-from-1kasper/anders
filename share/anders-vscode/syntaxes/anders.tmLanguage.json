@@ -14,7 +14,7 @@
             "name": "comment.line.double-dash.anders"
         },
         {
-            "match": "(?<=^|[\\s()\\[\\]])(unsafe|macro|macrovariables|prefix|postfix|infix|infixr|infixl|#eval|#infer|#macroexpand|option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|begin|section|end|variables)(?=$|[\\s()\\[\\]])",
+            "match": "(?<=^|[\\s()\\[\\]])(token|unsafe|macro|macrovariables|prefix|postfix|infix|infixr|infixl|#eval|#infer|#macroexpand|option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|begin|section|end|variables)(?=$|[\\s()\\[\\]])",
             "name": "keyword.other.anders"
         },
         {

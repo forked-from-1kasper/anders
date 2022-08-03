@@ -7,23 +7,23 @@ let uncurry f (x, y) = f x y
 
 let (%) f g x = f (g x)
 
-let cutAtBegin prefix s =
+let cutAtBegin s prefix =
   let len1 = String.length prefix in
   let len2 = String.length s in
 
   let rec loop idx =
-    if idx = len1 then Some (String.sub s len1 (len2 - len1))
+    if idx = len1 then Some (prefix, String.sub s len1 (len2 - len1))
     else if String.get prefix idx <> String.get s idx then None
     else loop (idx + 1) in
 
   if len1 > len2 then None else loop 0
 
-let cutAtEnd postfix s =
+let cutAtEnd s postfix =
   let len1 = String.length postfix in
   let len2 = String.length s in
 
   let rec loop idx =
-    if idx > len1 then Some (String.sub s 0 (len2 - len1))
+    if idx > len1 then Some (postfix, String.sub s 0 (len2 - len1))
     else if String.get postfix (len1 - idx)
          <> String.get s (len2 - idx) then None
     else loop (idx + 1) in
@@ -72,12 +72,21 @@ let take4 = function
   | x :: y :: z :: w :: ws -> (x, y, z, w, ws)
   | _                      -> raise TooFewArguments
 
+let singleton value = [value]
+
 (* https://github.com/ocaml/ocaml/blob/trunk/stdlib/list.ml *)
 let rec listEqual fn xs ys =
   match xs, ys with
   | [], [] -> true
   | [], _ :: _ | _ :: _, [] -> false
   | x :: xs, y :: ys -> fn x y && listEqual fn xs ys
+
+let rec findMap f = function
+  |   []    -> None
+  | x :: xs ->
+    match f x with
+    | None -> findMap f xs
+    | y    -> y
 
 let getDigit x = Char.chr (Z.to_int x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 

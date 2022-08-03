@@ -156,19 +156,13 @@ let etype x y c =
 
 let kan     = etype "U" "Uω" Kan
 let pretype = etype "V" "Vω" Pretype
-let level   = token "L" >> level >>= fun n -> pure (ELevelElem n)
+let level   = token "L" >> many1 numSubscript >>= fun n -> pure (ELevelElem (getLevel n))
 let indexed = (kan <|> pretype <|> level) << eof
 
-let getVar x =
-  let xs = [(!intervalPrim, EI);
-            (!zeroPrim, EDir Zero);
-            (!onePrim, EDir One)] in
-  match List.assoc_opt x xs with Some e -> e | None -> decl x
+let getConstants () = [(!intervalPrim, EI); (!zeroPrim, EDir Zero); (!onePrim, EDir One)]
+let getVar x = match List.assoc_opt x (getConstants ()) with Some e -> e | None -> decl x
 
-let expandVar x =
-  match runParser indexed (ofString x) 0 with
-  | Ok (_, e) -> e
-  | Error _   -> getVar x
+let expandVar x = getVar x
 
 type prim =
   | Nullary    of exp
@@ -230,7 +224,7 @@ let getPrim = function
   | "?"        -> Nullary    EHole
   | x          -> Nullary    (expandVar x)
 
-let infix = function
+let getInfix = function
   | "∨" | "\\/" -> Some (fun e1 e2 -> EOr (e1, e2))
   | "∧" | "/\\" -> Some (fun e1 e2 -> EAnd (e1, e2))
   | "→"         -> Some (fun e1 e2 -> impl e1 e2)
@@ -256,19 +250,26 @@ let primExpander fn = function
   end
   | _ -> None
 
+let expandIndexed x =
+  match runParser indexed (ofString x) 0 with
+  | Ok (_, e) -> Some e
+  | Error _   -> None
+
 let cosmosExpander fn = function
   | Node ('(', Atom "U" :: e :: es) -> Some (appStx fn es (EType (Kan,     Finite (fn e))))
   | Node ('(', Atom "V" :: e :: es) -> Some (appStx fn es (EType (Pretype, Finite (fn e))))
+  | Node ('(', Atom x :: es)        -> Option.map (appStx fn es) (expandIndexed x)
+  | Atom x                          -> expandIndexed x
   | _                               -> None
 
 let infixExpander fn = function
-  | Node ('(', [a; Atom x; b]) -> Option.map (fun g -> g (fn a) (fn b)) (infix x)
+  | Node ('(', [a; Atom x; b]) -> Option.map (fun g -> g (fn a) (fn b)) (getInfix x)
   | _                          -> None
 
-let expandBinder fn es0 = match es0 with
+let expandBinder fn = function
   | is :: Atom ":" :: es -> let e = fn (paren es)
     in List.map (fun i -> (expandIdent i, e)) (takeParens is)
-  | _ -> failwith (Printf.sprintf "expandBinder: %s" (showStxs es0))
+  | e                    -> raise (InvalidSyntax (paren e))
 
 let expandBinders fn es = List.concat (List.map (expandBinder fn % expandNode) es)
 let expandQuantifier fn c es e = List.fold_right (fun (i, t) -> c i t) (expandBinders fn es) (fn e)
@@ -284,11 +285,6 @@ let extEquation : formula -> ident * dir = function
   | Equation (x, d) -> (x, d)
   | _               -> raise (Failure "extEquation")
 
-let face p e d : formula = match getVar p, e, getDir d with
-  | EVar x,  "=", d  -> Equation (x, d)
-  | EDir d1, "=", d2 -> if d1 = d2 then Truth else Falsehood
-  | _,       _,   _  -> failwith "invalid face"
-
 let parseFace xs =
   if List.mem Falsehood xs then None
   else if List.mem Truth xs then Some Env.empty
@@ -296,9 +292,14 @@ let parseFace xs =
 
 let parsePartial xs e = Option.map (fun ys -> (ys, e)) (parseFace xs)
 
-let expandEquation = function
-  | Node ('(', [Atom p; Atom e; Atom d]) -> face p e d
-  | e                                    -> raise (InvalidSyntax e)
+let expandEquation e = match e with
+  | Node ('(', [Atom p; Atom "="; Atom d]) ->
+  begin match getVar p, getDir d with
+    | EDir d1, d2 -> if d1 = d2 then Truth else Falsehood
+    | EVar x,  d  -> Equation (x, d)
+    | _,       _  -> raise (InvalidSyntax e)
+  end
+  | e -> raise (InvalidSyntax e)
 
 let expandFace = List.map expandEquation
 
@@ -325,13 +326,14 @@ let lowExpander fn = function
   | _                                               -> None
 
 let simpleExpander fn = function
-  | Node ('(', f :: xs) -> Some (appStx fn xs (fn f))
+  | Node ('(', e :: es) -> Some (appStx fn es (fn e))
   | Node ('[', es)      -> Some (ESystem (expandSystem fn es))
   | _                   -> None
 
 let rec traverseExpanders g e = function
   |   []    -> None
-  | f :: fs -> match f g e with
+  | f :: fs ->
+    match f g e with
     | None -> traverseExpanders g e fs
     | t    -> t
 
@@ -412,9 +414,9 @@ let isWhitespace c = c = ' ' || c = '\n' || c = '\t' || c = '\t'
 let ws       = str isWhitespace >> eps
 let nl       = str (fun c -> c = '\n' || c = '\r') >> eps
 let keywords = ["def"; "definition"; "theorem"; "lemma"; "proposition"; "macro"; "import";
-                "infixl"; "infixr"; "infix"; "postulate"; "axiom"; "macrovariables"; "option";
-                "unsafe"; "variables"; "section"; "end"; "#macroexpand"; "#infer"; "#eval";
-                "--"; "{-"; "-}"]
+                "prefix"; "postfix"; "infixl"; "infixr"; "infix"; "postulate"; "axiom";
+                "macrovariables"; "option"; "unsafe"; "variables"; "section"; "end";
+                "#macroexpand"; "#infer"; "#eval"; "--"; "{-"; "-}"]
 let reserved = ['('; ')'; '['; ']'; '<'; '>'; '\n'; '\t'; '\r'; ' '; '.'; ',']
 
 let isValidChar  c = not (List.mem c reserved)

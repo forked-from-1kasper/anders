@@ -60,10 +60,10 @@ let getDigit x = Char.chr (Z.to_int x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 
 let ten = Z.of_int 10
 
-let rec showSubscript x =
+let rec showSubscript printZero x =
   if Z.lt x Z.zero then failwith "showSubscript: expected positive integer"
-  else if Z.equal x Z.zero then "" else let (y, d) = Z.div_rem x ten in
-    showSubscript y ^ getDigit d
+  else if Z.equal x Z.zero then (if printZero then "₀" else "")
+  else let (y, d) = Z.div_rem x ten in showSubscript false y ^ getDigit d
 
 module ListRef =
 struct

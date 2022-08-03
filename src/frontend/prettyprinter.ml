@@ -29,11 +29,11 @@ let ppCosmos = function
   | Kan     -> "U"
 
 let rec ppExp paren e = let x = match e with
-  | EType (c, Finite (ELevelElem n)) -> ppCosmos c ^ showSubscript n
+  | EType (c, Finite (ELevelElem n)) -> ppCosmos c ^ showSubscript false n
   | EType (c, Finite e) -> ppCosmos c ^ " " ^ ppExp true e
-  | EType (c, Omega n) -> ppCosmos c ^ "ω" ^ showSubscript n
+  | EType (c, Omega n) -> ppCosmos c ^ "ω" ^ showSubscript false n
   | ELevel -> "L"
-  | ELevelElem n -> "L" ^ showSubscript n
+  | ELevelElem n -> "L" ^ showSubscript true n
   | ELSucc e -> Printf.sprintf "isucc %s" (ppExp true e)
   | EAdd (e1, e2) -> Printf.sprintf "iadd %s %s" (ppExp true e1) (ppExp true e2)
   | EMax (e1, e2) -> Printf.sprintf "imax %s %s" (ppExp true e1) (ppExp true e2)

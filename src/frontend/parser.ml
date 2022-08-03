@@ -26,6 +26,12 @@ let expandIdent = function
   | Atom x -> ident x
   | e      -> raise (ExpectedIdent e)
 
+let takeParens = function
+  | Node ('(', es) -> es
+  | e              -> [e]
+
+let traceParser es = Printf.printf "When trying to parse\n  %s\n" (showStxs es)
+
 let expandNode = function
   | Node ('(', es) -> es
   | e              -> raise (ExpectedNode e)
@@ -69,15 +75,6 @@ let rec nud stream = function
 
 and prattBinder e = let (is, es) = unpackBinder e in
   paren [paren is; Atom ":"; prattSigma es]
-
-and prattSystem es =
-  let rec loop stream buf =
-    if ListRef.isEmpty stream then List.rev buf
-    else
-      let xs = ListRef.takeWhile ((<>) (Atom "→")) stream in
-      let e  = pratter (ListRef.junk stream) in
-      loop (ListRef.junk stream) (paren [paren xs; e] :: buf)
-  in Node ('[', loop (ListRef.ofList es) [])
 
 and led assoc bp stream left t =
   let rbp = match assoc with
@@ -123,7 +120,18 @@ and prattSigma xs =
     | Some (Atom ",") -> paren [stx; Atom ","; loop (ListRef.junk stream)]
     | Some e          -> raise (InvalidSyntax e)
     | None            -> stx in
-  loop (ListRef.ofList xs)
+  try loop (ListRef.ofList xs)
+  with ex -> traceParser xs; raise ex
+
+and prattSystem es =
+  let rec loop stream buf =
+    if ListRef.isEmpty stream then List.rev buf
+    else
+      let xs = ListRef.takeWhile ((<>) (Atom "→")) stream in
+      let e  = pratter (ListRef.junk stream) in
+      loop (ListRef.junk stream) (paren [paren xs; e] :: buf)
+  in try Node ('[', loop (ListRef.ofList es) [])
+  with ex -> traceParser es; raise ex
 
 and unpack = function
   | Node ('(', xs) -> prattSigma xs
@@ -161,10 +169,6 @@ let expandVar x =
   match runParser indexed (ofString x) 0 with
   | Ok (_, e) -> e
   | Error _   -> getVar x
-
-let expandParens = function
-  | Node ('(', es) -> es
-  | t              -> [t]
 
 type prim =
   | Nullary    of exp
@@ -248,7 +252,7 @@ let primExpander fn = function
   | Atom x ->
   begin match getPrim x with
     | Nullary e -> Some e
-    | _         -> Printf.printf "FEW: %s\n" x; raise TooFewArguments
+    | _         -> raise TooFewArguments
   end
   | _ -> None
 
@@ -263,7 +267,7 @@ let infixExpander fn = function
 
 let expandBinder fn es0 = match es0 with
   | is :: Atom ":" :: es -> let e = fn (paren es)
-    in List.map (fun i -> (expandIdent i, e)) (expandParens is)
+    in List.map (fun i -> (expandIdent i, e)) (takeParens is)
   | _ -> failwith (Printf.sprintf "expandBinder: %s" (showStxs es0))
 
 let expandBinders fn es = List.concat (List.map (expandBinder fn % expandNode) es)
@@ -334,9 +338,10 @@ let rec traverseExpanders g e = function
 let expanders = [quantifierExpander; lowExpander; infixExpander; cosmosExpander; primExpander; simpleExpander]
 
 let rec expandTerm e =
-  match traverseExpanders expandTerm e expanders with
+  try match traverseExpanders expandTerm e expanders with
   | None   -> raise (InvalidSyntax e)
   | Some t -> t
+  with ex -> traceParser (takeParens e); raise ex
 
 type macro =
   { variables : Set.t;

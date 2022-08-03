@@ -62,6 +62,11 @@ let prettyPrintExn : exn -> unit = function
   | ProtocolViolation                  -> Printf.printf "Protocol violation\n"
   | InvalidSyntax e                    -> Printf.printf "Invalid syntax:\n  %s\n" (showStx e)
   | ExpectedNode e                     -> Printf.printf "“%s” expected to be a node.\n" (showStx e)
+  | ExpectedIdent e                    -> Printf.printf "\n  %s\nexpected to be an ident.\n" (showStx e)
+  | OpConflict (e1, e2)                -> Printf.printf "Operator conflict between\n  %s\nand\n  %s\n" (showStxs (takeParens e1)) (showStx e2)
+  | UnexpectedInfix x                  -> Printf.printf "Unexpected infix operator “%s” in this position.\n" x
+  | UnexpectedPostfix x                -> Printf.printf "Unexpected postfix operator “%s” in this position.\n" x
+  | TooFewArguments                    -> Printf.printf "Too few arguments.\n"
   | Restart                            -> raise Restart
   | ex                                 -> Printf.printf "Uncaught exception: %s\n" (Printexc.to_string ex)
 

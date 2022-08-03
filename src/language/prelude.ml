@@ -31,6 +31,24 @@ let isEmpty = function
   | [] -> true
   | _  -> false
 
+exception TooFewArguments
+
+let take1 = function
+  | x :: xs -> (x, xs)
+  | _       -> raise TooFewArguments
+
+let take2 = function
+  | x :: y :: ys -> (x, y, ys)
+  | _            -> raise TooFewArguments
+
+let take3 = function
+  | x :: y :: z :: zs -> (x, y, z, zs)
+  | _                 -> raise TooFewArguments
+
+let take4 = function
+  | x :: y :: z :: w :: ws -> (x, y, z, w, ws)
+  | _                      -> raise TooFewArguments
+
 (* https://github.com/ocaml/ocaml/blob/trunk/stdlib/list.ml *)
 let rec listEqual fn xs ys =
   match xs, ys with

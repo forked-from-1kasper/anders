@@ -19,7 +19,6 @@ exception ExpectedNode  of syntax
 exception OpConflict        of syntax * syntax
 exception UnexpectedInfix   of string
 exception UnexpectedPostfix of string
-exception TooFewArguments
 
 let mkIdent = ident
 
@@ -45,10 +44,6 @@ let isQuantifier s = s = "W" || s = "Π" || s = "Σ" || s = "λ"
 let mkApp f x = match f with
   | Node ('(', xs) -> paren (xs @ [x])
   | t              -> paren [t; x]
-
-let next = function
-  |   []    -> raise TooFewArguments
-  | x :: xs -> (x, xs)
 
 let getPrecedence = function
   | Atom t -> Dict.find_opt t !operators
@@ -151,9 +146,10 @@ let etype x y c =
       (token x >> level >>= fun n -> pure (EType (c, Finite (ELevelElem n))))
   <|> (token y >> level >>= fun n -> pure (EType (c, Omega n)))
 
-let indexed =
-       etype "U" "Uω" Kan <|> etype "V" "Vω" Pretype
-  <|> (token "L" >> level >>= fun n -> pure (ELevelElem n))
+let kan     = etype "U" "Uω" Kan
+let pretype = etype "V" "Vω" Pretype
+let level   = token "L" >> level >>= fun n -> pure (ELevelElem n)
+let indexed = (kan <|> pretype <|> level) << eof
 
 let getVar x =
   let xs = [(!intervalPrim, EI);
@@ -162,7 +158,7 @@ let getVar x =
   match List.assoc_opt x xs with Some e -> e | None -> decl x
 
 let expandVar x =
-  match runParser (indexed << eof) (ofString x) 0 with
+  match runParser indexed (ofString x) 0 with
   | Ok (_, e) -> e
   | Error _   -> getVar x
 
@@ -170,94 +166,99 @@ let expandParens = function
   | Node ('(', es) -> es
   | t              -> [t]
 
-let nullary = function
-  | "𝟎"    | "empty" -> Some EEmpty
-  | "𝟏"    | "unit"  -> Some EUnit
-  | "𝟐"    | "bool"  -> Some EBool
-  | "★"    | "star"  -> Some EStar
-  | "0₂"   | "false" -> Some EFalse
-  | "1₂"   | "true"  -> Some ETrue
-  | "ℕ"    | "nat"   -> Some EN
-  | "zero"           -> Some EZero
-  | "succ"           -> Some ESucc
-  | "L"              -> Some ELevel
-  | "?"              -> Some EHole
-  | x                -> Some (expandVar x)
+type prim =
+  | Nullary    of exp
+  | Unary      of (exp -> exp)
+  | Binary     of (exp -> exp -> exp)
+  | Ternary    of (exp -> exp -> exp -> exp)
+  | Quaternary of (exp -> exp -> exp -> exp -> exp)
 
-let unary e = function
-  | "Id"      -> Some (EId e)
-  | "ref"     -> Some (ERef e)
-  | "idJ"     -> Some (EJ e)
-  | "ouc"     -> Some (EOuc e)
-  | "PathP"   -> Some (EPathP e)
-  | "Glue"    -> Some (EGlue e)
-  | "Partial" -> Some (EPartial e)
-  | "ind₀"    -> Some (EIndEmpty e)
-  | "ind₁"    -> Some (EIndUnit e)
-  | "ind₂"    -> Some (EIndBool e)
-  | "ℕ-ind"   -> Some (ENInd e)
-  | "indᵂ"    -> Some (EIndW e)
-  | "ℑ"       -> Some (EIm e)
-  | "ℑ-unit"  -> Some (EInf e)
-  | "ℑ-join"  -> Some (EJoin e)
-  | "isucc"   -> Some (ELSucc e)
-  | "-"       -> Some (ENeg e)
-  | "U"       -> Some (EType (Kan, Finite e))
-  | "V"       -> Some (EType (Pretype, Finite e))
-  | "typeof"  -> Some (ETypeof e)
-  | _         -> None
+let getPrim = function
+  | "hcomp"    -> Quaternary (fun e1 e2 e3 e4 -> EHComp (e1, e2, e3, e4))
+  | "glue"     -> Ternary    (fun e1 e2 e3    -> EGlueElem (e1, e2, e3))
+  | "unglue"   -> Ternary    (fun e1 e2 e3    -> EUnglue (e1, e2, e3))
+  | "iota"     -> Ternary    (fun e1 e2 e3    -> EIota (e1, e2, e3))
+  | "resp"     -> Ternary    (fun e1 e2 e3    -> EResp (e1, e2, e3))
+  | "coeq-ind" -> Ternary    (fun e1 e2 e3    -> EIndCoeq (e1, e2, e3))
+  | "transp"   -> Binary     (fun e1 e2       -> ETransp (e1, e2))
+  | "PartialP" -> Binary     (fun e1 e2       -> EPartialP (e1, e2))
+  | "inc"      -> Binary     (fun e1 e2       -> EInc (e1, e2))
+  | "sup"      -> Binary     (fun e1 e2       -> ESup (e1, e2))
+  | "coeq"     -> Binary     (fun e1 e2       -> ECoeq (e1, e2))
+  | "iadd"     -> Binary     (fun e1 e2       -> EAdd (e1, e2))
+  | "imax"     -> Binary     (fun e1 e2       -> EMax (e1, e2))
+  | "ind-ℑ"    -> Binary     (fun e1 e2       -> EIndIm (e1, e2))
+  | "Id"       -> Unary      (fun e           -> EId e)
+  | "ref"      -> Unary      (fun e           -> ERef e)
+  | "idJ"      -> Unary      (fun e           -> EJ e)
+  | "ouc"      -> Unary      (fun e           -> EOuc e)
+  | "PathP"    -> Unary      (fun e           -> EPathP e)
+  | "Glue"     -> Unary      (fun e           -> EGlue e)
+  | "Partial"  -> Unary      (fun e           -> EPartial e)
+  | "ind₀"     -> Unary      (fun e           -> EIndEmpty e)
+  | "ind₁"     -> Unary      (fun e           -> EIndUnit e)
+  | "ind₂"     -> Unary      (fun e           -> EIndBool e)
+  | "ℕ-ind"    -> Unary      (fun e           -> ENInd e)
+  | "indᵂ"     -> Unary      (fun e           -> EIndW e)
+  | "ℑ"        -> Unary      (fun e           -> EIm e)
+  | "ℑ-unit"   -> Unary      (fun e           -> EInf e)
+  | "ℑ-join"   -> Unary      (fun e           -> EJoin e)
+  | "isucc"    -> Unary      (fun e           -> ELSucc e)
+  | "-"        -> Unary      (fun e           -> ENeg e)
+  | "typeof"   -> Unary      (fun e           -> ETypeof e)
+  | "𝟎"        -> Nullary    EEmpty
+  | "empty"    -> Nullary    EEmpty
+  | "𝟏"        -> Nullary    EUnit
+  | "unit"     -> Nullary    EUnit
+  | "𝟐"        -> Nullary    EBool
+  | "bool"     -> Nullary    EBool
+  | "★"        -> Nullary    EStar
+  | "star"     -> Nullary    EStar
+  | "0₂"       -> Nullary    EFalse
+  | "false"    -> Nullary    EFalse
+  | "1₂"       -> Nullary    ETrue
+  | "true"     -> Nullary    ETrue
+  | "ℕ"        -> Nullary    EN
+  | "nat"      -> Nullary    EN
+  | "zero"     -> Nullary    EZero
+  | "succ"     -> Nullary    ESucc
+  | "L"        -> Nullary    ELevel
+  | "?"        -> Nullary    EHole
+  | x          -> Nullary    (expandVar x)
 
-let binary e1 e2 = function
-  | "transp"   -> Some (ETransp (e1, e2))
-  | "PartialP" -> Some (EPartialP (e1, e2))
-  | "inc"      -> Some (EInc (e1, e2))
-  | "sup"      -> Some (ESup (e1, e2))
-  | "coeq"     -> Some (ECoeq (e1, e2))
-  | "iadd"     -> Some (EAdd (e1, e2))
-  | "imax"     -> Some (EMax (e1, e2))
-  | "ind-ℑ"    -> Some (EIndIm (e1, e2))
-  | _          -> None
-
-let ternary e1 e2 e3 = function
-  | "glue"     -> Some (EGlueElem (e1, e2, e3))
-  | "unglue"   -> Some (EUnglue (e1, e2, e3))
-  | "iota"     -> Some (EIota (e1, e2, e3))
-  | "resp"     -> Some (EResp (e1, e2, e3))
-  | "coeq-ind" -> Some (EIndCoeq (e1, e2, e3))
-  | _          -> None
-
-let quaternary e1 e2 e3 e4 = function
-  | "hcomp" -> Some (EHComp (e1, e2, e3, e4))
-  | _       -> None
-
-let infix e1 e2 = function
-  | "∨" | "\\/" -> Some (EOr (e1, e2))
-  | "∧" | "/\\" -> Some (EAnd (e1, e2))
-  | "→"         -> Some (impl e1 e2)
-  | "×"         -> Some (prod e1 e2)
-  | "@"         -> Some (EAppFormula (e1, e2))
+let infix = function
+  | "∨" | "\\/" -> Some (fun e1 e2 -> EOr (e1, e2))
+  | "∧" | "/\\" -> Some (fun e1 e2 -> EAnd (e1, e2))
+  | "→"         -> Some (fun e1 e2 -> impl e1 e2)
+  | "×"         -> Some (fun e1 e2 -> prod e1 e2)
+  | "@"         -> Some (fun e1 e2 -> EAppFormula (e1, e2))
   | _           -> None
 
 let appStx fn es e = List.fold_left eApp e (List.map fn es)
 
-let unaryExpander fn = function
-  | Node ('(', (Atom x :: e :: es)) -> Option.map (appStx fn es) (unary (fn e) x)
+let primExpander fn = function
+  | Node ('(', Atom x :: es) ->
+  begin match getPrim x with
+    | Nullary    e -> Some (appStx fn es e)
+    | Unary      g -> let (x, xs)          = take1 es in Some (appStx fn xs (g (fn x)))
+    | Binary     g -> let (x, y, ys)       = take2 es in Some (appStx fn ys (g (fn x) (fn y)))
+    | Ternary    g -> let (x, y, z, zs)    = take3 es in Some (appStx fn zs (g (fn x) (fn y) (fn z)))
+    | Quaternary g -> let (x, y, z, w, ws) = take4 es in Some (appStx fn ws (g (fn x) (fn y) (fn z) (fn w)))
+  end
+  | Atom x ->
+  begin match getPrim x with
+    | Nullary e -> Some e
+    | _         -> Printf.printf "FEW: %s\n" x; raise TooFewArguments
+  end
+  | _ -> None
+
+let cosmosExpander fn = function
+  | Node ('(', Atom "U" :: e :: es) -> Some (appStx fn es (EType (Kan,     Finite (fn e))))
+  | Node ('(', Atom "V" :: e :: es) -> Some (appStx fn es (EType (Pretype, Finite (fn e))))
   | _                               -> None
 
-let binaryExpander fn = function
-  | Node ('(', (Atom x :: a :: b :: es)) -> Option.map (appStx fn es) (binary (fn a) (fn b) x)
-  | _                                    -> None
-
-let ternaryExpander fn = function
-  | Node ('(', (Atom x :: a :: b :: c :: es)) -> Option.map (appStx fn es) (ternary (fn a) (fn b) (fn c) x)
-  | _                                         -> None
-
-let quaternaryExpander fn = function
-  | Node ('(', (Atom x :: a :: b :: c :: d :: es)) -> Option.map (appStx fn es) (quaternary (fn a) (fn b) (fn c) (fn d) x)
-  | _                                              -> None
-
 let infixExpander fn = function
-  | Node ('(', [a; Atom x; b]) -> infix (fn a) (fn b) x
+  | Node ('(', [a; Atom x; b]) -> Option.map (fun g -> g (fn a) (fn b)) (infix x)
   | _                          -> None
 
 let expandBinder fn es0 = match es0 with
@@ -320,10 +321,9 @@ let lowExpander fn = function
   | _                                               -> None
 
 let simpleExpander fn = function
-  | Node ('(', f :: xs)                   -> Some (appStx fn xs (fn f))
-  | Node ('[', es)                        -> Some (ESystem (expandSystem fn es))
-  | Atom x                                -> nullary x
-  | _                                     -> None
+  | Node ('(', f :: xs) -> Some (appStx fn xs (fn f))
+  | Node ('[', es)      -> Some (ESystem (expandSystem fn es))
+  | _                   -> None
 
 let rec traverseExpanders g e = function
   |   []    -> None
@@ -331,10 +331,7 @@ let rec traverseExpanders g e = function
     | None -> traverseExpanders g e fs
     | t    -> t
 
-let expanders = [quantifierExpander; lowExpander; infixExpander;
-                 unaryExpander; binaryExpander;
-                 ternaryExpander; quaternaryExpander;
-                 simpleExpander]
+let expanders = [quantifierExpander; lowExpander; infixExpander; cosmosExpander; primExpander; simpleExpander]
 
 let rec expandTerm e =
   match traverseExpanders expandTerm e expanders with

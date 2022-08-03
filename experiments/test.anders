@@ -63,9 +63,9 @@ def symm (A : U) (a b : A) (p : a = b) : b = a :=
 def trans (A : U) (a b c : A) (p : a = b) (q : b = c) : a = c :=
 <i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)
 
+postfix 50 ⁻¹
 macro X ⁻¹ := <i> X @ -i
 
 #infer λ (A : U) (a b : A) (p : a = b), p ⁻¹
 
-postfix 50 ⁻¹
-#macroexpand f a b c ⁻¹
+#macroexpand f a b c⁻¹

@@ -7,6 +7,29 @@ let uncurry f (x, y) = f x y
 
 let (%) f g x = f (g x)
 
+let cutAtBegin prefix s =
+  let len1 = String.length prefix in
+  let len2 = String.length s in
+
+  let rec loop idx =
+    if idx = len1 then Some (String.sub s len1 (len2 - len1))
+    else if String.get prefix idx <> String.get s idx then None
+    else loop (idx + 1) in
+
+  if len1 > len2 then None else loop 0
+
+let cutAtEnd postfix s =
+  let len1 = String.length postfix in
+  let len2 = String.length s in
+
+  let rec loop idx =
+    if idx > len1 then Some (String.sub s 0 (len2 - len1))
+    else if String.get postfix (len1 - idx)
+         <> String.get s (len2 - idx) then None
+    else loop (idx + 1) in
+
+  if len1 > len2 then None else loop 1
+
 let initLast xs =
   let rec func xs = function
     | []      -> failwith "initLast: expected non-empty list"

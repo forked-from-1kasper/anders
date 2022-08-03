@@ -95,7 +95,10 @@ and expression rbp rassoc stream =
         else if lbp < rbp || (lbp = rbp && lassoc = Left && rassoc = Left)
         then left else raise (OpConflict (left, t))
       | Some (Postfix, lbp) ->
-        if lbp > rbp then begin ListRef.drop stream; loop (paren [left; t]) end
+        if lbp > rbp then begin
+          let (es, e) = initLast (takeParens left) in
+          ListRef.drop stream; loop (paren (es @ [paren [e; t]]))
+        end
         else if lbp = rbp then raise (OpConflict (left, t))
         else left
       | Some (Prefix, _) | None ->
@@ -162,8 +165,6 @@ let indexed = (kan <|> pretype <|> level) << eof
 let getConstants () = [(!intervalPrim, EI); (!zeroPrim, EDir Zero); (!onePrim, EDir One)]
 let getVar x = match List.assoc_opt x (getConstants ()) with Some e -> e | None -> decl x
 
-let expandVar x = getVar x
-
 type prim =
   | Nullary    of exp
   | Unary      of (exp -> exp)
@@ -222,7 +223,7 @@ let getPrim = function
   | "succ"     -> Nullary    ESucc
   | "L"        -> Nullary    ELevel
   | "?"        -> Nullary    EHole
-  | x          -> Nullary    (expandVar x)
+  | x          -> Nullary    (getVar x)
 
 let getInfix = function
   | "∨" | "\\/" -> Some (fun e1 e2 -> EOr (e1, e2))

@@ -9,7 +9,7 @@ Changelog
 * Rename `pre-eval` option to `normalize`.
 * Several major optimisations.
 * Built-in natural numbers ℕ.
-* `typeof`.
+* `typeof` & `domainof`.
 
 27 MAY 2022 **Version 1.4.1:**
 

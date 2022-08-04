@@ -77,6 +77,7 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EResp (f, g, x)      -> VResp (eval ctx f, eval ctx g, eval ctx x)
   | EIndCoeq (e, i, r)   -> VIndCoeq (eval ctx e, eval ctx i, eval ctx r)
   | ETypeof e            -> inferV (eval ctx e)
+  | EDomainof e          -> domainOf (inferV (eval ctx e))
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -487,6 +488,8 @@ and inferJ v t =
               VPi (idv v x y, (p, fun p ->
                 app (app (app (pi, x), y), p))))))))))
 
+and domainOf v = fst (extPiG v)
+
 and evalField p v = match extByTag p v with
   | None   -> fst (getField p v (inferV v))
   | Some k -> k
@@ -789,6 +792,7 @@ and infer ctx e : value = traceInfer e; match e with
 
     inferIndCoeq f g v
   | ETypeof e -> inferV (infer ctx e)
+  | EDomainof e -> inferV (domainOf (infer ctx e))
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 and inferSystem ctx ts = checkOverlapping ctx ts;

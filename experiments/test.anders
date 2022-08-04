@@ -68,3 +68,8 @@ postfix 50 ⁻¹
 macro X⁻¹ := <i> X @ -i
 
 #infer λ (A : U) (a b : A) (p : a = b), p⁻¹
+
+infixl 20 ∘
+macro X ∘ Y := λ (x : domainof Y), X (Y x)
+
+#infer λ (A B C D : U) (h : C → D) (g : B → C) (f : A → B), h ∘ g ∘ f

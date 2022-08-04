@@ -205,6 +205,7 @@ let getPrim = function
   | "isucc"    -> Unary      (fun e           -> ELSucc e)
   | "-"        -> Unary      (fun e           -> ENeg e)
   | "typeof"   -> Unary      (fun e           -> ETypeof e)
+  | "domainof" -> Unary      (fun e           -> EDomainof e)
   | "𝟎"        -> Nullary    EEmpty
   | "empty"    -> Nullary    EEmpty
   | "𝟏"        -> Nullary    EUnit

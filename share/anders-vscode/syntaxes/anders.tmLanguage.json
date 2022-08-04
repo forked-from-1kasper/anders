@@ -18,7 +18,7 @@
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s(),\\[\\]])(λ|coeq|resp|iota|coeq-ind|Σ|Π|Id|W|ℑ|ℑ-unit|ind-ℑ|ℑ-join|indᵂ|ind₀|ind₁|ind₂|sup|ref|idJ|forall|summa|Partial|PartialP|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue|typeof)(?=$|[\\s(),\\[\\]])",
+            "match": "(?<=^|[\\s(),\\[\\]])(λ|coeq|resp|iota|coeq-ind|Σ|Π|Id|W|ℑ|ℑ-unit|ind-ℑ|ℑ-join|indᵂ|ind₀|ind₁|ind₂|sup|ref|idJ|forall|summa|Partial|PartialP|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue|typeof|domainof)(?=$|[\\s(),\\[\\]])",
             "name": "keyword.control.anders"
         },
         {

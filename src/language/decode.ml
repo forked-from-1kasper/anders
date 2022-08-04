@@ -109,6 +109,7 @@ struct
     | '\x62' -> let (f, g, x) = exp3 () in EResp (f, g, x)
     | '\x63' -> let (e, i, r) = exp3 () in EIndCoeq (e, i, r)
     | '\xF0' -> ETypeof (exp ())
+    | '\xF1' -> EDomainof (exp ())
     | _      -> failwith "Term?"
 
   and exp2 () = let a = exp () in let b = exp () in (a, b)

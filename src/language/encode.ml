@@ -104,6 +104,7 @@ struct
     | EResp (f, g, x)      -> W.put '\x62'; exp3 f g x
     | EIndCoeq (e, i, r)   -> W.put '\x63'; exp3 e i r
     | ETypeof e            -> W.put '\xF0'; exp e
+    | EDomainof e          -> W.put '\xF1'; exp e
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c

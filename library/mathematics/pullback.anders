@@ -29,13 +29,15 @@ section
   def pb₃ : Π (x : pullback A B C f g), Path C (f x.1) (g x.2.1) := λ (x : pullback A B C f g), x.2.2
 end
 
-def induced (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z₂ : Z → B)
-  (h : Π (z : Z), Path C ((∘ Z A C f z₁) z) (((∘ Z B C g z₂)) z)) : Z → pullback A B C f g :=
-λ (z : Z), (z₁ z, z₂ z, h z)
+section
+  variables (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z₂ : Z → B)
 
-def pullbackSq (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z₂ : Z → B): U :=
-Σ (h : Π (z : Z), Path C ((∘ Z A C f z₁) z) (((∘ Z B C g z₂)) z)), isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
+  def induced (h : Π (z : Z), Path C (f (z₁ z)) (g (z₂ z))) : Z → pullback A B C f g :=
+  λ (z : Z), (z₁ z, z₂ z, h z)
 
-def isPullbackSq (Z A B C : U) (f : A → C) (g : B → C)
-  (z₁ : Z → A) (z₂ : Z → B) (h : Π (z : Z), Path C ((∘ Z A C f z₁) z) (((∘ Z B C g z₂)) z)) : U :=
-isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
+  def pullbackSq : U :=
+  Σ (h : Π (z : Z), Path C (f (z₁ z)) (g (z₂ z))), isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
+
+  def isPullbackSq (h : Π (z : Z), Path C (f (z₁ z)) (g (z₂ z))) : U :=
+  isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
+end

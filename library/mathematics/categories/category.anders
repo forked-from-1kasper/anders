@@ -10,33 +10,33 @@ import library/data/path
 def cat : U₁ := Σ (ob : U) (hom : ob → ob → U), unit
 
 def isPrecategory (C : cat) : U :=
-Σ (id      : Π (x : C.ob), C.hom x x)
-  (∘       : Π (x y z : C.ob), C.hom x y → C.hom y z → C.hom x z)
-  (homSet  : Π (x y : C.ob), isSet (C.hom x y))
-  (∘-left  : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
-  (∘-right : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)
-  (∘-assoc : Π (x y z w : C.ob) (f : C.hom x y) (g : C.hom y z) (h : C.hom z w),
-    Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
+Σ (id        : Π (x : C.ob), C.hom x x)
+  (com       : Π (x y z : C.ob), C.hom x y → C.hom y z → C.hom x z)
+  (homSet    : Π (x y : C.ob), isSet (C.hom x y))
+  (com-left  : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (com x x y (id x) f) f)
+  (com-right : Π (x y : C.ob) (f : C.hom x y), Path (C.hom x y) (com x y y f (id y)) f)
+  (com-assoc : Π (x y z w : C.ob) (f : C.hom x y) (g : C.hom y z) (h : C.hom z w),
+    Path (C.hom x w) (com x z w (com x y z f g) h) (com x y w f (com y z w g h))), unit
 
 def precategory : U₁ := Σ (C : cat) (P : isPrecategory C), unit
 
 def catᵒᵖ (P : precategory) : precategory :=
 ((P.C.ob, λ (A B : P.C.ob), P.C.hom B A, P.C.2.2),
  ((λ (A : P.C.ob), P.P.id A),
-  (λ (A B C : P.C.ob) (f : P.C.hom B A) (g : P.C.hom C B), P.P.∘ C B A g f),
+  (λ (A B C : P.C.ob) (f : P.C.hom B A) (g : P.C.hom C B), P.P.com C B A g f),
   (λ (A B : P.C.ob), P.P.homSet B A),
-  (λ (A B : P.C.ob) (f : P.C.hom B A), P.P.∘-right B A f),
-  (λ (A B : P.C.ob) (f : P.C.hom B A), P.P.∘-left B A f),
+  (λ (A B : P.C.ob) (f : P.C.hom B A), P.P.com-right B A f),
+  (λ (A B : P.C.ob) (f : P.C.hom B A), P.P.com-left B A f),
   (λ (A B C D : P.C.ob) (f : P.C.hom B A) (g : P.C.hom C B) (h : P.C.hom D C),
-    <i> (P.P.∘-assoc D C B A h g f) @ -i), P.P.2.2.2.2.2.2), P.2.2)
+    <i> (P.P.com-assoc D C B A h g f) @ -i), P.P.2.2.2.2.2.2), P.2.2)
 
 def opPreserve (C : precategory) : PathP (<_> precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 
 def isoCat (P : precategory) (A B : P.C.ob) : U :=
 Σ (f    : P.C.hom A B)
   (g    : P.C.hom B A)
-  (linv : Path (P.C.hom A A) (P.P.∘ A B A f g) (P.P.id A))
-  (rinv : Path (P.C.hom B B) (P.P.∘ B A B g f) (P.P.id B)), unit
+  (linv : Path (P.C.hom A A) (P.P.com A B A f g) (P.P.id A))
+  (rinv : Path (P.C.hom B B) (P.P.com B A B g f) (P.P.id B)), unit
 
 def isCategory (P : precategory) : U := Σ (A : P.C.ob), isContr (Π (B : P.C.ob), isoCat P A B)
 def category : U₁ := Σ (P : precategory), isCategory P
@@ -51,13 +51,13 @@ def cospan (P : precategory) : U := Σ (X : P.C.ob) (_ : homTo P X), homTo P X
 
 def hasCospanCone (P : precategory) (D : cospan P) (w : P.C.ob) : U :=
 Σ (f : P.C.hom w D.2.1.1) (g : P.C.hom w D.2.2.1),
-  Path (P.C.hom w D.1) (P.P.∘ w D.2.1.1 D.1 f D.2.1.2) (P.P.∘ w D.2.2.1 D.1 g D.2.2.2)
+  Path (P.C.hom w D.1) (P.P.com w D.2.1.1 D.1 f D.2.1.2) (P.P.com w D.2.2.1 D.1 g D.2.2.2)
 
 def cospanCone (P : precategory) (D : cospan P) : U := Σ (w : P.C.ob), hasCospanCone P D w
 
 def isCospanConeHom (P : precategory) (D : cospan P) (E1 E2 : cospanCone P D) (h : P.C.hom E1.1 E2.1) : U :=
-(Path (P.C.hom E1.1 D.2.1.1) (P.P.∘ E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1) ×
-(Path (P.C.hom E1.1 D.2.2.1) (P.P.∘ E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1)
+(Path (P.C.hom E1.1 D.2.1.1) (P.P.com E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1) ×
+(Path (P.C.hom E1.1 D.2.2.1) (P.P.com E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1)
 
 def cospanConeHom (P : precategory) (D : cospan P) (E1 E2 : cospanCone P D) : U := Σ (h : P.C.hom E1.1 E2.1), isCospanConeHom P D E1 E2 h
 def isPullback (P : precategory) (D : cospan P) (E : cospanCone P D) : U := Σ (h : cospanCone P D), isContr (cospanConeHom P D h E)

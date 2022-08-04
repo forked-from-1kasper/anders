@@ -172,6 +172,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EIndCoeq (e, i, r)   -> EIndCoeq (salt ns e, salt ns i, salt ns r)
   | ETypeof e            -> ETypeof (salt ns e)
   | EDomainof e          -> EDomainof (salt ns e)
+  | ELet (t, r, (x, e))  -> let y = fresh x in ELet (Option.map (salt ns) t, salt ns r, (y, salt (Env.add x y ns) e))
 
 and saltClos ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)

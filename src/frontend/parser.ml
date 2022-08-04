@@ -55,6 +55,8 @@ let getPrecedence = function
   | Atom t -> Dict.find_opt t !operators
   | Node _ -> None
 
+let takeUntilToken stream t = ListRef.takeWhile ((<>) (Atom t)) stream
+
 let mapsto = Atom "↦"
 
 (* https://github.com/gabrielhdt/pratter/blob/master/pratter.ml *)
@@ -64,8 +66,20 @@ let rec nud stream = function
                                               Node ('[', [prattSigma is; mapsto; prattSigma (List.tl xs)])
   | Node ('[', es)                         -> prattSystem es
   | Node (_,   es)                         -> prattSigma es
+  | Atom "let"                             ->
+    let i = ListRef.next stream in
+    begin match ListRef.next stream with
+      | Atom ":"  ->
+        let e1 = prattSigma (takeUntilToken stream ":=") in ListRef.drop stream;
+        let e2 = prattSigma (takeUntilToken stream "in") in ListRef.drop stream;
+        Node ('(', [Atom "let"; i; Atom ":"; e1; Atom ":="; e2; Atom "in"; pratter stream])
+      | Atom ":=" ->
+        let e0 = prattSigma (takeUntilToken stream "in") in ListRef.drop stream;
+        Node ('(', [Atom "let"; i; Atom ":="; e0; Atom "in"; pratter stream])
+      | e         -> raise (InvalidSyntax e)
+    end
   | Atom x when isQuantifier x             ->
-    let xs = List.map prattBinder (ListRef.takeWhile ((<>) (Atom ",")) stream) in
+    let xs = List.map prattBinder (takeUntilToken stream ",") in
     paren [paren (Atom x :: xs); Atom ","; pratter (ListRef.junk stream)]
   | Atom x -> match Dict.find_opt x !operators with
     | Some (Prefix, _)  -> paren [Atom x; nud stream (ListRef.next stream)]
@@ -130,7 +144,7 @@ and prattSystem es =
   let rec loop stream buf =
     if ListRef.isEmpty stream then List.rev buf
     else
-      let xs = ListRef.takeWhile ((<>) (Atom "→")) stream in
+      let xs = takeUntilToken stream "→" in
       let e  = pratter (ListRef.junk stream) in
       loop (ListRef.junk stream) (paren [paren xs; e] :: buf)
   in try Node ('[', loop (ListRef.ofList es) [])
@@ -224,6 +238,7 @@ let getPrim = function
   | "succ"     -> Nullary    ESucc
   | "L"        -> Nullary    ELevel
   | "?"        -> Nullary    EHole
+  | ":="       -> raise      (InvalidSyntax (Atom ":="))
   | x          -> Nullary    (getVar x)
 
 let getInfix = function
@@ -312,12 +327,14 @@ let expandClause fn = function
 let expandSystem fn = System.of_seq % Seq.filter_map (expandClause fn) % List.to_seq
 
 let quantifierExpander fn = function
-  | Node ('(', [Node ('<', is); e])                       -> Some (pLam (fn e) (List.map expandIdent is))
-  | Node ('(', [Node ('(', Atom "λ" :: bs); Atom ","; e]) -> Some (expandQuantifier fn eLam bs e)
-  | Node ('(', [Node ('(', Atom "Π" :: bs); Atom ","; e]) -> Some (expandQuantifier fn ePi  bs e)
-  | Node ('(', [Node ('(', Atom "Σ" :: bs); Atom ","; e]) -> Some (expandQuantifier fn eSig bs e)
-  | Node ('(', [Node ('(', Atom "W" :: bs); Atom ","; e]) -> Some (expandQuantifier fn eW   bs e)
-  | _                                                     -> None
+  | Node ('(', [Atom "let"; i; Atom ":"; e1; Atom ":="; e2; Atom "in"; e3]) -> Some (ELet (Some (fn e1), fn e2, (expandIdent i, fn e3)))
+  | Node ('(', [Atom "let"; i; Atom ":="; e1; Atom "in"; e2])               -> Some (ELet (None, fn e1, (expandIdent i, fn e2)))
+  | Node ('(', [Node ('<', is); e])                                         -> Some (pLam (fn e) (List.map expandIdent is))
+  | Node ('(', [Node ('(', Atom "λ" :: bs); Atom ","; e])                   -> Some (expandQuantifier fn eLam bs e)
+  | Node ('(', [Node ('(', Atom "Π" :: bs); Atom ","; e])                   -> Some (expandQuantifier fn ePi  bs e)
+  | Node ('(', [Node ('(', Atom "Σ" :: bs); Atom ","; e])                   -> Some (expandQuantifier fn eSig bs e)
+  | Node ('(', [Node ('(', Atom "W" :: bs); Atom ","; e])                   -> Some (expandQuantifier fn eW   bs e)
+  | _                                                                       -> None
 
 let lowExpander fn = function
   | Node ('(', [e1; Atom ","; e2])                  -> Some (EPair (ref None, fn e1, fn e2))

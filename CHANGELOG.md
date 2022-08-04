@@ -10,6 +10,7 @@ Changelog
 * Several major optimisations.
 * Built-in natural numbers ℕ.
 * `typeof` & `domainof`.
+* Syntax sugar for `let`.
 
 27 MAY 2022 **Version 1.4.1:**
 

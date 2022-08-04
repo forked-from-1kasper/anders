@@ -78,6 +78,12 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EIndCoeq (e, i, r)   -> VIndCoeq (eval ctx e, eval ctx i, eval ctx r)
   | ETypeof e            -> inferV (eval ctx e)
   | EDomainof e          -> domainOf (inferV (eval ctx e))
+  | ELet (t0, r, (i, e)) ->
+    let v = eval ctx r in
+    let t = match t0 with
+      | Some e0 -> eval ctx e0
+      | None    -> inferV v in
+    eval (upLocal ctx i t v) e
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -678,6 +684,9 @@ and check ctx (e0 : exp) (t0 : value) =
       check (faceEnv alpha ctx) e
         (app (upd alpha u, VRef vone))) ts;
     checkOverlapping ctx ts
+  | ELet (t0, r, (i, e)), t1 ->
+    let t = inferLetDef ctx r t0 in
+    check (upLocal ctx i t (eval ctx r)) e t1
   | e, t -> eqNf (infer ctx e) t
   with exc -> let (err, es) = extTraceback (extErr exc) in raise (Internal (Traceback (err, (e0, rbV t0) :: es)))
 
@@ -793,7 +802,12 @@ and infer ctx e : value = traceInfer e; match e with
     inferIndCoeq f g v
   | ETypeof e -> inferV (infer ctx e)
   | EDomainof e -> inferV (domainOf (infer ctx e))
+  | ELet (t0, r, (i, e)) -> let t = inferLetDef ctx r t0 in infer (upLocal ctx i t (eval ctx r)) e
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
+
+and inferLetDef ctx r = function
+  | None    -> infer ctx r
+  | Some t0 -> isType (infer ctx t0); let t = eval ctx t0 in check ctx r t; t
 
 and inferSystem ctx ts = checkOverlapping ctx ts;
   (eval ctx (getFormula ts), System.mapi (fun mu -> infer (faceEnv mu ctx)) ts)

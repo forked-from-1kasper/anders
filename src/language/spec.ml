@@ -64,8 +64,8 @@ type exp =
   | EType of cosmos * exp level                                                        (* cosmos *)
   | ELevel | ELevelElem of Z.t | ELSucc of exp | EAdd of exp * exp | EMax of exp * exp (* levels *)
   | EVar of ident | EHole                                                           (* variables *)
-  | EPi of exp * (ident * exp) | ELam of exp * (ident * exp) | EApp of exp * exp            (* Π *)
-  | ESig of exp * (ident * exp) | EPair of tag * exp * exp                                  (* Σ *)
+  | EPi of exp * tele | ELam of exp * tele | EApp of exp * exp                              (* Π *)
+  | ESig of exp * tele | EPair of tag * exp * exp                                           (* Σ *)
   | EFst of exp | ESnd of exp | EField of exp * string                            (* Σ accessors *)
   | EId of exp | ERef of exp | EJ of exp                                      (* strict equality *)
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* path equality *)
@@ -78,13 +78,13 @@ type exp =
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
   | EN | EZero | ESucc | ENInd of exp                                                       (* ℕ *)
-  | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp                            (* W *)
+  | EW of exp * tele | ESup of exp * exp | EIndW of exp                                     (* W *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
   | ECoeq of exp * exp | EIota of exp * exp * exp                                 (* Coequalizer *)
   | EResp of exp * exp * exp | EIndCoeq of exp * exp * exp                        (* Coequalizer *)
-  | ETypeof of exp | EDomainof of exp                                                  (* Macros *)
+  | ELet of exp option * exp * tele | ETypeof of exp | EDomainof of exp                (* Macros *)
 
-type tele = ident * exp
+and tele = ident * exp
 
 let eLam p a b = ELam (a, (p, b))
 let ePi  p a b = EPi  (a, (p, b))
@@ -155,7 +155,7 @@ type error =
 type resp =
   | Version of int64 * int64 * int64
   | Trace   of string * exp list
-  | Hole    of exp * (ident * exp) list
+  | Hole    of exp * tele list
   | Error   of error
   | Bool    of bool
   | Term    of exp

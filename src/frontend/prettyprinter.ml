@@ -89,6 +89,8 @@ let rec ppExp paren e = let x = match e with
   | EIndCoeq (e, i, r) -> Printf.sprintf "coeq-ind %s %s %s" (ppExp true e) (ppExp true i) (ppExp true r)
   | ETypeof e -> Printf.sprintf "typeof %s" (ppExp true e)
   | EDomainof e -> Printf.sprintf "domainof %s" (ppExp true e)
+  | ELet (Some t, r, (i, e)) -> Printf.sprintf "let %s : %s := %s in %s" (showIdent i) (showExp t) (showExp r) (showExp e)
+  | ELet (None, r, (i, e)) -> Printf.sprintf "let %s := %s in %s" (showIdent i) (showExp r) (showExp e)
   in match e with
   | ELevel | ELevelElem _ | EType (_, Omega _) | EType (_, Finite (ELevelElem _))
   | EVar _ | EFst _ | ESnd _ | EI | ESystem _ | EHole | EDir _ | EPair _

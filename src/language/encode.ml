@@ -105,10 +105,15 @@ struct
     | EIndCoeq (e, i, r)   -> W.put '\x63'; exp3 e i r
     | ETypeof e            -> W.put '\xF0'; exp e
     | EDomainof e          -> W.put '\xF1'; exp e
+    | ELet (t, r, (i, e))  -> W.put '\xF2'; expOpt t; exp r; ident i; exp e
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c
   and exp4 a b c d = exp a; exp b; exp c; exp d
+
+  and expOpt = function
+    | Some e -> W.put '\xFF'; exp e
+    | None   -> W.put '\x00'
 
   and clos idx a p b = W.put idx; exp a; ident p; exp b
 

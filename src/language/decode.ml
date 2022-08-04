@@ -110,11 +110,17 @@ struct
     | '\x63' -> let (e, i, r) = exp3 () in EIndCoeq (e, i, r)
     | '\xF0' -> ETypeof (exp ())
     | '\xF1' -> EDomainof (exp ())
+    | '\xF2' -> let t = expOpt () in let r = exp () in let i = ident () in let e = exp () in ELet (t, r, (i, e))
     | _      -> failwith "Term?"
 
   and exp2 () = let a = exp () in let b = exp () in (a, b)
   and exp3 () = let a = exp () in let b = exp () in let c = exp () in (a, b, c)
   and exp4 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in (a, b, c, d)
+
+  and expOpt () = match R.get () with
+    | '\xFF' -> Some (exp ())
+    | '\x00' -> None
+    | _      -> failwith "Term?"
 
   and clos () = let a = exp () in let p = ident () in let b = exp () in (a, p, b)
 

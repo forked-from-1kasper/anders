@@ -43,3 +43,5 @@ S¹-ind (λ (_ : S¹), U) 𝟐 bool-neg-path
 
 def oddity (ℓ : Ω¹S¹) : 𝟐 :=
 transp (<i> Möbius (ℓ @ i)) 0 0₂
+
+def oddity-test := oddity (double-loop loop)

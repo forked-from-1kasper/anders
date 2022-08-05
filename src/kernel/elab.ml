@@ -180,7 +180,7 @@ and saltClos ctor ns p a b =
 and saltSystem ns xs =
   System.fold (fun k v -> System.add (freshFace ns k) (salt ns v)) xs System.empty
 
-let freshExp   = salt Env.empty
+let freshExp = salt Env.empty
 
 (* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
    >This increases efficiency as it won’t trigger computation. *)

@@ -123,6 +123,8 @@ and transport i p phi u0 = match p, phi, u0 with
   | VUnit, _, _ -> u0
   (* transp (<_> 𝟐) i u₀ ~> u₀ *)
   | VBool, _, _ -> u0
+  (* transp (<_> ℕ) i u₀ ~> u₀ *)
+  | VN, _, _ -> u0
   (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
      λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x -i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)
@@ -260,6 +262,12 @@ and homcom t r i u u0 = match t, r, u, u0 with
       (System.map (fun (_, w, x) -> app (vfst w, x (dim i))) ts)
       (System.map (unglue phi (VSystem t)) u))) (unglue phi (VSystem t) u0) in
     glue phi (VSystem t1) a1
+  (* hcomp 𝟏 0 (λ (_ : I), []) ★ ~> ★ *)
+  | VUnit, VFormula ks, _, VStar when bot ks -> VStar
+  (* hcomp 𝟐 0 (λ (_ : I), []) 0₂ ~> 0₂ *)
+  | VBool, VFormula ks, _, VFalse when bot ks -> VFalse
+  (* hcomp 𝟐 0 (λ (_ : I), []) 1₂ ~> 1₂ *)
+  | VBool, VFormula ks, _, VTrue when bot ks -> VTrue
   (* hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀)) ~>
      sup A B (hcomp A r a (ouc a₀))
              (hcomp (B (hcomp A r a (ouc a₀)) → (W (x : A), B x)) r

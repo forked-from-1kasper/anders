@@ -86,16 +86,22 @@ subst-comp (singl A a) (λ (z : singl A a), C a (z.1) (z.2)) (eta A a) d
 -- DNF solver
 def ∂ (i : I) := i ∨ -i
 def ∂-eq-neg-∂ (i : I) : Id I (∂ i) (∂ -i) := ref (∂ i)
+
 def min (i j : I) := i ∧ j
 def max (i j : I) := i ∨ j
+
 def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
 def ⊕-comm (i j : I) : Id I (⊕ i j) (⊕ j i) := ref (⊕ i j)
+
 def ∧-comm (i j : I) : Id I (i ∧ j) (j ∧ i) := ref (i ∧ j)
 def ∨-comm (i j : I) : Id I (i ∨ j) (j ∨ i) := ref (i ∨ j)
+
 def ¬-of-∧ (i j : I) : Id I -(i ∧ j) (-i ∨ -j) := ref -(i ∧ j)
 def ¬-of-∨ (i j : I) : Id I -(i ∨ j) (-i ∧ -j) := ref -(i ∨ j)
+
 def ∧-distrib-∨ (i j k : I) : Id I ((i ∨ j) ∧ k) ((i ∧ k) ∨ (j ∧ k)) := ref ((i ∨ j) ∧ k)
 def ∨-distrib-∧ (i j k : I) : Id I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) := ref ((i ∧ j) ∨ k)
+
 def ∧-assoc (i j k : I) : Id I (i ∧ (j ∧ k)) ((i ∧ j) ∧ k) := ref (i ∧ (j ∧ k))
 
 -- Strict Equality
@@ -130,14 +136,18 @@ def ≤ (i j : I) := Id I (i ∧ j) i
 def ≥ (i j : I) := ≤ j i
 
 def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(i = 1) (j = 1) → 1=1]
-def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
+
+def ∨-left  (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
 def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p -- works due to commutativity of ∨
-def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
+
+def ∧-1  (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
 def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
+
 def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
 def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
 def ∨-max-left  (i j : I) : ≤ i (i ∨ j) := ref i
 def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
+
 def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
 
 def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j := comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q

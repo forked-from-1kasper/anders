@@ -118,9 +118,12 @@ def cong-Id (A B : V) (f : A → B) (a b : A) (p : Id A a b) : Id B (f a) (f b) 
 def φ (i : I) : Partial U₁ (i ∨ -i) := [(i = 0) → U, (i = 1) → U → U]
 def φ′ (i : I) : Partial U₁ (i ∨ -i) := [(i = 1) → U → U, (i = 0) → U]
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [(i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U]
+
 def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
 def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
+
 def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
+
 def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i = 1) (j = 1) → U]
 def κ : Partial U₁ 1 := [(1 = 1) → U]
 def θ (A B : U) (a : A) (b : B) (φ : I) : PartialP [(φ = 0) → A, (φ = 1) → B] (φ ∨ -φ) := [(φ = 0) → a, (φ = 1) → b]

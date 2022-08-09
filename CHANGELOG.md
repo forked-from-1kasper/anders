@@ -1,7 +1,7 @@
 Changelog
 =========
 
-?? AUG 2022 **Version 1.8.0:**
+9 AUG 2022 **Version 1.8.0:**
 
 * Abandoned Menhir in favour of new extensible parser.
 * Abandoned useless “module … where” syntax.

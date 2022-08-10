@@ -151,10 +151,14 @@ def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
 def ∨-max-left  (i j : I) : ≤ i (i ∨ j) := ref i
 def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
 
-def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
+def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j :=
+rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
 
-def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j := comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 def ≤-refl (i : I) : ≤ i i := ref i
+
+def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j :=
+comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
+
 def ≤-trans (i j k : I) (p : ≤ i j) (q : ≤ j k) : ≤ i k :=
 comp-Id I (i ∧ k) (i ∧ j) i
   (comp-Id I (i ∧ k) (i ∧ j ∧ k) (i ∧ j)
@@ -382,7 +386,7 @@ section
   <_> hcomp-Path A v w r u u₀
 end
 
-def hcomp-U (r : I) (E : I → Partial U r) (A : (U)[r ↦ E 0]) := hcomp U r E (ouc A)
+def hcomp-U (r : I) (E : I → Partial U r) (A : U[r ↦ E 0]) := hcomp U r E (ouc A)
 
 section
   variables (A B : U) (f : A → B) (g : B → A)

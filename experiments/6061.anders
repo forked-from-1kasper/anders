@@ -1,0 +1,11 @@
+def 1= : I → V := Id I 1
+
+def f : Partial 𝟐 0 := [(0 = 1) → 0₂]
+def g : Partial 𝟐 0 := [(0 = 1) → 1₂]
+
+def h (the : Π (A : U), Partial A 0 → A) : PathP (<_> 𝟐) (the 𝟐 f) (the 𝟐 g) :=
+<_> the 𝟐 f
+
+-- normalizes to “λ (p : Id I 1 0), <_> [] p”
+def i (p : 1= 0) : PathP (<_> 𝟐) 0₂ 1₂ :=
+h (λ (A : U) (φ : Partial A 0), φ p) 

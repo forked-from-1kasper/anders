@@ -33,8 +33,12 @@ theorem diff-comp (A B C : U) (f : A → B) (g : B → C) (x : A) :
 
 def ∞-unital-magma (X : U) := Σ (e : X) (μ : X → X → X), Π (x : X), Path X (μ e x) x × Path X (μ x e) x
 
-def is-left-invertible  (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (λ (x : X), M.μ x a)
-def is-right-invertible (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (M.μ a)
+section
+  variables  (X : U) (M : ∞-unital-magma X)
+
+  def is-left-invertible  := Π (a : X), isEquiv X X (λ (x : X), M.μ x a)
+  def is-right-invertible := Π (a : X), isEquiv X X (M.μ a)
+end
 
 def H-space   := Σ (X : U), ∞-unital-magma X
 def LIH-space := Σ (X : U) (M : ∞-unital-magma X), is-left-invertible X M

@@ -47,14 +47,15 @@ def iso→path (A B : U) (f : A → B) (g : B → A)
 <i> Glue B (∂ i) [(i = 0) → (A, f, isoToEquiv A B f g s t),
                   (i = 1) → (B, id B, idIsEquiv B)]
 
-def path→iso (A B : U) : PathP (<_> U) A B → iso A B :=
-λ (p : PathP (<_> U) A B), (coerce A B p, coerce B A (<i> p @ -i), trans⁻¹-trans A B p, λ (a : A), <k> trans-trans⁻¹ A B p a @ -k, star)
+def path→iso (A B : U) (p : A = B) : iso A B :=
+(coerce A B p, coerce B A (<i> p @ -i), trans-backwards-and-forward A B p,
+ λ (a : A), (trans-forward-and-backwards A B p a)⁻¹, ★)
 
 def iso→equiv (A B : U) : iso A B → equiv A B :=
 λ (x : iso A B), idtoeqv A B (iso→path A B x.f x.g x.s x.t)
 
 def equiv→iso (A B : U) : equiv A B → iso A B :=
-λ (x : equiv A B), (x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
+λ (x : equiv A B), (x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, ★)
 
 def isHae (A B : U) (f : A → B) : U :=
 Σ (g : B → A) (η : Path (idᵀ A) (∘ A B A g f) (id A)) (ε : Path (idᵀ B) (∘ B A B f g) (id B)),

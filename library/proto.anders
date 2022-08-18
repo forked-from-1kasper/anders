@@ -6,3 +6,8 @@ def ∘ (A B C : U) : ∘ᵀ A B C := λ (g : B → C) (f : A → B) (x : A), g 
 def idᵀ (A : U) : U := A → A
 def id (A : U) (a : A) : A := a
 def const (A B : U) : A → B → A := λ (a : A) (b : B), a
+
+macrovariables X Y
+
+infix 25 = macro X = Y := PathP (<_> typeof Y) X Y
+token ⁻¹ postfix 50 ⁻¹ macro X⁻¹ := <i> X @ -i

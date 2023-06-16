@@ -310,12 +310,7 @@ and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
 and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
 and equivPtSingl t0 = VSig (inferV t0, (freshName "T", fun t -> prodv (equiv t t0) t))
 
-and closByVal ctx p t e v = traceClos e p v;
-  (* dirty hack to handle free variables introduced by type checker, for example, while checking terms like p : Path P a b *)
-  let ctx' = match v with
-  | Var (x, t) -> if Env.mem x ctx.local then ctx else upLocal ctx x t v
-  | _          -> ctx in
-  eval (upLocal ctx' p t v) e
+and closByVal ctx p t e v = traceClos e p v; eval (upLocal ctx p t v) e
 
 and app (f, x) = match f, x with
   (* J A C a φ a (ref a) ~> φ *)

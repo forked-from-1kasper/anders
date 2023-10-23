@@ -17,11 +17,8 @@ def +-rec := +-recω L₀ L₀
 section
   variables (A B : U) (C : + A B → U) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y))
 
-  def +-β₁ (a : A) : PathP (<_> C (inl A B a)) (f a) (+-ind A B C f g (inl A B a)) :=
-  <_> f a
-
-  def +-β₂ (b : B) : PathP (<_> C (inr A B b)) (g b) (+-ind A B C f g (inr A B b)) :=
-  <_> g b
+  def +-β₁ (a : A) : PathP (<_> C (inl A B a)) (f a) (+-ind A B C f g (inl A B a)) := <_> f a
+  def +-β₂ (b : B) : PathP (<_> C (inr A B b)) (g b) (+-ind A B C f g (inr A B b)) := <_> g b
 end
 
 def +-η (A B : U) (c : + A B) :

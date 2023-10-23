@@ -20,10 +20,10 @@ def isAbGroup   (G : Set) : U := Σ (g : isGroup G), isComm G.1 g.1.1
 def isRing      (R : Set) : U := Σ (m : isMonoid R) (a : isAbGroup R), isDistr R.1 a.1.1.1 m.1
 def isAbRing    (R : Set) : U := Σ (m : isCMonoid R) (a : isAbGroup R), isDistr R.1 a.1.1.1 m.1.1
 
-def monoid  : U₁ := Σ (X : Set), isMonoid X
-def cmonoid : U₁ := Σ (X : Set), isCMonoid X
-def group   : U₁ := Σ (X : Set), isGroup X
-def abgroup : U₁ := Σ (X : Set), isAbGroup X
-def ring    : U₁ := Σ (X : Set), isRing X
-def abring  : U₁ := Σ (X : Set), isAbRing X
-def dgroup  : U₁ := Σ (X : Set), isDiffGroup X
+def monoid  := Σ (X : Set), isMonoid X
+def cmonoid := Σ (X : Set), isCMonoid X
+def group   := Σ (X : Set), isGroup X
+def abgroup := Σ (X : Set), isAbGroup X
+def ring    := Σ (X : Set), isRing X
+def abring  := Σ (X : Set), isAbRing X
+def dgroup  := Σ (X : Set), isDiffGroup X

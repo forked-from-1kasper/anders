@@ -15,7 +15,7 @@
    https://personal.cis.strath.ac.uk/fredrik.nordvall-forsberg/papers/indind_finite.pdf
 
    Copyright © Groupoid Infinity, 2021—2022,
-             © @siegment, 2022 -}
+             © @siegment, 2022—2023 -}
 
 import library/data/path
 
@@ -28,7 +28,7 @@ def 1-β (C : U) (c : C) : Path C (1-rec C c ★) c := idp C c
 def 2-ind (C : 𝟐 → U) (x : C 0₂) (y : C 1₂) (z : 𝟐) : C z := ind₂ C x y z
 def 2-rec (C : U) (x : C) (y : C) (z : 𝟐) : C := ind₂ (λ (_ : 𝟐), C) x y z
 
-def W′ (A : U) (B : A → U) : U := W (x : A), B x
+def W′   (A : U) (B : A → U) : U := W (x : A), B x
 def sup′ (A : U) (B : A → U) (x : A) (f : B x → W′ A B) : W′ A B := sup A B x f
 
 def W-ind (A : U) (B : A → U) (C : (W (x : A), B x) → U)

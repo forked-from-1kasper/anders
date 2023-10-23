@@ -1,12 +1,13 @@
 {- Copyright © Groupoid Infinity, 2021—2022,
-             © @siegment, 2022 -}
+             © @siegment, 2022—2023 -}
 
 import library/data/maybe
 import library/data/nat
 
 option girard true
 
-def List-ctor (A : U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+def List-ctor (A : U) := Maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+
 def List (A : U) := W (x : Maybe A), List-ctor A x
 def nil (A : U) : List A := sup (Maybe A) (List-ctor A) (nothing A) (ind₀ (List A))
 def cons (A : U) (x : A) (xs : List A) : List A := sup (Maybe A) (List-ctor A) (just A x) (λ (x : 𝟏), xs)
@@ -19,7 +20,7 @@ transp (<i> C (sup (Maybe A) (List-ctor A) (1₂, x) (λ (x : 𝟏), ind₁ (λ 
 
 def List-ind (A : U) (C : List A → U) (z : C (nil A))
   (s : Π (x : A) (xs : List A), C xs → C (cons A x xs)) : Π (n : List A), C n :=
-indᵂ C (maybe-ind A
+indᵂ C (Maybe-ind A
   (λ (x : Maybe A), Π (f : List-ctor A x → List A), (Π (b : List-ctor A x), C (f b)) → C (sup (Maybe A) (List-ctor A) x f))
   (λ (f : 𝟎 → List A) (g : Π (x : 𝟎), C (f x)), nil-List A C f z)
   (λ (x : A) (f : 𝟏 → List A) (g : Π (x : 𝟏), C (f x)), cons-List A C f x (s x (f ★) (g ★))))

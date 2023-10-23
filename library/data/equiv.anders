@@ -14,9 +14,9 @@
 
 import library/data/path
 
-def fiber (A B : U) (f : A → B) (y : B) : U := Σ (x : A), Path B y (f x)
+def fiber   (A B : U) (f : A → B) (y : B) : U := Σ (x : A), Path B y (f x)
 def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
-def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
+def equiv   (A B : U) : U := Σ (f : A → B), isEquiv A B f
 
 def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a, <_> a) (b, p) :=
 <i> (p @ i, <j> p @ i ∧ j)
@@ -51,8 +51,6 @@ section
     (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1] :=
   hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
 end
-
-def univ-formation (A B : U) := equiv A B → PathP (<_> U) A B
 
 def idtoeqv (A B : U) (p : PathP (<_> U) A B) : equiv A B :=
 transp (<i> equiv A (p @ i)) 0 (idEquiv A)

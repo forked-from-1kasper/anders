@@ -3,6 +3,7 @@ import library/data/nat
 def Vec (A : U) : ℕ → U := ℕ-iterω L₁ U 𝟏 (λ (X : U), A × X)
 def vzero (A : U) : Vec A zero := ★
 def vsucc (A : U) (n : ℕ) (head : A) (tail : Vec A n) : Vec A (succ n) := (head, tail)
+
 def Vec-ind (A : U) (T : Π (n : ℕ), Vec A n → U) (z : T zero (vzero A))
   (s : Π (n : ℕ) (x : A) (v : Vec A n), T n v → T (succ n) (vsucc A n x v)) (m : ℕ) : Π (x : Vec A m), T m x :=
 ℕ-ind (λ (k : ℕ), Π (x : Vec A k), T k x) (ind₁ (T zero) z)

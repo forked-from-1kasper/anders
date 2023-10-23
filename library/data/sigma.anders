@@ -1,18 +1,21 @@
 import library/data/path
 
 def Sigma (A : U) (B : A → U) : U := Σ (x : A), B x
-def prod (A B : U) : U := Σ (_ : A), B
-def pair (A : U) (B : A → U) (a : A) (b : B a) : Sigma A B := (a, b)
-def pr₁ (A : U) (B : A → U) (x : Sigma A B) : A := x.1
-def pr₂ (A : U) (B : A → U) (x : Sigma A B) : B (pr₁ A B x) := x.2
-def Σ-β₁ (A : U) (B : A → U) (a : A) (b : B a) : Path A a (pr₁ A B (a, b)) := idp A a
-def Σ-β₂ (A : U) (B : A → U) (a : A) (b : B a) : Path (B a) b (pr₂ A B (a, b)) := idp (B a) b
-def Σ-η (A : U) (B : A → U) (p : Sigma A B) : Path (Sigma A B) p (pr₁ A B p, pr₂ A B p) := idp (Sigma A B) p
 
-def Sigma-rec (A : U) (B : A → U) (C : U) (g : Π (x : A), B x → C) (p : Σ (x : A), B x) : C := g p.1 p.2
-def Sigma-ind (A : U) (B : A → U) (C : Π (s : Σ (x : A), B x), U)
-  (g : Π (x : A) (y : B x), C (x, y)) (p : Σ (x : A), B x) : C p :=
-g p.1 p.2
+section
+  variables (A : U) (B : A → U)
+
+  def pr₁ (x : Σ (x : A), B x) : A             := x.1
+  def pr₂ (x : Σ (x : A), B x) : B (pr₁ A B x) := x.2
+
+  def Σ-β₁ (a : A) (b : B a) : a = pr₁ A B (a, b) := idp A a
+  def Σ-β₂ (a : A) (b : B a) : b = pr₂ A B (a, b) := idp (B a) b
+
+  def Σ-η (p : Σ (x : A), B x) : Path (Sigma A B) p (pr₁ A B p, pr₂ A B p) := idp (Sigma A B) p
+
+  def Σ-rec (C : U) (g : Π (x : A), B x → C) (p : Σ (x : A), B x) : C := g p.1 p.2
+  def Σ-ind (C : Π (s : Σ (x : A), B x), U) (g : Π (x : A) (y : B x), C (x, y)) (p : Σ (x : A), B x) : C p := g p.1 p.2
+end
 
 def ac (A B : U) (R : A → B → U) (g : Π (x : A), Σ (y : B), R x y) :
   Σ (f : A → B), Π (x : A), R x (f x) :=

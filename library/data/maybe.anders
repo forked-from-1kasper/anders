@@ -4,9 +4,9 @@ def Maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : Maybe A := (0₂, ★)
 def just (A : U) (a : A) : Maybe A := (1₂, a)
 
-def maybe-ind (A : U) (P : Maybe A → U) (n : P (nothing A))
+def Maybe-ind (A : U) (P : Maybe A → U) (n : P (nothing A))
   (j : Π (x : A), P (just A x)) : Π (a : Maybe A), P a :=
 +-ind 𝟏 A P (ind₁ (λ (x : 𝟏), P (0₂, x)) n) j
 
-def maybe-rec (A P : U) (n : P) (j : A → P) : Maybe A → P :=
-maybe-ind A (λ (x : Maybe A), P) n j
+def Maybe-rec (A P : U) (n : P) (j : A → P) : Maybe A → P :=
+Maybe-ind A (λ (x : Maybe A), P) n j

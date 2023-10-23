@@ -12,17 +12,28 @@
    Copyright © Groupoid Infinity, 2021—2022,
              © @siegment, 2022—2023 -}
 
-import library/data/path
+import library/mathematics/prop
 
-def fiber   (A B : U) (f : A → B) (y : B) : U := Σ (x : A), Path B y (f x)
-def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
-def equiv   (A B : U) : U := Σ (f : A → B), isEquiv A B f
+section
+  variables (n : L) (A B : U n)
+
+  def fiberω   (f : A → B) (y : B) := Σ (x : A), PathP (<_> B) y (f x)
+  def isEquivω (f : A → B)         := Π (y : B), isContrω n (fiberω n A B f y)
+  def equivω                       := Σ (f : A → B), isEquivω n A B f
+end
+
+def fiber   := fiberω   L₀
+def isEquiv := isEquivω L₀
+def equiv   := equivω   L₀
 
 def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a, <_> a) (b, p) :=
 <i> (p @ i, <j> p @ i ∧ j)
 
 def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, <_> a), λ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
 def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)
+
+def equiv-respects-contrω (n : L) (A B : U n) (w : equivω n A B) (H : isContrω n A) : isContrω n B :=
+(w.1 H.1, λ (y : B), transp (<i> PathP (<_> B) (w.1 H.1) ((w.2 y).1.2 @ -i)) 0 (<j> w.1 (H.2 ((w.2 y).1.1) @ j)))
 
 section
   variables (A B : U)
@@ -58,10 +69,24 @@ transp (<i> equiv A (p @ i)) 0 (idEquiv A)
 def ua (A B : U) (e : equiv A B) : PathP (<_> U) A B :=
 <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
 
-def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (ua A B (idtoeqv A B p)) p :=
+def ua-idtoeqv (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (ua A B (idtoeqv A B p)) p :=
 <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, idtoeqv A B p),
                         (i = 1) → (B, transp (<_> equiv B B) (-j) (idEquiv B)),
                         (j = 1) → (p @ i, idtoeqv (p @ i) B (<k> p @ (i ∨ k)))]
 
 def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1 :=
 <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
+
+def isEquivProp (A B : U) (f : A → B) : isProp (isEquiv A B f) :=
+propPi B (λ (y : B), isContr (fiber A B f y))
+         (λ (y : B), propIsContr (fiber A B f y))
+
+def idtoeqv→trans (A B : U) (p : PathP (<_> U) A B) : Path (A → B) (idtoeqv A B p).1 (trans A B p) :=
+<i> λ (a : A), transp p 0 (transp (<_> A) i a)
+
+def ideqv-compute (A B : U) (e : equiv A B) : Path (A → B) (idtoeqv A B (ua A B e)).1 e.1 :=
+comp-Path (A → B) (idtoeqv A B (ua A B e)).1 (trans A B (ua A B e)) e.1 (idtoeqv→trans A B (ua A B e)) (ua-β A B e)
+
+-- should “isEquiv” be opaque?
+--def idtoeqv-ua (A B : U) (e : equiv A B) : Path (equiv A B) (idtoeqv A B (ua A B e)) e :=
+--lemSig (A → B) (isEquiv A B) (isEquivProp A B) (idtoeqv A B (ua A B e)) e (ideqv-compute A B e)

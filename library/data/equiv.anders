@@ -63,6 +63,7 @@ section
   hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
 end
 
+-- This is what first projection of “transp (<i> equiv A (p @ i)) 0 (idEquiv A)” computes into.
 def transportε (A B : U) (p : PathP (<_> U) A B) : A → B :=
 λ (x : A), transp p 0 (transp (<_> A) 0 x)
 

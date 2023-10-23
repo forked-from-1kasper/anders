@@ -133,7 +133,8 @@ struct
     | Assign (x, t, e) -> W.put '\x21'; string x; exp2 t e
     | Assume (x, t)    -> W.put '\x22'; string x; exp t
     | Erase x          -> W.put '\x23'; string x
-    | Wipe             -> W.put '\x24'
+    | Opaque x         -> W.put '\x24'; string x
+    | Wipe             -> W.put '\x25'
     | Set (p, x)       -> W.put '\x30'; string p; string x
     | Version          -> W.put '\x31'
     | Ping             -> W.put '\x32'

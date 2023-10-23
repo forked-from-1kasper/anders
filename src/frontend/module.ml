@@ -13,29 +13,28 @@ type command =
   | Command of string * exp
 
 type decl =
-  | Def of string * exp option * exp
-  | Ext of string * exp * string
+  | Def   of string * exp option * exp
+  | Ext   of string * exp * string
   | Axiom of string * exp
 
 type associativity = Left | Right | Neither
 type operator = Infix of associativity | Prefix | Postfix
 
 type line =
-  | Operator of operator * float * string list
-  | Import of string list
-  | Plugin of string
-  | Option of string * string
-  | Variables of tele list
+  | Operator       of operator * float * string list
+  | Import         of string list
+  | Plugin         of string
+  | Option         of string * string
+  | Opaque         of string
+  | Variables      of tele list
   | Macrovariables of string list
-  | Token of string list
-  | Macro of bool * syntax * syntax
-  | Macroexpand of syntax
-  | Decl of decl
-  | Infer of exp
-  | Eval of exp
-  | Section | End
-  | Skip
-  | Eof
+  | Token          of string list
+  | Macro          of bool * syntax * syntax
+  | Macroexpand    of syntax
+  | Decl           of decl
+  | Infer          of exp
+  | Eval           of exp
+  | Section | End | Skip | Eof
 
 type content = line list
 type file = content
@@ -86,6 +85,7 @@ let showLine = function
   | Plugin p -> Printf.sprintf "plugin %s" p
   | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
   | Decl d -> showDecl d
+  | Opaque x -> Printf.sprintf "opaque %s" x
   | Section -> "section" | End -> "end"
   | Variables xs -> Printf.sprintf "variables%s" (showTeles xs)
   | Macrovariables is -> Printf.sprintf "macrovariables %s" (String.concat " " is)

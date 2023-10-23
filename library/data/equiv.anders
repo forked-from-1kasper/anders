@@ -63,8 +63,14 @@ section
   hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
 end
 
+def transportε (A B : U) (p : PathP (<_> U) A B) : A → B :=
+λ (x : A), transp p 0 (transp (<_> A) 0 x)
+
+def transportεIsEquiv (A B : U) (p : PathP (<_> U) A B) : isEquiv A B (transportε A B p) :=
+(transp (<i> equiv A (p @ i)) 0 (idEquiv A)).2
+
 def idtoeqv (A B : U) (p : PathP (<_> U) A B) : equiv A B :=
-transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+(transportε A B p, transportεIsEquiv A B p)
 
 def ua (A B : U) (e : equiv A B) : PathP (<_> U) A B :=
 <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
@@ -84,9 +90,10 @@ propPi B (λ (y : B), isContr (fiber A B f y))
 def idtoeqv→trans (A B : U) (p : PathP (<_> U) A B) : Path (A → B) (idtoeqv A B p).1 (trans A B p) :=
 <i> λ (a : A), transp p 0 (transp (<_> A) i a)
 
-def ideqv-compute (A B : U) (e : equiv A B) : Path (A → B) (idtoeqv A B (ua A B e)).1 e.1 :=
+def ideqv-compute (A B : U) (e : equiv A B) : Path (A → B) (transportε A B (ua A B e)) e.1 :=
 comp-Path (A → B) (idtoeqv A B (ua A B e)).1 (trans A B (ua A B e)) e.1 (idtoeqv→trans A B (ua A B e)) (ua-β A B e)
 
--- should “isEquiv” be opaque?
---def idtoeqv-ua (A B : U) (e : equiv A B) : Path (equiv A B) (idtoeqv A B (ua A B e)) e :=
---lemSig (A → B) (isEquiv A B) (isEquivProp A B) (idtoeqv A B (ua A B e)) e (ideqv-compute A B e)
+opaque transportεIsEquiv
+
+def idtoeqv-ua (A B : U) (e : equiv A B) : Path (equiv A B) (idtoeqv A B (ua A B e)) e :=
+lemSig (A → B) (isEquiv A B) (isEquivProp A B) (idtoeqv A B (ua A B e)) e (ideqv-compute A B e)

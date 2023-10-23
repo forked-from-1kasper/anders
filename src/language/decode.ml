@@ -144,7 +144,8 @@ struct
     | '\x21' -> let x = string () in let (t, e) = exp2 () in Assign (x, t, e)
     | '\x22' -> let x = string () in let t = exp () in Assume (x, t)
     | '\x23' -> Erase (string ())
-    | '\x24' -> Wipe
+    | '\x24' -> Opaque (string ())
+    | '\x25' -> Wipe
     | '\x30' -> let p = string () in let x = string () in Set (p, x)
     | '\x31' -> Version
     | '\x32' -> Ping

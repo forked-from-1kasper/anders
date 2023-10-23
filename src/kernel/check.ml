@@ -364,16 +364,28 @@ and app (f, x) = match f, x with
 
 and evalSystem ctx = bimap (getDef ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
-and getType ctx x = match Env.find_opt x ctx.local, Env.find_opt x !(ctx.global) with
+and evalTerm ctx = function
+  | Exp e   -> eval ctx e
+  | Value v -> v
+
+and getType ctx x =
+  match Env.find_opt x ctx.local, Env.find_opt x !(ctx.global) with
   | Some (t, _), _ -> t
-  | _, Some (t, _) -> t
+  | _, Some t      -> evalTerm ctx t.typval
   | _, _           -> raise (Internal (VariableNotFound x))
 
-and getDef ctx x = match Env.find_opt x ctx.local, Env.find_opt x !(ctx.global) with
-  | Some (_, v), _       -> v
-  | _, Some (_, Value v) -> v
-  | _, Some (t, Exp e)   -> let v = eval ctx e in upGlobal ctx x t (Value v); v
-  | _, _                 -> raise (Internal (VariableNotFound x))
+and getGlobalDef ctx x =
+  match Env.find_opt x !(ctx.global) with
+  | None   -> raise (Internal (VariableNotFound x))
+  | Some t ->
+    if t.opaque then Var (x, evalTerm ctx t.typval)
+    else match t.defval with
+    | Value v -> v
+    | Exp   e -> let v = eval ctx e in upGlobal ctx x { t with defval = Value v }; v
+
+and getDef ctx x = match Env.find_opt x ctx.local with
+  | Some (_, v) -> v
+  | None        -> getGlobalDef ctx x
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 

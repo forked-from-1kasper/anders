@@ -78,6 +78,7 @@ let transmit mesg =
 let def p t e    = transmit (Def (p, t, e))
 let assign p t e = transmit (Assign (p, t, e))
 let assume p t   = transmit (Assume (p, t))
+let opaque x     = transmit (Opaque x)
 
 let set p x = transmit (Set (p, x))
 let wipe () = transmit Wipe

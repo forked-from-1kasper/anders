@@ -45,6 +45,7 @@ let rec checkLine conf = function
   | Infer e -> Printf.printf "INFER: %s\n" (Prettyprinter.showExp (infer e)); flush_all (); conf
   | Eval e -> Printf.printf "EVAL: %s\n" (Prettyprinter.showExp (eval e)); flush_all (); conf
   | Operator (op, prec, is) -> List.iter (fun i -> Parser.operators := Dict.add i (op, prec) !Parser.operators) is; conf
+  | Opaque x -> opaque x; conf
   | Decl d ->
     if !Prefs.verbose then begin
       Printf.printf "Checking: %s\n" (getDeclName d); flush_all ()

@@ -74,9 +74,11 @@ and clos = ident * (value -> value)
 
 type term = Exp of exp | Value of value
 
+type decl = { typval : term; defval : term; opaque : bool }
+
 type ctx =
   { local  : (value * value) Env.t;
-    global : (value * term) Env.t ref }
+    global : decl Env.t ref }
 
 (* Implementation *)
 
@@ -103,12 +105,12 @@ exception IncompatibleFaces
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
 let upLocal ctx p t v = { ctx with local = upVar p (t, v) ctx.local }
-let upGlobal ctx p t v = ctx.global := upVar p (t, v) !(ctx.global)
+let upGlobal ctx p t = ctx.global := upVar p t !(ctx.global)
 
 let assign ctx x t e =
   if Env.mem (ident x) !(ctx.global)
   then raise (Internal (AlreadyDeclared x))
-  else upGlobal ctx (ident x) t e
+  else upGlobal ctx (ident x) { typval = t; defval = e; opaque = false }
 
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty

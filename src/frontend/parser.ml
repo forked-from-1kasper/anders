@@ -434,7 +434,7 @@ let ws       = str isWhitespace >> eps
 let nl       = str (fun c -> c = '\n' || c = '\r') >> eps
 let keywords = ["def"; "definition"; "theorem"; "lemma"; "proposition"; "macro"; "import";
                 "prefix"; "postfix"; "infixl"; "infixr"; "infix"; "postulate"; "axiom";
-                "macrovariables"; "option"; "unsafe"; "variables"; "section"; "end";
+                "macrovariables"; "option"; "opaque"; "unsafe"; "variables"; "section"; "end";
                 "token"; "#macroexpand"; "#infer"; "#eval"; "--"; "{-"; "-}"]
 let reserved = ['('; ')'; '['; ']'; '<'; '>'; '\n'; '\t'; '\r'; ' '; '.'; ',']
 
@@ -543,9 +543,10 @@ let tokens         = token "token" >> ws >> sepBy1 ws ident >>= fun is -> pure (
 let variables      = token "variables" >> ws >> binders >>= fun bs -> pure (Variables bs)
 let import         = token "import" >> ws >> sepBy1 ws ident >>= fun fs -> pure (Import fs)
 let options        = token "option" >> ws >> ident >>= fun i -> ws >> ident >>= fun v -> pure (Option (i, v))
+let opaque         = token "opaque" >> ws >> ident >>= fun x -> pure (Opaque x)
 let section        = (token "section" >> pure Section) <|> (token "end" >> pure End)
 
-let commands = import <|> variables <|> options <|> operator <|> macroexpand <|> infer <|> eval <|> macrovariables <|> tokens
+let commands = import <|> variables <|> options <|> opaque <|> operator <|> macroexpand <|> infer <|> eval <|> macrovariables <|> tokens
 let cmdeof   = eof >> pure Eof
 let cmdline  = def <|> axm <|> macro <|> commands <|> section <|> comment <|> cmdeof
 let cmd      = optional ws >> cmdline

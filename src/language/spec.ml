@@ -119,6 +119,7 @@ type req =
   | Assign of string * exp * exp
   | Assume of string * exp
   | Erase  of string
+  | Opaque of string
   | Wipe
   (* configuration *)
   | Set    of string * string

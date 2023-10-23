@@ -32,13 +32,17 @@ let proto : req -> resp = function
   | Def (x, t0, e0)    -> promote (fun () ->
     let t = freshExp t0 in let e = freshExp e0 in
     isType (infer ctx t); let t' = eval ctx t in
-    check ctx e t'; assign ctx x t' (getTerm e); OK)
+    check ctx e t'; assign ctx x (Value t') (getTerm e); OK)
+  | Opaque x -> let y = ident x in
+    promote (fun () -> match Env.find_opt y !(ctx.global) with
+    | Some t -> upGlobal ctx y { t with opaque = true }; OK
+    | None   -> Error (VariableNotFound y))
   | Assign (x, t0, e0) -> promote (fun () ->
     let t = freshExp t0 in isType (infer ctx t);
-    assign ctx x (eval ctx t) (getTerm (freshExp e0)); OK)
+    assign ctx x (Value (eval ctx t)) (getTerm (freshExp e0)); OK)
   | Assume (x, t0)     -> promote (fun () -> let t = freshExp t0 in
     isType (infer ctx t); let t' = eval ctx t in
-    assign ctx x t' (Value (Var (ident x, t'))); OK)
+    assign ctx x (Value t') (Value (Var (ident x, t'))); OK)
   | Erase x            -> ctx.global := Env.remove (ident x) !(ctx.global); OK
   | Wipe               -> ctx.global := Env.empty; OK
   | Set (p, x)         ->

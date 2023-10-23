@@ -10,32 +10,47 @@
    HoTT 4.6 Surjections and Embedding
 
    Copyright © Groupoid Infinity, 2021—2022,
-             © @siegment, 2022 -}
+             © @siegment, 2022—2023 -}
 
 import library/data/path
 
 def fiber (A B : U) (f : A → B) (y : B) : U := Σ (x : A), Path B y (f x)
 def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
 def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
-def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
+
+def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a, <_> a) (b, p) :=
+<i> (p @ i, <j> p @ i ∧ j)
+
 def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, <_> a), λ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
 def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)
-def isInjective (A B : U) (f : A → B) : U := Π (x y : A), Path B (f x) (f y) → Path A x y
-def isInjective' (A B : U) (f : A → B) : U := Π (b : B), isProp (fiber A B f b)
-def injective (A B : U) : U := Σ (f : A → B), isInjective A B f
-def isEmbedding (A B : U) (f : A → B) : U := Π (x y : A), isEquiv (Path A x y) (Path B (f x) (f y)) (ap A B f x y)
-def embedding (A B : U) : U := Σ (f : A → B), isEmbedding A B f
-def inv-equiv (A B : U) (w : equiv A B) : B → A := λ (y : B), (w.2 y).1.1
-def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y := <i> (w.2 y).1.2 @ -i
-def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
-def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
-def glue′ (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
-def unglue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue φ e b
 
-def hcomp-Glue (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
-   (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
-   (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1] :=
-hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
+section
+  variables (A B : U)
+
+  def isInjective  (f : A → B) : U := Π (x y : A), Path B (f x) (f y) → Path A x y
+  def isInjective′ (f : A → B) : U := Π (b : B), isProp (fiber A B f b)
+  def isEmbedding  (f : A → B) : U := Π (x y : A), isEquiv (Path A x y) (Path B (f x) (f y)) (ap A B f x y)
+
+  def Injection : U := Σ (f : A → B), isInjective A B f
+  def Embedding : U := Σ (f : A → B), isEmbedding A B f
+
+  def inv-equiv (w : equiv A B) : B → A := λ (y : B), (w.2 y).1.1
+  def ret-equiv (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y := <i> (w.2 y).1.2 @ -i
+  def sec-equiv (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
+end
+
+section
+  variables (A : U) (φ : I)
+
+  def Glue′   (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
+  def glue′   (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
+  def unglue′ (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue φ e b
+
+  def hcomp-Glue (e : Partial (Σ (T : U), equiv T A) φ) (ψ : I)
+    (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
+    (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1] :=
+  hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
+end
 
 def univ-formation (A B : U) := equiv A B → PathP (<_> U) A B
 

@@ -18,7 +18,7 @@ lemSig A B pB t u (pA t.1 u.1)
 def propPi (A : U) (B : A → U) (h : Π (x : A), isProp (B x)) : isProp (Π (x : A), B x) :=
 λ (f₀ f₁ : Π (x : A), B x), <i> λ (x : A), (h x (f₀ x) (f₁ x)) @ i
 
-def propPi2 (A : U) (B : A → A → U) (h : Π (x y : A), isProp (B x y)) : isProp (Π (x y : A), B x y) :=
+def propPi₂ (A : U) (B : A → A → U) (h : Π (x y : A), isProp (B x y)) : isProp (Π (x y : A), B x y) :=
 propPi A (λ (a : A), Π (b : A), B a b) (λ (x : A), propPi A (B x) (h x))
 
 def isContrProp (A : U) (h : isContr A) : isProp A :=
